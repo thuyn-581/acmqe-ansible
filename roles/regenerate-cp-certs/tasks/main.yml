@@ -8,8 +8,11 @@
   shell: |
     alias oc="./oc --insecure-skip-tls-verify"
     oc login -u {{ spoke_user }} -p {{ spoke_pwd }} {{ spoke_api_url }}
-    oc version
   changed_when: true       
+
+- name: Login openshift at {{ spoke_api_url }}
+  shell: |
+    oc version
 
 - name: Preparations
   block:
