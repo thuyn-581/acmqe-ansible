@@ -10,4 +10,4 @@ spoke_pwd: ""
 
 #misc
 # oc_cmd: "oc --insecure-skip-tls-verify"
-ocp_version: ""
+ocp_version: "4.10"
