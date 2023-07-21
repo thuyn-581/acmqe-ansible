@@ -11,8 +11,7 @@
 
 - name: Debug
   shell: |
-    oc version
-    alias
+    set PATH=/home/runner:$PATH
 
 - name: Preparations
   block:
