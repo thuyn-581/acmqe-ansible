@@ -8,5 +8,6 @@
 - name: Install cli tools
   shell: |
     tar -xzvf ./openshift-client-linux.tar.gz
+    mv oc ~/user/local/bin/oc
 
 

@@ -6,8 +6,7 @@
 
 - name: Login openshift at {{ spoke_api_url }}
   shell: |
-    alias oc="./oc --insecure-skip-tls-verify"
-    oc login -u {{ spoke_user }} -p {{ spoke_pwd }} {{ spoke_api_url }}
+    oc --insecure-skip-tls-verify login -u {{ spoke_user }} -p {{ spoke_pwd }} {{ spoke_api_url }}
   changed_when: true       
 
 - name: Debug
