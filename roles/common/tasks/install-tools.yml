@@ -10,3 +10,5 @@
     tar -xzvf ./openshift-client-linux.tar.gz
     chmod +x oc
     chmod +x kubectl
+    ls -l
+    pwd
