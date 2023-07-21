@@ -4,9 +4,6 @@
   vars_files:
     - ./vars/vars.yml  
   tasks:
-  - set_fact:
-      oc_cmd: "{{ ./oc --insecure-skip-tls-verify }}"
-      
   - name: Regenerate selected control plane certificates
     import_role:
       name: regenerate-cp-certs
