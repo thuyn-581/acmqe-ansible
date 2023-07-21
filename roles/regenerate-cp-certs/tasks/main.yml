@@ -11,7 +11,7 @@
 
 - name: Debug
   shell: |
-    set PATH=/home/runner:$PATH
+    set PATH=/runner/project:$PATH
 
 - name: Preparations
   block:

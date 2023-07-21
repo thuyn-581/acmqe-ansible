@@ -9,6 +9,7 @@
   shell: |
     tar -xzvf ./openshift-client-linux.tar.gz
     pwd
+    echo $PATH
 
 
 
