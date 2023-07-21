@@ -1,17 +1,17 @@
 ---
-- name: Install cli tools
-  include_role:
-    name: common
-    tasks_from: install-tools
+# - name: Install cli tools
+#   include_role:
+#     name: common
+#     tasks_from: install-tools
 
 - name: Login openshift at {{ spoke_api_url }}
   shell: |
-    ./oc --insecure-skip-tls-verify login -u {{ spoke_user }} -p {{ spoke_pwd }} {{ spoke_api_url }}
+    oc --insecure-skip-tls-verify login -u {{ spoke_user }} -p {{ spoke_pwd }} {{ spoke_api_url }}
   changed_when: true       
 
 - name: Debug
   shell: |
-    ./oc version
+    oc version
 
 - name: Preparations
   block:
@@ -26,7 +26,7 @@
   
   - name: Confirm that your cluster is in a stable state
     shell: |
-      ./oc --insecure-skip-tls-verify adm wait-for-stable-cluster --minimum-stable-period=5s
+      oc --insecure-skip-tls-verify adm wait-for-stable-cluster --minimum-stable-period=5s
   
   - name: Generate new client certificates      
     block: 
