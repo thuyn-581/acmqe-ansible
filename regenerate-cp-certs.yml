@@ -1,0 +1,9 @@
+- name: Regenerate ocp cluster certificates
+  hosts: localhost
+  any_errors_fatal: true 
+  vars_files:
+    - ./vars/vars.yml  
+  tasks:
+  - name: Regenerate selected control plane certificates
+    import_role:
+      name: regenerate-cp-certs

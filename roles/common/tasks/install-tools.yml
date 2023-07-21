@@ -1,0 +1,11 @@
+---
+- name: Download oc cli tool
+  ansible.builtin.get_url:
+    url: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-{{ ocp_version }}/openshift-client-linux.tar.gz"
+    dest: ./openshift-client-linux.tar.gz
+    validate_certs: false
+
+- name: Install cli tools
+  shell: |
+    tar -xzvf ./openshift-client-linux.tar.gz
+    mv oc /usr/local/bin/oc

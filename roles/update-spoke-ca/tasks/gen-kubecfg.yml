@@ -1,0 +1,26 @@
+---
+- name: Login openshift at {{ spoke_url }}
+  shell: |
+    {{ oc_cmd }} login -u {{ spoke_user }} -p {{ spoke_pwd }} {{ spoke_url }}
+  changed_when: true  
+
+- name: Gen new system:masters/admin.kubeconfig
+  block:
+  - name: Create new admin.kubeconfig
+    shell: |   
+      {{ oc_cmd }} --insecure-skip-tls-verify config new-admin-kubeconfig > admin.kubeconfig
+      sleep 5
+
+  - name: Confirm your new admin.kubeconfig works
+    shell: |         
+      {{ oc_cmd }} --insecure-skip-tls-verify --kubeconfig=admin.kubeconfig whoami   
+
+  - name: Encode your new kubeconfig
+    shell: |         
+      cat admin.kubeconfig | base64 -w0   
+    register: kubeconfig
+  
+- name: Logout openshift at {{ api_url }}
+  shell: |
+    {{ oc_cmd }} logout
+  changed_when: true      
