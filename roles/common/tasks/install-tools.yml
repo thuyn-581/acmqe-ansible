@@ -9,6 +9,6 @@
   shell: |
     tar -xzvf ./openshift-client-linux.tar.gz
     alias oc="./oc --insecure-skip-tls-verify"
-  become: true
+  # become: true
 
   # mv oc /usr/bin/oc  
