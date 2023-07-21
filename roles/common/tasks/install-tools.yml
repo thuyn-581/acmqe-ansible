@@ -9,5 +9,5 @@
   shell: |
     tar -xzvf ./openshift-client-linux.tar.gz
     pwd
-    mv ./oc /usr/local/bin/oc
+    mv ./oc ./bin/oc
 
