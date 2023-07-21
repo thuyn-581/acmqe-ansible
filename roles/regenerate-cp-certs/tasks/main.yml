@@ -13,6 +13,7 @@
 - name: Debug
   shell: |
     oc version
+    alias
 
 - name: Preparations
   block:
