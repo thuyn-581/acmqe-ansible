@@ -8,7 +8,6 @@
 - name: Install cli tools
   shell: |
     tar -xzvf ./openshift-client-linux.tar.gz
-    chmod +x oc
-    chmod +x kubectl
-    ls -l
     pwd
+    mv ./oc /usr/local/bin/oc
+
