@@ -6,7 +6,7 @@
 
 - name: Login openshift at {{ spoke_api_url }}
   shell: |
-    {{ oc_cmd }} login -u {{ spoke_user }} -p {{ spoke_pwd }} {{ spoke_api_url }}
+    oc login -u {{ spoke_user }} -p {{ spoke_pwd }} {{ spoke_api_url }}
   changed_when: true       
 
 - name: Preparations
@@ -22,24 +22,24 @@
   
   - name: Confirm that your cluster is in a stable state
     shell: |
-      {{ oc_cmd }} adm wait-for-stable-cluster --minimum-stable-period=5s
+      oc adm wait-for-stable-cluster --minimum-stable-period=5s
   
   - name: Generate new client certificates      
     block: 
     - name: STEP 3 - Generate new client certificates into namespace/openshift-config-managed
       shell: >
-        {{ oc_cmd }} adm ocp-certificates regenerate-leaf -n openshift-config-managed secrets 
+        oc adm ocp-certificates regenerate-leaf -n openshift-config-managed secrets 
         kube-controller-manager-client-cert-key 
         kube-scheduler-client-cert-key
 
     - name: STEP 4 - Generate new certificates into namespace/kube-apiserver-operator
       shell: >
-        (( oc_cmd )) adm ocp-certificates regenerate-leaf -n openshift-kube-apiserver-operator secrets 
+        oc adm ocp-certificates regenerate-leaf -n openshift-kube-apiserver-operator secrets 
         node-system-admin-client
 
     - name: STEP 5 - Generate new certificates into namespace/kube-apiserver
       shell: >      
-        {{ oc_cmd }} adm ocp-certificates regenerate-leaf -n openshift-kube-apiserver secrets 
+        oc adm ocp-certificates regenerate-leaf -n openshift-kube-apiserver secrets 
         check-endpoints-client-cert-key 
         control-plane-node-admin-client-cert-key  
         external-loadbalancer-serving-certkey 
@@ -50,13 +50,13 @@
 
     - name: STEP 6 -  Wait for cluster operators to stabilize after the change
       shell: |
-        {{ oc_cmd }} adm wait-for-stable-cluster
+        oc adm wait-for-stable-cluster
 
   - name: Generate new signers      
     block:         
     - name: STEP 7 - Generate new root signers
       shell: >     
-        {{ oc_cmd }} adm ocp-certificates regenerate-top-level -n openshift-kube-apiserver-operator secrets 
+        oc adm ocp-certificates regenerate-top-level -n openshift-kube-apiserver-operator secrets 
         kube-apiserver-to-kubelet-signer 
         kube-control-plane-signer 
         loadbalancer-serving-signer  
@@ -65,59 +65,59 @@
 
     - name: STEP 8 - kube-controller-manager to create a new bound service account signing key
       shell: |   
-        {{ oc_cmd }} -n openshift-kube-controller-manager-operator delete secrets/next-service-account-private-key
+        oc -n openshift-kube-controller-manager-operator delete secrets/next-service-account-private-key
         
     - name: STEP 9 - kube-apiserver to create a new bound service account signing key
       shell: |   
-        {{ oc_cmd }} -n openshift-kube-apiserver-operator delete secrets/next-bound-service-account-signing-key
+        oc -n openshift-kube-apiserver-operator delete secrets/next-bound-service-account-signing-key
           
     - name: STEP 10 - Wait for cluster operators to stabilize after the change
       shell: |   
-        {{ oc_cmd }} adm wait-for-stable-cluster
+        oc adm wait-for-stable-cluster
             
   - name: STEP 13 - Generate new client certificates for openshift-config-managed
     shell: >
-      {{ oc_cmd }} adm ocp-certificates regenerate-leaf -n openshift-config-managed secrets 
+      oc adm ocp-certificates regenerate-leaf -n openshift-config-managed secrets 
       kube-controller-manager-client-cert-key 
       kube-scheduler-client-cert-key           
 
   - name: STEP 14 - Update the CA bundle
     shell: |    
-      {{ oc_cmd }} config refresh-ca-bundle
+      oc config refresh-ca-bundle
 
   - name: STEP 15 - Create a new kubelet bootstrap.kubeconfig
     shell: |    
-      {{ oc_cmd }} config new-kubelet-bootstrap-kubeconfig > bootstrap.kubeconfig
+      oc config new-kubelet-bootstrap-kubeconfig > bootstrap.kubeconfig
       sleep 5
         
   - name: STEP 16 - Confirm the new bootstrap.kubeconfig
     shell: >    
-      {{ oc_cmd }} whoami --kubeconfig=bootstrap.kubeconfig 
+      oc whoami --kubeconfig=bootstrap.kubeconfig 
       --server=$(oc get infrastructure/cluster -ojsonpath='{ .status.apiServerURL }')
           
   - name: STEP 17 - Copy the bootstrap.kubeconfig to every node
     shell: |    
-      {{ oc_cmd }} adm copy-to-node nodes --all --copy=bootstrap.kubeconfig=/etc/kubernetes/kubeconfig
+      oc adm copy-to-node nodes --all --copy=bootstrap.kubeconfig=/etc/kubernetes/kubeconfig
             
   - name: STEP 18 - Restart all kubelets and remove their old kubelet.kubeconfig
     shell: |    
-      {{ oc_cmd }} adm restart-kubelet nodes --all --directive=RemoveKubeletKubeconfig
+      oc adm restart-kubelet nodes --all --directive=RemoveKubeletKubeconfig
   
   - name: STEP 19 - Restart all nodes
     shell: |             
-      {{ oc_cmd }} adm reboot-machine-config-pool mcp/worker mcp/master       
+      oc adm reboot-machine-config-pool mcp/worker mcp/master       
 
   - name: STEP 20 - Wait for the nodes to restart
     shell: |   
-      {{ oc_cmd }} adm wait-for-node-reboot nodes --all
+      oc adm wait-for-node-reboot nodes --all
     
   - name: STEP 21 - Generate new client certificates for the kube-apiserver-operator
     shell: |   
-      {{ oc_cmd }} adm ocp-certificates regenerate-leaf -n openshift-kube-apiserver-operator secrets node-system-admin-client
+      oc adm ocp-certificates regenerate-leaf -n openshift-kube-apiserver-operator secrets node-system-admin-client
     
   - name: STEP 22 - Generate new client certificates for the kube-apiserver
     shell: >   
-      {{ oc_cmd }} adm ocp-certificates regenerate-leaf -n openshift-kube-apiserver secrets 
+      oc adm ocp-certificates regenerate-leaf -n openshift-kube-apiserver secrets 
       check-endpoints-client-cert-key 
       control-plane-node-admin-client-cert-key 
       external-loadbalancer-serving-certkey 
@@ -129,20 +129,20 @@
     
   - name: STEP 23 - Wait for cluster operators to stabilize after the change
     shell: |   
-      {{ oc_cmd }} adm wait-for-stable-cluster
+      oc adm wait-for-stable-cluster
     
   - name: STEP 25 - Create new system:masters/admin.kubeconfig
     shell: |   
-      {{ oc_cmd }} config new-admin-kubeconfig > admin.kubeconfig
+      oc config new-admin-kubeconfig > admin.kubeconfig
       sleep 5
     
   - name: STEP 26 - Confirm your new admin.kubeconfig works
     shell: |         
-      {{ oc_cmd }} --kubeconfig=admin.kubeconfig whoami        
+      oc --kubeconfig=admin.kubeconfig whoami        
 
   - name: STEP 27 - Revoke trust for old signers replaced above
     shell: >  
-      {{ oc_cmd }} adm ocp-certificates remove-old-trust -n openshift-kube-apiserver-operator configmaps 
+      oc adm ocp-certificates remove-old-trust -n openshift-kube-apiserver-operator configmaps 
       kube-apiserver-to-kubelet-client-ca 
       kube-control-plane-signer-ca 
       loadbalancer-serving-ca 
@@ -152,12 +152,12 @@
       
   - name: STEP 28 - Wait for the cluster operators to stabilize after the change
     shell: |    
-      {{ oc_cmd }} adm wait-for-stable-cluster    
+      oc adm wait-for-stable-cluster    
 
   - name: STEP 29 - Restart all nodes
     shell: |      
-      {{ oc_cmd }} adm reboot-machine-config-pool mcp/worker mcp/master
+      oc adm reboot-machine-config-pool mcp/worker mcp/master
 
   - name: STEP 30 - Wait for the nodes to restart
     shell: |    
-      {{ oc_cmd }} adm wait-for-node-reboot nodes --all
+      oc adm wait-for-node-reboot nodes --all

@@ -8,5 +8,7 @@
 - name: Install cli tools
   shell: |
     tar -xzvf ./openshift-client-linux.tar.gz
-    mv oc /usr/bin/oc
+    alias oc="./oc --insecure-skip-tls-verify"
   become: true
+
+  # mv oc /usr/bin/oc  
