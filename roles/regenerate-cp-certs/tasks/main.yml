@@ -12,6 +12,7 @@
 - name: Debug
   shell: |
     set PATH=/runner/project:$PATH
+    whereis oc
 
 - name: Preparations
   block:
