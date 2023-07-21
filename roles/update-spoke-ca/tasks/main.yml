@@ -7,13 +7,13 @@
 - name: Generate new admin.kubeconfig for spoke
   import_tasks: gen-kubecfg.yml
 
-- name: Login openshift at {{ api_url }}
+- name: Login openshift on hub at {{ hub_api_url }}
   shell: |
-    {{ oc_cmd }} login -u {{ ocp_user }} -p {{ ocp_user_pwd }} {{ api_url }} 
+    {{ oc_cmd }} login -u {{ hub_user }} -p {{ hub_pwd }} {{ hub_api_url }} 
 
 - name: Update spoke kubeconfig on hub
   vars:
-    spoke_name: "{{ spoke_url.split('.')[1] }}"
+    spoke_name: "{{ spoke_api_url.split('.')[1] }}"
   block:
   - name: Retrieve your administrator kubeconfig secret name from your managed cluster 
     shell: |

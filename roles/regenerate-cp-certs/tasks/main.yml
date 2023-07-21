@@ -4,9 +4,9 @@
     name: common
     tasks_from: install-tools
 
-- name: Login openshift at {{ api_url }}
+- name: Login openshift at {{ hub_api_url }}
   shell: |
-    {{ oc_cmd }} login -u {{ ocp_user }} -p {{ ocp_user_pwd }} {{ api_url }}
+    {{ oc_cmd }} login -u {{ hub_user }} -p {{ hub_pwd }} {{ hub_api_url }}
   changed_when: true       
 
 - name: Preparations

@@ -1,7 +1,7 @@
 ---
-- name: Login openshift at {{ spoke_url }}
+- name: Login openshift at {{ spoke_api_url }}
   shell: |
-    {{ oc_cmd }} login -u {{ spoke_user }} -p {{ spoke_pwd }} {{ spoke_url }}
+    {{ oc_cmd }} login -u {{ spoke_user }} -p {{ spoke_pwd }} {{ spoke_api_url }}
   changed_when: true  
 
 - name: Gen new system:masters/admin.kubeconfig
@@ -20,7 +20,7 @@
       cat admin.kubeconfig | base64 -w0   
     register: kubeconfig
   
-- name: Logout openshift at {{ api_url }}
+- name: Logout openshift at {{ spoke_api_url }}
   shell: |
     {{ oc_cmd }} logout
   changed_when: true      
