@@ -8,7 +8,6 @@
   shell: |
     export PATH=$PWD:$PATH
     echo $PATH
-    {{ oc_cmd }} version
     
 - name: Login openshift at {{ spoke_api_url }}
   shell: |
