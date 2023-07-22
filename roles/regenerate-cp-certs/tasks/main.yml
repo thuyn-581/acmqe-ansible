@@ -22,6 +22,8 @@
     oc410 version
 
 - name: Preparations
+  environment:
+    PATH: "{{ path.stdout }}"
   block:
   - name: Set timestamp for removing certs
     shell: |
@@ -33,12 +35,14 @@
       msg: "{{ start_time.stdout }}" 
   
   - name: Confirm that your cluster is in a stable state
-    environment:
-      PATH: "{{ path.stdout }}"
+    # environment:
+    #   PATH: "{{ path.stdout }}"
     shell: |
       {{ oc_cmd }} adm wait-for-stable-cluster --minimum-stable-period=5s
   
 - name: Generate new client certificates      
+  # environment:
+  #   PATH: "{{ path.stdout }}"
   block: 
   - name: STEP 3 - Generate new client certificates into namespace/openshift-config-managed
     shell: >
