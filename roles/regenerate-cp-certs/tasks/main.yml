@@ -12,7 +12,7 @@
     
 - name: Login openshift at {{ spoke_api_url }}
   environment:
-    PATH: "{{ $PWD:$PATH }}"
+    PATH: "{{ path }}"
   shell: |
     {{ oc_cmd }} login -u {{ spoke_user }} -p {{ spoke_pwd }} {{ spoke_api_url }}
   changed_when: true       

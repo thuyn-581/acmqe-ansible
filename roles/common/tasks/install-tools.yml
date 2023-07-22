@@ -5,11 +5,18 @@
     dest: ./openshift-client-linux.tar.gz
     validate_certs: false
 
-- name: Install cli tools
-  shell: |
-    tar -xzvf ./openshift-client-linux.tar.gz
-    mv oc oc410
-    chmod +x oc410
+- name: Extend PATH for oc 4.10 cli tools
+  block:
+  - name: Extract oc 
+    shell: |
+      tar -xzvf ./openshift-client-linux.tar.gz
+      mv oc oc410
+  
+  - name: Get PATH 
+    shell: |
+      echo $PWD:$PATH
+    register: path
+
 
 
 
