@@ -9,7 +9,6 @@
   shell: |
     tar -xzvf ./openshift-client-linux.tar.gz
     mv oc oc410
-    export PATH=$pwd:$PATH
 
 
 
