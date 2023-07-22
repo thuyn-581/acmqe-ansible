@@ -1,9 +1,4 @@
 ---
-- name: Install cli tools
-  include_role:
-    name: common
-    tasks_from: install-tools
-  
 - name: Generate new admin.kubeconfig for spoke
   import_tasks: gen-kubecfg.yml
 

@@ -3,6 +3,8 @@
   any_errors_fatal: true 
   vars_files:
     - ./vars/vars.yml  
+  vars:
+    oc_cmd: "oc410 --insecure-skip-tls-verify"    
   tasks:
   - name: Regenerate selected control plane certificates
     import_role:
