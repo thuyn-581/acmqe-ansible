@@ -21,7 +21,7 @@
       cat admin.kubeconfig | base64 -w0   
     register: kubeconfig
   
-- name: Logout openshift at {{ spoke_api_url }}
-  shell: |
-    {{ oc_cmd }} logout
-  changed_when: true      
+  - name: Logout openshift at {{ spoke_api_url }}
+    shell: |
+      {{ oc_cmd }} logout
+    changed_when: true      
