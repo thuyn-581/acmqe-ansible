@@ -8,12 +8,12 @@
   block:
   - name: Create new admin.kubeconfig
     shell: |   
-      {{ oc_cmd }} --insecure-skip-tls-verify config new-admin-kubeconfig > admin.kubeconfig
+      {{ oc_cmd }} config new-admin-kubeconfig > admin.kubeconfig
       sleep 5
 
   - name: Confirm your new admin.kubeconfig works
     shell: |         
-      {{ oc_cmd }} --insecure-skip-tls-verify --kubeconfig=admin.kubeconfig whoami   
+      {{ oc_cmd }} --kubeconfig=admin.kubeconfig whoami   
 
   - name: Encode your new kubeconfig
     shell: |         
