@@ -6,7 +6,7 @@
 
 - name: Login openshift at {{ spoke_api_url }}
   shell: |
-    {{ oc_cmd }} --insecure-skip-tls-verify login -u {{ spoke_user }} -p {{ spoke_pwd }} {{ spoke_api_url }}
+    {{ oc_cmd }} login -u {{ spoke_user }} -p {{ spoke_pwd }} {{ spoke_api_url }}
   changed_when: true       
 
 - name: Debug
@@ -26,7 +26,7 @@
   
   - name: Confirm that your cluster is in a stable state
     shell: |
-      {{ oc_cmd }} --insecure-skip-tls-verify adm wait-for-stable-cluster --minimum-stable-period=5s
+      {{ oc_cmd }} adm wait-for-stable-cluster --minimum-stable-period=5s
   
   - name: Generate new client certificates      
     block: 
