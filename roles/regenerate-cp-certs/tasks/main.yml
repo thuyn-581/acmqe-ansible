@@ -11,6 +11,8 @@
     whereis oc410
     
 - name: Login openshift at {{ spoke_api_url }}
+  environment:
+    PATH: "{{ $PWD:$PATH }}"
   shell: |
     {{ oc_cmd }} login -u {{ spoke_user }} -p {{ spoke_pwd }} {{ spoke_api_url }}
   changed_when: true       
