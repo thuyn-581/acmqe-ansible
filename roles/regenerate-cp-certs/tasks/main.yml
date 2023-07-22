@@ -4,15 +4,16 @@
     name: common
     tasks_from: install-tools
 
-- name: Debug
-  shell: |
-    export PATH=$PWD:$PATH
-    echo $PATH
-    whereis oc410
+- debug: Debug
+    msg: "{{ path.stdout }}"
+  # shell: |
+  #   export PATH=$PWD:$PATH
+  #   echo $PATH
+  #   whereis oc410
     
 - name: Login openshift at {{ spoke_api_url }}
   environment:
-    PATH: "{{ path }}"
+    PATH: "{{ path.stdout }}"
   shell: |
     {{ oc_cmd }} login -u {{ spoke_user }} -p {{ spoke_pwd }} {{ spoke_api_url }}
   changed_when: true       
