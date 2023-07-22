@@ -4,7 +4,8 @@
     name: common
     tasks_from: install-tools
 
-- debug: Debug
+- name: Print path
+  debug: 
     msg: "{{ path.stdout }}"
   # shell: |
   #   export PATH=$PWD:$PATH
