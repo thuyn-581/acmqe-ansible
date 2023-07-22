@@ -9,7 +9,7 @@
 
 - name: Login openshift on hub at {{ hub_api_url }}
   shell: |
-    oc login -u {{ hub_user }} -p {{ hub_pwd }} {{ hub_api_url }} 
+    {{ oc_cmd }} login -u {{ hub_user }} -p {{ hub_pwd }} {{ hub_api_url }} 
 
 - name: Update spoke kubeconfig on hub
   vars:
@@ -17,12 +17,12 @@
   block:
   - name: Retrieve your administrator kubeconfig secret name from your managed cluster 
     shell: |
-      oc -n {{ spoke_name }} get clusterdeployments {{ spoke_name }} -ojsonpath='{.spec.clusterMetadata.adminKubeconfigSecretRef.name}'
+      {{ oc_cmd }} -n {{ spoke_name }} get clusterdeployments {{ spoke_name }} -ojsonpath='{.spec.clusterMetadata.adminKubeconfigSecretRef.name}'
     register: secret_name
 
   - name: Patch your spoke kubeconfig secret with the new kubeconfig
     shell: >
-      oc -n {{ spoke_name }} patch secrets {{ secret_name.stdout }} --type=json 
+      {{ oc_cmd }} -n {{ spoke_name }} patch secrets {{ secret_name.stdout }} --type=json 
       -p='[{"op":"replace", "path":"/data/{{ item }}", "value":"{{ kubeconfig.stdout }}"}]'
     with_items:
     - raw-kubeconfig
