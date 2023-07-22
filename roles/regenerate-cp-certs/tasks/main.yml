@@ -7,10 +7,6 @@
 - name: Print path
   debug: 
     msg: "{{ path.stdout }}"
-  # shell: |
-  #   export PATH=$PWD:$PATH
-  #   echo $PATH
-  #   whereis oc410
     
 - name: Login openshift at {{ spoke_api_url }}
   environment:
@@ -20,6 +16,8 @@
   changed_when: true       
 
 - name: Preparations
+  environment:
+    PATH: "{{ path.stdout }}"
   block:
   - name: Set timestamp for removing certs
     shell: |
@@ -34,57 +32,60 @@
     shell: |
       {{ oc_cmd }} adm wait-for-stable-cluster --minimum-stable-period=5s
   
-  - name: Generate new client certificates      
-    block: 
-    - name: STEP 3 - Generate new client certificates into namespace/openshift-config-managed
-      shell: >
-        {{ oc_cmd }} adm ocp-certificates regenerate-leaf -n openshift-config-managed secrets 
-        kube-controller-manager-client-cert-key 
-        kube-scheduler-client-cert-key
+- name: Generate new client certificates      
+  block: 
+  - name: STEP 3 - Generate new client certificates into namespace/openshift-config-managed
+    shell: >
+      {{ oc_cmd }} adm ocp-certificates regenerate-leaf -n openshift-config-managed secrets 
+      kube-controller-manager-client-cert-key 
+      kube-scheduler-client-cert-key
 
-    - name: STEP 4 - Generate new certificates into namespace/kube-apiserver-operator
-      shell: >
-        {{ oc_cmd }} adm ocp-certificates regenerate-leaf -n openshift-kube-apiserver-operator secrets 
-        node-system-admin-client
+  - name: STEP 4 - Generate new certificates into namespace/kube-apiserver-operator
+    shell: >
+      {{ oc_cmd }} adm ocp-certificates regenerate-leaf -n openshift-kube-apiserver-operator secrets 
+      node-system-admin-client
 
-    - name: STEP 5 - Generate new certificates into namespace/kube-apiserver
-      shell: >      
-        {{ oc_cmd }} adm ocp-certificates regenerate-leaf -n openshift-kube-apiserver secrets 
-        check-endpoints-client-cert-key 
-        control-plane-node-admin-client-cert-key  
-        external-loadbalancer-serving-certkey 
-        internal-loadbalancer-serving-certkey 
-        kubelet-client localhost-recovery-serving-certkey 
-        localhost-serving-cert-certkey 
-        service-network-serving-certkey
+  - name: STEP 5 - Generate new certificates into namespace/kube-apiserver
+    shell: >      
+      {{ oc_cmd }} adm ocp-certificates regenerate-leaf -n openshift-kube-apiserver secrets 
+      check-endpoints-client-cert-key 
+      control-plane-node-admin-client-cert-key  
+      external-loadbalancer-serving-certkey 
+      internal-loadbalancer-serving-certkey 
+      kubelet-client localhost-recovery-serving-certkey 
+      localhost-serving-cert-certkey 
+      service-network-serving-certkey
 
-    - name: STEP 6 -  Wait for cluster operators to stabilize after the change
-      shell: |
-        {{ oc_cmd }} adm wait-for-stable-cluster
+  - name: STEP 6 -  Wait for cluster operators to stabilize after the change
+    shell: |
+      {{ oc_cmd }} adm wait-for-stable-cluster
 
-  - name: Generate new signers      
-    block:         
-    - name: STEP 7 - Generate new root signers
-      shell: >     
-        {{ oc_cmd }} adm ocp-certificates regenerate-top-level -n openshift-kube-apiserver-operator secrets 
-        kube-apiserver-to-kubelet-signer 
-        kube-control-plane-signer 
-        loadbalancer-serving-signer  
-        localhost-serving-signer 
-        service-network-serving-signer 
+- name: Generate new signers      
+  block:         
+  - name: STEP 7 - Generate new root signers
+    shell: >     
+      {{ oc_cmd }} adm ocp-certificates regenerate-top-level -n openshift-kube-apiserver-operator secrets 
+      kube-apiserver-to-kubelet-signer 
+      kube-control-plane-signer 
+      loadbalancer-serving-signer  
+      localhost-serving-signer 
+      service-network-serving-signer 
 
-    - name: STEP 8 - kube-controller-manager to create a new bound service account signing key
-      shell: |   
-        {{ oc_cmd }} -n openshift-kube-controller-manager-operator delete secrets/next-service-account-private-key
+  - name: STEP 8 - kube-controller-manager to create a new bound service account signing key
+    shell: |   
+      {{ oc_cmd }} -n openshift-kube-controller-manager-operator delete secrets/next-service-account-private-key
+      
+  - name: STEP 9 - kube-apiserver to create a new bound service account signing key
+    shell: |   
+      {{ oc_cmd }} -n openshift-kube-apiserver-operator delete secrets/next-bound-service-account-signing-key
         
-    - name: STEP 9 - kube-apiserver to create a new bound service account signing key
-      shell: |   
-        {{ oc_cmd }} -n openshift-kube-apiserver-operator delete secrets/next-bound-service-account-signing-key
-          
-    - name: STEP 10 - Wait for cluster operators to stabilize after the change
-      shell: |   
-        {{ oc_cmd }} adm wait-for-stable-cluster
-            
+  - name: STEP 10 - Wait for cluster operators to stabilize after the change
+    shell: |   
+      {{ oc_cmd }} adm wait-for-stable-cluster
+
+- name: Step 13 - 30
+
+  block:
   - name: STEP 13 - Generate new client certificates for openshift-config-managed
     shell: >
       {{ oc_cmd }} adm ocp-certificates regenerate-leaf -n openshift-config-managed secrets 
