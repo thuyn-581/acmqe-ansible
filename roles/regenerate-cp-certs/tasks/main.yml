@@ -16,8 +16,6 @@
   changed_when: true       
 
 - name: Preparations
-  environment:
-    PATH: "{{ path.stdout }}"
   block:
   - name: Set timestamp for removing certs
     shell: |
@@ -29,6 +27,8 @@
       msg: "{{ start_time.stdout }}" 
   
   - name: Confirm that your cluster is in a stable state
+    environment:
+      PATH: "{{ path.stdout }}"
     shell: |
       {{ oc_cmd }} adm wait-for-stable-cluster --minimum-stable-period=5s
   
