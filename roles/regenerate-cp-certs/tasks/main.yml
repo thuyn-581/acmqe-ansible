@@ -35,14 +35,12 @@
       msg: "{{ start_time.stdout }}" 
   
   - name: Confirm that your cluster is in a stable state
-    # environment:
-    #   PATH: "{{ path.stdout }}"
     shell: |
       {{ oc_cmd }} adm wait-for-stable-cluster --minimum-stable-period=5s
   
 - name: Generate new client certificates      
-  # environment:
-  #   PATH: "{{ path.stdout }}"
+  environment:
+    PATH: "{{ path.stdout }}"
   block: 
   - name: STEP 3 - Generate new client certificates into namespace/openshift-config-managed
     shell: >
@@ -71,6 +69,8 @@
       {{ oc_cmd }} adm wait-for-stable-cluster
 
 - name: Generate new signers      
+  environment:
+    PATH: "{{ path.stdout }}"
   block:         
   - name: STEP 7 - Generate new root signers
     shell: >     
@@ -94,7 +94,8 @@
       {{ oc_cmd }} adm wait-for-stable-cluster
 
 - name: Step 13 - 30
-
+  environment:
+    PATH: "{{ path.stdout }}"
   block:
   - name: STEP 13 - Generate new client certificates for openshift-config-managed
     shell: >
