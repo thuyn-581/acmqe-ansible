@@ -4,7 +4,7 @@
   vars_files:
   - ./vars/vars.yml  
   vars:
-    oc_cmd: "oc --insecure-skip-tls-verify"
+    oc_cmd: "oc410 --insecure-skip-tls-verify"
   tasks:
   - name: Update spoke CA on hub
     import_role:
