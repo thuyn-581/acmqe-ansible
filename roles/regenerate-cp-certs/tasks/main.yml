@@ -6,7 +6,7 @@
 
 - name: Debug
   shell: |
-    export PATH=$pwd:$PATH
+    export PATH=$PWD:$PATH
     echo $PATH
     {{ oc_cmd }} version
     
