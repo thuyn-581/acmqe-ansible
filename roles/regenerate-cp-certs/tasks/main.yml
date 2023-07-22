@@ -16,8 +16,6 @@
   changed_when: true       
 
 - name: Debug
-  environment:
-    PATH: "{{ path.stdout }}"
   shell: |
     oc410 version
 
