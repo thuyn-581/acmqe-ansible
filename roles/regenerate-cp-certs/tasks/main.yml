@@ -8,6 +8,7 @@
   shell: |
     export PATH=$PWD:$PATH
     echo $PATH
+    whereis oc410
     
 - name: Login openshift at {{ spoke_api_url }}
   shell: |
