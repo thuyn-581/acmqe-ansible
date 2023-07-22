@@ -9,5 +9,5 @@ spoke_user: "kubeadmin"
 spoke_pwd: "" 
 
 #misc
-oc_cmd: "./oc410 --insecure-skip-tls-verify"
+oc_cmd: "oc410 --insecure-skip-tls-verify"
 ocp_version: "4.10"

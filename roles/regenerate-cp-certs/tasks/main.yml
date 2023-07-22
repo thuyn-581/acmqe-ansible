@@ -11,6 +11,7 @@
 
 - name: Debug
   shell: |
+    echo $PATH
     {{ oc_cmd }} version
 
 - name: Preparations
