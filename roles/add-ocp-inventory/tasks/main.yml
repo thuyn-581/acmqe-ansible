@@ -2,7 +2,7 @@
   - name: Create {{ sa }}
     import_tasks: create-service-account.yml
 
-  - name: Create ocp credentials in AAP 
+  - name: Create ocp credentials in Ansible Tower 
     awx.awx.credential:
       controller_username: "{{ tower_user }}"
       controller_password: "{{ tower_pwd }}"
@@ -17,7 +17,7 @@
         bearer_token: "{{ sa_token.stdout }}"
     run_once: true
 
-  - name: Create ocp container group in AAP 
+  - name: Create ocp container group in Ansible Tower
     awx.awx.instance_group:
       controller_username: "{{ tower_user }}"
       controller_password: "{{ tower_pwd }}"
@@ -49,7 +49,7 @@
               stdin: true    
     run_once: true    
 
-  - name: Create ocp inventory in AAP 
+  - name: Create ocp inventory in Ansible Tower 
     awx.awx.inventory:
       controller_username: "{{ tower_user }}"
       controller_password: "{{ tower_pwd }}"
@@ -61,7 +61,7 @@
         - "openshift-container-group-{{ cluster }}"
     run_once: true
 
-  - name: Create host 
+  - name: Create host in Ansible Tower
     awx.awx.host:
       controller_username: "{{ tower_user }}"
       controller_password: "{{ tower_pwd }}"

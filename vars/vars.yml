@@ -1,5 +1,5 @@
 #ocp creds
-ocp_api_url: "https://api.ocp.qe.red-chesterfield.com:6443"
+ocp_api_url: "https://api.o4-ibmvm-02.qe.red-chesterfield.com:6443"
 ocp_user: "kubeadmin"
 ocp_pwd: "" 
 
