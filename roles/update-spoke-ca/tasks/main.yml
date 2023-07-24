@@ -9,7 +9,7 @@
 
 - name: Update spoke kubeconfig on hub
   vars:
-    spoke_name: "{{ spoke_api_url.split('.')[1] }}"
+    spoke_name: "{{ ocp_api_url.split('.')[1] }}"
   environment:
     PATH: "{{ path.stdout }}"    
   block:

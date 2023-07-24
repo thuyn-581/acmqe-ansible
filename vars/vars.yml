@@ -1,11 +1,4 @@
-#hub ocp creds
-hub_api_url: "https://api.hub.red-chesterfield.com:6443"
-hub_user: "kubeadmin"
-hub_pwd: ""
-
-#spoke
-spoke_api_url: "https://api.spoke.red-chesterfield.com:6443"
-spoke_user: "kubeadmin"
-spoke_pwd: "" 
-
-#misc
+#ocp creds
+ocp_api_url: "https://api.spoke.red-chesterfield.com:6443"
+ocp_user: "kubeadmin"
+ocp_pwd: "" 

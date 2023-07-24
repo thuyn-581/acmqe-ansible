@@ -1,4 +1,5 @@
-TBD
+Openshift KCS -
+https://access.redhat.com/articles/regenerating_cluster_certificates#regenerating-the-internal-ca-for-ingress-8
 
 ## License
 
