@@ -1,0 +1,12 @@
+- name: Add Openshift Inventory
+  hosts: localhost
+  any_errors_fatal: true 
+  vars_files:
+  - ./vars/vars.yml    
+  vars:
+    cluster: "{{ ocp_api_url.split('.')[1] }}"
+    
+  tasks:
+  - name: Add Openshift Inventory on local Tower
+    import_role:
+      name: add-ocp-inventory

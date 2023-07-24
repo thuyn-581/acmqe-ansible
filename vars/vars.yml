@@ -1,4 +1,7 @@
 #ocp creds
-ocp_api_url: "https://api.ocp.dev09.red-chesterfield.com:6443"
+ocp_api_url: "https://api.ocp4-aws-dr-2.dev09.red-chesterfield.com:6443"
 ocp_user: "kubeadmin"
-ocp_pwd: "" 
+ocp_pwd: "9B3He-4yxPD-9p3iA-oMXYg" 
+
+#misc
+oc_cmd: "oc --insecure-skip-tls-verify=true"

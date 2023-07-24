@@ -1,0 +1,76 @@
+---
+  - name: Create {{ sa }}
+    import_tasks: create-service-account.yml
+
+  - name: Create ocp credentials in AAP 
+    awx.awx.credential:
+      controller_username: "{{ tower_user }}"
+      controller_password: "{{ tower_pwd }}"
+      controller_host: "https://ansible.qe.red-chesterfield.com"         
+      validate_certs: false
+      name: "openshift-creds-{{ cluster }}"
+      credential_type: "OpenShift or Kubernetes API Bearer Token"
+      organization: "acmqe"
+      inputs: 
+        host: "https://api.o4-ibmvm-02.qe.red-chesterfield.com:6443"
+        verify_ssl: false
+        bearer_token: "{{ sa_token.stdout }}"
+    run_once: true
+
+  - name: Create ocp container group in AAP 
+    awx.awx.instance_group:
+      controller_username: "{{ tower_user }}"
+      controller_password: "{{ tower_pwd }}"
+      controller_host: "{{ tower }}"        
+      validate_certs: false
+      name: "openshift-container-group-{{ cluster }}"
+      is_container_group: true
+      credential: "openshift-creds-{{ cluster }}"
+      pod_spec_override: |
+        apiVersion: v1
+        kind: Pod
+        metadata:
+          namespace: default
+        spec:
+          serviceAccountName: automation-service-account
+          automountServiceAccountToken: false
+          containers:
+            - image: {{ image }}
+              name: worker
+              args:
+                - ansible-runner
+                - worker
+                - '--private-data-dir=/runner'
+              resources:
+                requests:
+                  cpu: 250m
+                  memory: 100Mi
+              tty: true
+              stdin: true    
+    run_once: true    
+
+  - name: Create ocp inventory in AAP 
+    awx.awx.inventory:
+      controller_username: "{{ tower_user }}"
+      controller_password: "{{ tower_pwd }}"
+      controller_host: "{{ tower }}"        
+      validate_certs: false
+      name: "openshift-inventory-{{ cluster }}"
+      organization: "acmqe"
+      instance_groups: 
+        - "openshift-container-group-{{ cluster }}"
+    run_once: true
+
+  - name: Create host 
+    awx.awx.host:
+      controller_username: "{{ tower_user }}"
+      controller_password: "{{ tower_pwd }}"
+      controller_host: "{{ tower }}"        
+      validate_certs: false
+      name: "openshift-host-{{ cluster }}"
+      inventory: "openshift-inventory-{{ cluster }}"
+      enabled: true
+      variables:
+        ansible_host: '127.0.0.1'
+        ansible_connection: 'local'
+    run_once: true        

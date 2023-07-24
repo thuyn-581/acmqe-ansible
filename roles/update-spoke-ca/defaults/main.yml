@@ -1,4 +1,0 @@
-#hub
-hub_api_url: "https://api.hub.red-chesterfield.com:6443"
-hub_user: "kubeadmin"
-hub_pwd: ""

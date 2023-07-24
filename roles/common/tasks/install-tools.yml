@@ -1,0 +1,19 @@
+---
+- name: Download oc cli tool
+  ansible.builtin.get_url:
+    url: 'https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-linux.tar.gz'
+    dest: ./openshift-client-linux.tar.gz
+    validate_certs: false
+
+- name: Download yq tool 
+  ansible.builtin.get_url:
+    url: 'https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64'
+    dest: /usr/local/bin/yq  
+    validate_certs: false
+
+- name: Install cli tools
+  shell: |
+    tar -xzvf ./openshift-client-linux.tar.gz
+    mv oc /usr/local/bin/oc
+    chmod a+x /usr/local/bin/yq  
+  become: true
