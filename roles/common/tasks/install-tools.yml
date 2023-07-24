@@ -10,6 +10,7 @@
     url: 'https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64'
     dest: /usr/local/bin/yq  
     validate_certs: false
+  become: true
 
 - name: Install cli tools
   shell: |
