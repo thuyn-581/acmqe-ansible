@@ -33,7 +33,7 @@
           namespace: default
         spec:
           serviceAccountName: automation-service-account
-          automountServiceAccountToken: false
+          automountServiceAccountToken: true
           containers:
             - image: {{ image }}
               name: worker
