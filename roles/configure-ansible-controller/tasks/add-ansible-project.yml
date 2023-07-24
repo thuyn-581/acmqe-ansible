@@ -3,6 +3,10 @@
   block:
   - name: Create SCM credential from a private_key file
     awx.awx.credential:
+      controller_username: "admin"
+      controller_password: "{{ aap_pwd.stdout }}"
+      controller_host: "https://{{ aap_url.stdout }}"      
+      validate_certs: false           
       name: "{{ project_name }}"
       organization: Default
       state: present
@@ -12,6 +16,10 @@
 
   - name: Create project {{ project_name }}
     awx.awx.project:
+      controller_username: "admin"
+      controller_password: "{{ aap_pwd.stdout }}"
+      controller_host: "https://{{ aap_url.stdout }}"       
+      validate_certs: false 
       name: "{{ project_name }}"
       description: "ACM QE ansible playbooks"
       organization: "Default"
@@ -22,6 +30,3 @@
       scm_url: "{{ project_repo_url }}"
       credential: "{{ project_name }}"
       state: present
-      controller_username: "admin"
-      controller_password: "{{ aap_pwd.stdout }}"
-      controller_host: "https://{{ aap_url.stdout }}"   
