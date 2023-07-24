@@ -4,9 +4,9 @@
     name: common
     tasks_from: install-oc410
 
-- name: Print path
-  debug: 
-    msg: "{{ path.stdout }}"
+# - name: Print path
+#   debug: 
+#     msg: "{{ path.stdout }}"
 
 - name: Login openshift at {{ ocp_api_url }}
   environment:

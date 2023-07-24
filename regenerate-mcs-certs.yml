@@ -1,4 +1,4 @@
-- name: Regenerate selected control plane certificates
+- name: Regenerate CA certificates for the Machine Config Server
   hosts: localhost
   any_errors_fatal: true 
   vars_files:
@@ -6,6 +6,6 @@
   vars:
     oc_cmd: "oc410 --insecure-skip-tls-verify"    
   tasks:
-  - name: Regenerate selected control plane certificates
+  - name: Regenerate CA certificates for the Machine Config Server
     import_role:
-      name: regenerate-cp-certs
+      name: regenerate-mcs-certs
