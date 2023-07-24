@@ -1,4 +1,9 @@
 ---
+  - name: Install cli tools
+    include_role:
+      name: common
+      tasks_from: install-tools    
+        
   - name: Create {{ sa }}
     import_tasks: create-service-account.yml
 

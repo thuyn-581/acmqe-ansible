@@ -6,10 +6,10 @@
       follow: yes
       remote_src: true
 
-  # - name: Install cli tools
-  #   include_role:
-  #     name: common
-  #     tasks_from: install-tools    
+  - name: Install cli tools
+    include_role:
+      name: common
+      tasks_from: install-tools    
 
   - name: Authenticate with kubeadmin credentials
     shell: |
