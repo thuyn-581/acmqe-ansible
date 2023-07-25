@@ -1,7 +1,7 @@
 ---
   - name: Debug
     shell: |
-      ls -l /home/centos/workspace/tests/ansible@tmp/secretFiles 
+      echo ${{ gh_private_key }}
   # - name: Copy task modules to remote
   #   block:
   #   - name: Copy task modules to remote
