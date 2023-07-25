@@ -1,65 +1,65 @@
 ---
-  - name: Download AAP license manifest
-    block:
-    - name: Generate RHSM refresh token
-      uri:
-        url: https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token 
-        method: POST
-        body_format: form-urlencoded       
-        body:
-          grant_type: refresh_token
-          client_id: rhsm-api 
-          refresh_token: "{{ rhsm_token }}"
-        return_content: yes
-      register: token
-      until: "'access_token' in token.content"
-      retries: 10
-      delay: 10 
-      
-    - debug: 
-        msg: "{{ token.json.access_token }}"   
+- name: Download AAP license manifest
+  block:
+  - name: Generate RHSM refresh token
+    uri:
+      url: https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token 
+      method: POST
+      body_format: form-urlencoded       
+      body:
+        grant_type: refresh_token
+        client_id: rhsm-api 
+        refresh_token: "{{ rhsm_token }}"
+      return_content: yes
+    register: token
+    until: "'access_token' in token.content"
+    retries: 10
+    delay: 10 
     
-    - name: Get manifest export jobID url
-      uri:
-        url: https://api.access.redhat.com/management/v1/allocations/{{ sub_alloc_uuid }}/export
-        headers: 
-          Authorization: "Bearer {{ token.json.access_token }}"
-        return_content: yes
-      register: exportJob
-      until: "'href' in exportJob.content"
-      retries: 10
-      delay: 10 
+  - debug: 
+      msg: "{{ token.json.access_token }}"   
+  
+  - name: Get manifest export jobID url
+    uri:
+      url: https://api.access.redhat.com/management/v1/allocations/{{ sub_alloc_uuid }}/export
+      headers: 
+        Authorization: "Bearer {{ token.json.access_token }}"
+      return_content: yes
+    register: exportJob
+    until: "'href' in exportJob.content"
+    retries: 10
+    delay: 10 
 
-    - debug: 
-        msg: "{{ exportJob.json.body.href }}"  
+  - debug: 
+      msg: "{{ exportJob.json.body.href }}"  
 
-    - name: Get manifest download link 
-      uri:
-        url: "{{ exportJob.json.body.href }}"
-        headers: 
-          Authorization: "Bearer {{ token.json.access_token }}"
-        return_content: yes
-      register: manifest
-      until: "'href' in manifest.content"
-      retries: 10
-      delay: 10 
+  - name: Get manifest download link 
+    uri:
+      url: "{{ exportJob.json.body.href }}"
+      headers: 
+        Authorization: "Bearer {{ token.json.access_token }}"
+      return_content: yes
+    register: manifest
+    until: "'href' in manifest.content"
+    retries: 10
+    delay: 10 
 
-    - debug: 
-        msg: "{{ manifest.json.body.href }}"       
-      
-    - name: Download manifest file
-      get_url:
-        url: "{{ manifest.json.body.href }}"
-        dest: "./manifest.zip"
-        headers: 
-          Authorization: "Bearer {{ token.json.access_token }}"
-        validate_certs: false  
+  - debug: 
+      msg: "{{ manifest.json.body.href }}"       
+    
+  - name: Download manifest file
+    get_url:
+      url: "{{ manifest.json.body.href }}"
+      dest: "./manifest.zip"
+      headers: 
+        Authorization: "Bearer {{ token.json.access_token }}"
+      validate_certs: false  
 
-  - name: Set AAP license using manifest file
-    awx.awx.license:
-      manifest: "./manifest.zip"
-      controller_username: "admin"
-      controller_password: "{{ aap_pwd.stdout }}"
-      controller_host: "https://{{ aap_url.stdout }}"        
-      validate_certs: false
-      force: true    
+- name: Set AAP license using manifest file
+  awx.awx.license:
+    manifest: "./manifest.zip"
+    controller_username: "admin"
+    controller_password: "{{ aap_pwd.stdout }}"
+    controller_host: "https://{{ aap_url.stdout }}"        
+    validate_certs: false
+    force: true    
