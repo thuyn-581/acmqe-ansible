@@ -5,7 +5,6 @@
       -d grant_type=refresh_token 
       -d client_id=rhsm-api 
       -d refresh_token={{ rhsm_token }} | yq .access_token
-    become: true 
     register: refresh_token
     until: refresh_token.stdout != "null"
     retries: 10
@@ -15,7 +14,6 @@
     shell: >
       curl -kL -H 'Authorization: Bearer {{ refresh_token.stdout }}'
       'https://api.access.redhat.com/management/v1/allocations/{{ sub_alloc_uuid }}/export' | yq .body.href
-    become: true 
     register: exportJobID_url
     until: exportJobID_url.stdout != "null"
     retries: 10
@@ -29,7 +27,6 @@
     shell: >
       curl -kL -H 'Authorization: Bearer {{ refresh_token.stdout }}'
       {{ exportJobID_url.stdout }} | yq .body.href
-    become: true 
     register: download_url       
     until: download_url.stdout != "null"
     retries: 10
