@@ -80,3 +80,6 @@
         ansible_host: '127.0.0.1'
         ansible_connection: 'local'
     run_once: true        
+
+  - name: Update inventory for template {{ job_name }}
+    import_tasks: update-inventory.yml       

@@ -3,16 +3,8 @@
   any_errors_fatal: true 
   vars_files:
   - ./vars/vars.yml    
-  vars:
-    cluster: "{{ ocp_api_url.split('.')[1] }}"  
-    job_name: "configure-ansible-controller"
   
   tasks:
-  - name: Update inventory
-    include_role:
-      name: common
-      tasks_from: update-inventory       
-
   - name: Configure Ansible Automation Controller on hub
     import_role:
-      name: "{{ job_name }}"
+      name: "configure-ansible-controller"
