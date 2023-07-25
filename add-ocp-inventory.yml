@@ -9,4 +9,4 @@
   tasks:
   - name: Add Openshift Inventory on local Tower
     import_role:
-      name: add-ocp-inventory
+      name: add-ocp-inventory       

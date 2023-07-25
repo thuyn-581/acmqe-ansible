@@ -1,11 +1,13 @@
 ---
 - name: Update inventory for template {{ job_name }}
-  awx.awx.job_template:
+  awx.awx.job_template:      
     controller_username: "{{ tower_user }}"
     controller_password: "{{ tower_pwd }}"
     controller_host: "{{ tower }}"     
     validate_certs: false    
     name: "{{ job_name }}"
-    project: "{{ project_name }}"
+    project: "{{ acmqe-ansible }}"
+    playbook: "{{ job_name }}.yml"
     inventory: "openshift-inventory-{{ cluster }}"
+    
  
