@@ -11,15 +11,9 @@
     dest: /usr/local/bin/yq  
     validate_certs: false
 
-# - name: Get PATH 
-#   shell: |
-#     echo $PWD:$PATH
-#   register: path   
-
 - name: Install cli tools
   shell: |
     tar -xzvf ./openshift-client-linux.tar.gz
     chmod a+x /usr/local/bin/yq
     mv oc /usr/local/bin/oc
-# mv yq /usr/local/bin/yq 
   become: true
