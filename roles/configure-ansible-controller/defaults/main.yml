@@ -10,5 +10,4 @@ rhsm_token: ""
 project_name: "acmqe-ansible"
 project_repo_url: "git@github.com:thuyn-581/acmqe-ansible.git"
 project_repo_branch: "main"
-gh_private_key: ""
 
