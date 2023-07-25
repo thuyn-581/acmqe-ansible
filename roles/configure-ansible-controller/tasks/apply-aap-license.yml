@@ -6,9 +6,7 @@
       -d client_id=rhsm-api 
       -d refresh_token={{ rhsm_token }} | yq .access_token
     register: refresh_token
-    # failed_when: "'null' in refresh_token.stdout" 
-    until: "'null' not in refresh_token.stdout"
-    # until: refresh_token.stdout != "null"
+    until: refresh_token != "null"
     retries: 10
     delay: 10      
     become: true    
@@ -19,7 +17,7 @@
       'https://api.access.redhat.com/management/v1/allocations/{{ sub_alloc_uuid }}/export' | yq .body.href
     changed_when: true
     register: exportJobID_url
-    until: exportJobID_url.stdout != "null"
+    until: exportJobID_url != "null"
     retries: 10
     delay: 10
     become: true
@@ -34,7 +32,7 @@
       {{ exportJobID_url.stdout }} | yq .body.href
     changed_when: true
     register: download_url       
-    until: download_url.stdout != "null"
+    until: download_url != "null"
     retries: 10
     delay: 10     
     become: true
