@@ -8,8 +8,7 @@
     register: refresh_token
     until: refresh_token != "null"
     retries: 10
-    delay: 10      
-    become: true    
+    delay: 10       
 
   - name: Get manifest export jobID url
     shell: >
@@ -20,7 +19,6 @@
     until: exportJobID_url != "null"
     retries: 10
     delay: 10
-    become: true
 
   - name: Print manifest export jobID url
     debug:
@@ -35,7 +33,6 @@
     until: download_url != "null"
     retries: 10
     delay: 10     
-    become: true
 
   - name: Print manifest download url
     debug:
