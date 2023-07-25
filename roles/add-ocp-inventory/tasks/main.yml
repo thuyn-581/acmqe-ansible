@@ -11,7 +11,7 @@
     awx.awx.credential:
       controller_username: "{{ tower_user }}"
       controller_password: "{{ tower_pwd }}"
-      controller_host: "https://ansible.qe.red-chesterfield.com"         
+      controller_host: "{{ tower }}"         
       validate_certs: false
       name: "openshift-creds-{{ cluster }}"
       credential_type: "OpenShift or Kubernetes API Bearer Token"

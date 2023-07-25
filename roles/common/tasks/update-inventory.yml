@@ -1,0 +1,10 @@
+---
+- name: Update inventory 
+  awx.awx.job_template:
+    controller_username: "{{ tower_user }}"
+    controller_password: "{{ tower_pwd }}"
+    controller_host: "{{ tower }}"     
+    validate_certs: false    
+    name: "{{ job_name }}"
+    inventory: "openshift-inventory-{{ cluster }}"
+ 
