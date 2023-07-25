@@ -3,7 +3,7 @@
     include_role:
       name: common
       tasks_from: install-tools    
-        
+
   - name: Create {{ sa }}
     import_tasks: create-service-account.yml
 
@@ -17,9 +17,10 @@
       credential_type: "OpenShift or Kubernetes API Bearer Token"
       organization: "acmqe"
       inputs: 
-        host: "https://api.o4-ibmvm-02.qe.red-chesterfield.com:6443"
+        host: "{{ ocp_api_url }}"
         verify_ssl: false
         bearer_token: "{{ sa_token.stdout }}"
+
     run_once: true
 
   - name: Create ocp container group in Ansible Tower
