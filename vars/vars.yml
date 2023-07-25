@@ -5,8 +5,4 @@ ocp_pwd: "8ck4I-pzhtx-nxc8a-YJYcu"
 
 #misc
 oc_cmd: "oc --insecure-skip-tls-verify=true"
-
-#tower
-tower: "https://ansible.qe.red-chesterfield.com"
-tower_pwd: "thnguyen"
-tower_user: ""
+project_name: "acmqe-ansible"

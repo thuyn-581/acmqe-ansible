@@ -7,7 +7,6 @@ sub_alloc_uuid: "e7e31a01-6ab3-433f-ba7c-0422cd31c044"
 rhsm_token: ""
 
 #project:
-project_name: "acmqe-ansible"
 project_repo_url: "git@github.com:thuyn-581/acmqe-ansible.git"
 project_repo_branch: "main"
 
