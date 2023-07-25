@@ -23,7 +23,7 @@
       controller_password: "{{ aap_pwd.stdout }}"
       controller_host: "https://{{ aap_url.stdout }}"       
       validate_certs: false 
-      name: "{{ project_name }}"
+      name: "{{ project_name }}-{{ item }}"
       description: "ACM QE ansible playbooks"
       organization: "Default"
       scm_type: "git"
@@ -33,3 +33,6 @@
       scm_url: "{{ project_repo_url }}"
       credential: "{{ project_name }}"
       state: present
+    with_items:
+    - main
+    - fips
