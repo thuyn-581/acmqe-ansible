@@ -6,7 +6,7 @@
     controller_host: "{{ tower }}"     
     validate_certs: false    
     name: "{{ job_name }}"
-    project: "{{ acmqe-ansible }}"
+    project: "{{ project_name }}"
     playbook: "{{ job_name }}.yml"
     inventory: "openshift-inventory-{{ cluster }}"
     
