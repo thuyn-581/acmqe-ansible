@@ -2,7 +2,7 @@
 - name: Add ansible project
   block:
   - name: Read secret file
-    include_vars: "vault-files/acmqe-ansible-key.yml"
+    include_vars: "defaults/acmqe-ansible-key.yml"
 
   - name: Create SCM credential from a private_key file
     awx.awx.credential:
