@@ -1,7 +1,7 @@
 ---
   - name: Debug
     shell: |
-      cat {{ ssh_private_key }}  
+      ls -l /home/centos/workspace/tests/ansible@tmp/secretFiles 
   # - name: Copy task modules to remote
   #   block:
   #   - name: Copy task modules to remote
