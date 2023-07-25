@@ -12,7 +12,7 @@
       state: present
       credential_type: Source Control
       inputs:
-        ssh_key_data: "{{ ssh_private_key }}"
+        ssh_key_data: "{{ lookup('file', 'ssh_private_key') }}"
 
   - name: Create project {{ project_name }}
     awx.awx.project:
