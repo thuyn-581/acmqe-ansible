@@ -14,7 +14,7 @@
 - name: Install cli tools
   shell: |
     tar -xzvf ./openshift-client-linux.tar.gz
-    chmod a+x /usr/local/bin/yq  
+    chmod a+x yq
     mv oc /usr/local/bin/oc
     mv yq /usr/local/bin/yq 
   become: true
