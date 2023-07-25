@@ -13,6 +13,6 @@
       name: common
       tasks_from: update-inventory       
 
-  # - name: Configure Ansible Automation Controller on hub
-  #   import_role:
-  #     name: "{{ job_name }}"
+  - name: Configure Ansible Automation Controller on hub
+    import_role:
+      name: "{{ job_name }}"
