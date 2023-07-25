@@ -1,50 +1,59 @@
 ---
-  - name: Generate RHSM refresh token
-    shell: >
-      curl https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token 
-      -d grant_type=refresh_token 
-      -d client_id=rhsm-api 
-      -d refresh_token={{ rhsm_token }} | yq .access_token
-    register: refresh_token
-    until: refresh_token != "null"
-    retries: 10
-    delay: 10       
+  - name: Download AAP license manifest
+    block:
+    - name: Generate RHSM refresh token
+      uri:
+        url: https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token 
+        method: POST
+        body_format: form-urlencoded       
+        body:
+          grant_type: refresh_token
+          client_id: rhsm-api 
+          refresh_token: "{{ rhsm_token }}"
+        return_content: yes
+      register: token
+      until: "'access_token' in token.content"
+      retries: 10
+      delay: 10 
+      
+    - debug: 
+        msg: "{{ token.json.access_token }}"   
+    
+    - name: Get manifest export jobID url
+      uri:
+        url: https://api.access.redhat.com/management/v1/allocations/{{ sub_alloc_uuid }}/export
+        headers: 
+          Authorization: "Bearer {{ token.json.access_token }}"
+        return_content: yes
+      register: exportJob
+      until: "'href' in exportJob.content"
+      retries: 10
+      delay: 10 
 
-  - name: Get manifest export jobID url
-    shell: >
-      curl -kL -H 'Authorization: Bearer {{ refresh_token.stdout }}'
-      'https://api.access.redhat.com/management/v1/allocations/{{ sub_alloc_uuid }}/export' | yq .body.href
-    changed_when: true
-    register: exportJobID_url
-    until: exportJobID_url != "null"
-    retries: 10
-    delay: 10
+    - debug: 
+        msg: "{{ exportJob.json.body.href }}"  
 
-  - name: Print manifest export jobID url
-    debug:
-      msg: "{{ exportJobID_url.stdout }}"
+    - name: Get manifest download link 
+      uri:
+        url: "{{ exportJob.json.body.href }}"
+        headers: 
+          Authorization: "Bearer {{ token.json.access_token }}"
+        return_content: yes
+      register: manifest
+      until: "'href' in manifest.content"
+      retries: 10
+      delay: 10 
 
-  - name: Get manifest download link 
-    shell: >
-      curl -kL -H 'Authorization: Bearer {{ refresh_token.stdout }}'
-      {{ exportJobID_url.stdout }} | yq .body.href
-    changed_when: true
-    register: download_url       
-    until: download_url != "null"
-    retries: 10
-    delay: 10     
-
-  - name: Print manifest download url
-    debug:
-      msg: "{{ download_url.stdout }}"      
-
-  - name: Download manifest file
-    ansible.builtin.get_url:
-      url: "{{ download_url.stdout }}"
-      dest: "./manifest.zip"
-      headers: 
-        Authorization: "Bearer {{ refresh_token.stdout }}"
-      validate_certs: false     
+    - debug: 
+        msg: "{{ manifest.json.body.href }}"       
+      
+    - name: Download manifest file
+      get_url:
+        url: "{{ manifest.json.body.href }}"
+        dest: "./manifest.zip"
+        headers: 
+          Authorization: "Bearer {{ token.json.access_token }}"
+        validate_certs: false  
 
   - name: Set AAP license using manifest file
     awx.awx.license:

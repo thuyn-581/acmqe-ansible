@@ -2,4 +2,4 @@
 *.kubeconfig
 *.tar.gz
 *.zip
-test.yml
+*test.yml
