@@ -6,8 +6,9 @@
       -d client_id=rhsm-api 
       -d refresh_token={{ rhsm_token }} | yq .access_token
     register: refresh_token
-    changed_when: "'null' not in refresh_token.stdout" 
-    until: refresh_token.stdout != "null"
+    # failed_when: "'null' in refresh_token.stdout" 
+    until: "'null' not in refresh_token.stdout"
+    # until: refresh_token.stdout != "null"
     retries: 10
     delay: 10      
     become: true    
