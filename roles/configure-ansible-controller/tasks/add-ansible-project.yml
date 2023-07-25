@@ -27,7 +27,7 @@
       description: "ACM QE ansible playbooks"
       organization: "Default"
       scm_type: "git"
-      scm_branch: "{{ project_repo_branch }}"
+      scm_branch: "{{ item }}"
       scm_clean: true
       scm_update_on_launch: true
       scm_url: "{{ project_repo_url }}"
