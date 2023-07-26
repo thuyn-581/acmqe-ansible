@@ -1,0 +1,33 @@
+---
+- name: Get SA token
+  include_role:
+    name: common
+    tasks_from: create-service-account
+
+- name: Deloy GOGS
+  block:
+  # - name: Create {{ gogs_ns }}
+  #   shell: |
+  #     oc --token={{ sa_token.stdout }} create ns {{ gogs_ns }}
+  #   changed_when: true
+  #   ignore_errors: true
+
+  - name: Deloy GOGS on {{ cluster }}
+    shell: >
+      oc --token={{ sa_token.stdout }} process 
+      -f gogs.yml 
+      --param=HOSTNAME=gogs_ns
+      --param=GOGS_VERSION=0.11.4 
+      | oc create -f
+   
+  # - name: Deloy GOGS on {{ cluster }}
+  #   shell: >
+  #     oc new-app -f https://raw.githubusercontent.com/chengkuangan/templates/master/gogs-persistent-template.yaml 
+  #     -p SKIP_TLS_VERIFY=true 
+  #     -n acmqe-gogs    
+
+  # - name: Add test git repositories
+  #   import_tasks: add-git-repos.yaml
+
+  # - name: Configre custom ca for GOGS 
+  #   import_tasks: configure-custom-ca.yml
