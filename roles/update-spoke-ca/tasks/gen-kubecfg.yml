@@ -11,11 +11,15 @@
     shell: |   
       {{ oc_cmd }} config new-admin-kubeconfig > admin.kubeconfig
       sleep 5
-
+      
   - name: Confirm your new admin.kubeconfig works
     shell: |         
       {{ oc_cmd }} --kubeconfig=admin.kubeconfig whoami   
-
+    register: result
+    until: result.rc == 0
+    retries: 10
+    delay: 15
+    
   - name: Encode your new kubeconfig
     shell: |         
       cat admin.kubeconfig | base64 -w0   

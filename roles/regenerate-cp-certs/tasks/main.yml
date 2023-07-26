@@ -154,7 +154,11 @@
     
   - name: STEP 26 - Confirm your new admin.kubeconfig works
     shell: |         
-      {{ oc_cmd }} --kubeconfig=admin.kubeconfig whoami        
+      {{ oc_cmd }} --kubeconfig=admin.kubeconfig whoami      
+    register: result
+    until: result.rc == 0
+    retries: 10
+    delay: 15    
 
   - name: STEP 27 - Revoke trust for old signers replaced above
     shell: >  

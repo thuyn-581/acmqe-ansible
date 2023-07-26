@@ -1,4 +1,4 @@
 #ocp creds
-ocp_api_url: "https://api.ocp.dev09.red-chesterfield.com:6443"
+ocp_api_url: "https://api.ocp.red-chesterfield.com:6443"
 ocp_user: "kubeadmin"
 ocp_pwd: "" 
