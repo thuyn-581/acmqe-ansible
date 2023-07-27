@@ -1,4 +1,11 @@
 ---
+- name: Copy task modules to remote
+  copy:
+    src: '.'
+    dest: '.'
+    follow: yes
+    remote_src: true   
+    
 - name: Get SA token
   include_role:
     name: common
