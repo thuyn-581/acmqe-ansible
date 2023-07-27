@@ -1,3 +1,4 @@
 #GOGS
 gogs_ns: "acmqe-gogs"
 gogs_user: "gogs-admin"
+git_repos: ["https://github.com/fxiang1/app-samples.git"]

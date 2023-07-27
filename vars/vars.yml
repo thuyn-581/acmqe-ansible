@@ -1,7 +1,7 @@
 #ocp creds
-ocp_api_url: "https://api.o4-ibmvm-01.qe.red-chesterfield.com:6443"
+ocp_api_url: "https://api.acmqe-410-grcgk-tests.dev09.red-chesterfield.com:6443"
 ocp_user: "kubeadmin"
-ocp_pwd: "2d58k-FVzm6-SLR7u-rfg7S" 
+ocp_pwd: "JW2NV-g2SAF-JfstQ-PoMYU" 
 
 #service account
 sa: "automation-service-account"
@@ -10,3 +10,4 @@ sa_ns: "default"
 #misc
 oc_cmd: "oc --insecure-skip-tls-verify=true"
 project_name: "acmqe-ansible"
+certs_dir: "./certs"

@@ -1,87 +1,86 @@
 ---
-  - name: Install cli tools
-    include_role:
-      name: common
-      tasks_from: install-tools    
-      
-  - name: Get SA token
-    include_role:
-      name: common
-      tasks_from: create-service-account
+- name: Install cli tools
+  include_role:
+    name: common
+    tasks_from: install-tools    
+    
+- name: Get SA token
+  include_role:
+    name: common
+    tasks_from: create-service-account
 
-  - name: Create ocp credentials in Ansible Tower 
-    awx.awx.credential:
-      controller_username: "{{ tower_user }}"
-      controller_password: "{{ tower_pwd }}"
-      controller_host: "{{ tower }}"         
-      validate_certs: false
-      name: "openshift-creds-{{ cluster }}"
-      credential_type: "OpenShift or Kubernetes API Bearer Token"
-      organization: "acmqe"
-      inputs: 
-        host: "{{ ocp_api_url }}"
-        verify_ssl: false
-        bearer_token: "{{ sa_token.stdout }}"
+- name: Create ocp credentials in Ansible Tower 
+  awx.awx.credential:
+    controller_username: "{{ tower_user }}"
+    controller_password: "{{ tower_pwd }}"
+    controller_host: "{{ tower }}"         
+    validate_certs: false
+    name: "openshift-creds-{{ cluster }}"
+    credential_type: "OpenShift or Kubernetes API Bearer Token"
+    organization: "acmqe"
+    inputs: 
+      host: "{{ ocp_api_url }}"
+      verify_ssl: false
+      bearer_token: "{{ sa_token.stdout }}"
+  run_once: true
 
-    run_once: true
+- name: Create ocp container group in Ansible Tower
+  awx.awx.instance_group:
+    controller_username: "{{ tower_user }}"
+    controller_password: "{{ tower_pwd }}"
+    controller_host: "{{ tower }}"        
+    validate_certs: false
+    name: "openshift-container-group-{{ cluster }}"
+    is_container_group: true
+    credential: "openshift-creds-{{ cluster }}"
+    pod_spec_override: |
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        namespace: default
+      spec:
+        serviceAccountName: automation-service-account
+        automountServiceAccountToken: false
+        containers:
+          - image: {{ image }}
+            name: worker
+            args:
+              - ansible-runner
+              - worker
+              - '--private-data-dir=/runner'
+            resources:
+              requests:
+                cpu: 250m
+                memory: 100Mi
+            tty: true
+            stdin: true    
+  run_once: true    
 
-  - name: Create ocp container group in Ansible Tower
-    awx.awx.instance_group:
-      controller_username: "{{ tower_user }}"
-      controller_password: "{{ tower_pwd }}"
-      controller_host: "{{ tower }}"        
-      validate_certs: false
-      name: "openshift-container-group-{{ cluster }}"
-      is_container_group: true
-      credential: "openshift-creds-{{ cluster }}"
-      pod_spec_override: |
-        apiVersion: v1
-        kind: Pod
-        metadata:
-          namespace: default
-        spec:
-          serviceAccountName: automation-service-account
-          automountServiceAccountToken: false
-          containers:
-            - image: {{ image }}
-              name: worker
-              args:
-                - ansible-runner
-                - worker
-                - '--private-data-dir=/runner'
-              resources:
-                requests:
-                  cpu: 250m
-                  memory: 100Mi
-              tty: true
-              stdin: true    
-    run_once: true    
+- name: Create ocp inventory in Ansible Tower 
+  awx.awx.inventory:
+    controller_username: "{{ tower_user }}"
+    controller_password: "{{ tower_pwd }}"
+    controller_host: "{{ tower }}"        
+    validate_certs: false
+    name: "openshift-inventory-{{ cluster }}"
+    organization: "acmqe"
+    instance_groups: 
+      - "openshift-container-group-{{ cluster }}"
+  run_once: true
 
-  - name: Create ocp inventory in Ansible Tower 
-    awx.awx.inventory:
-      controller_username: "{{ tower_user }}"
-      controller_password: "{{ tower_pwd }}"
-      controller_host: "{{ tower }}"        
-      validate_certs: false
-      name: "openshift-inventory-{{ cluster }}"
-      organization: "acmqe"
-      instance_groups: 
-        - "openshift-container-group-{{ cluster }}"
-    run_once: true
+- name: Create host in Ansible Tower
+  awx.awx.host:
+    controller_username: "{{ tower_user }}"
+    controller_password: "{{ tower_pwd }}"
+    controller_host: "{{ tower }}"        
+    validate_certs: false
+    name: "openshift-host-{{ cluster }}"
+    inventory: "openshift-inventory-{{ cluster }}"
+    enabled: true
+    variables:
+      ansible_host: '127.0.0.1'
+      ansible_connection: 'local'
+  run_once: true        
 
-  - name: Create host in Ansible Tower
-    awx.awx.host:
-      controller_username: "{{ tower_user }}"
-      controller_password: "{{ tower_pwd }}"
-      controller_host: "{{ tower }}"        
-      validate_certs: false
-      name: "openshift-host-{{ cluster }}"
-      inventory: "openshift-inventory-{{ cluster }}"
-      enabled: true
-      variables:
-        ansible_host: '127.0.0.1'
-        ansible_connection: 'local'
-    run_once: true        
-
-  - name: Update inventory for template {{ job_name }}
-    import_tasks: update-inventory.yml       
+- name: Update inventory for template {{ job_name }}
+  import_tasks: update-inventory.yml       

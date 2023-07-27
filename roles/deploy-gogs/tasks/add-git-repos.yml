@@ -1,8 +1,41 @@
 ---
-- name: Add gogs-admin user
-  shell: >
-    {{ oc_cmd }} -n {{ gogs_ns}} exec {{ pod }} --
-    /bin/bash -c 'USER=gogs /opt/gogs/gogs admin create-user --admin 
-    --config /etc/gogs/conf/app.ini
-    --name {{ gogs_user }} --password {{ gogs_user }} --email {{ gogs_user }}@acmqe.io' 
+- name: Create the repo {{ item.split('/') | last }} on gogs server
+  block:  
+  - name: Get gogs access token
+    uri:
+      url: http://{{ gogs_ns }}.apps.o4-ibmvm-01.qe.red-chesterfield.com/api/v1/users/{{ gogs_user }}/tokens
+      user: "{{ gogs_user }}"
+      password: "{{ gogs_user }}"
+      method: POST
+      body_format: json
+      force_basic_auth: true
+      status_code: 201
+      body:
+        name: "sample-token"
+        sha1: "8a4fc41b4868aecdd623b10cb1b64a36c6ee51f3"
+    register: gogs_access_token
   
+  # - debug:
+  #     msg: "{{ gogs_access_token.json.sha1 }}"
+
+  - name: Clone the repo {{ item.split('/') | last }} from GH
+    shell: |
+      rm -rf {{ item.split('/') | last }}
+      git clone --bare {{ item }}
+
+  - name: Create the repo {{ item.split('/') | last }} on gogs server
+    uri:
+      url: http://{{ gogs_user }}:{{ gogs_user}}@{{ hostname }}/api/v1/user/repos?token={{ gogs_access_token.json.sha1 }}
+      method: 'POST'
+      body_format: json
+      status_code: 201
+      body:
+        name: app-samples
+        private: false
+  
+  - name: Push the repo {{ item.split('/') | last }} to gogs server
+    shell: |
+      cd {{ item.split('/') | last }}
+      git push --mirror 'http://{{ gogs_user }}:{{ gogs_user}}@{{ hostname }}/{{ gogs_user }}/app-samples'
+      rm -rf {{ item.split('/') | last }}
+

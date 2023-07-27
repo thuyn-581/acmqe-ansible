@@ -62,4 +62,8 @@
     controller_password: "{{ aap_pwd.stdout }}"
     controller_host: "https://{{ aap_url.stdout }}"        
     validate_certs: false
-    force: true    
+    force: true 
+  register: result
+  until: result is not failed
+  retries: 1
+  delay: 10

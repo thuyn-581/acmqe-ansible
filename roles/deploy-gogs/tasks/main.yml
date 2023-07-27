@@ -6,7 +6,7 @@
 
 - name: Deloy GOGS 
   vars:
-    array: "{{ ocp_api_url.split(':6443')[0] | split('api.') }}"
+    hostname: "{{ gogs_ns }}.apps.{{ array[1] }}"
   block:
   - name: Create ns {{ gogs_ns }}
     shell: |
@@ -21,7 +21,7 @@
       shell: >
         {{ oc_cmd }} process 
         -f roles/deploy-gogs/defaults/gogs.template.yml
-        -p HOSTNAME={{ gogs_ns }}.apps.{{ array[1] }}
+        -p HOSTNAME={{ hostname }}
         -p SKIP_TLS_VERIFY=true 
         -p DATABASE_VERSION=10-el8
         | oc create -f - -n {{ gogs_ns }}
@@ -38,10 +38,17 @@
     - debug:
         msg: "{{ wait.stdout.split(' ')[0] }}"
 
-  - name: Add test git repositories
-    vars:
-      pod: "{{ wait.stdout.split(' ')[0] }}"
-    import_tasks: add-git-repos.yml
+    - name: Add gogs-admin user
+      shell: >
+        {{ oc_cmd }} -n {{ gogs_ns}} exec {{ wait.stdout.split(' ')[0] }} --
+        /bin/bash -c 'USER=gogs /opt/gogs/gogs admin create-user --admin 
+        --config /etc/gogs/conf/app.ini
+        --name {{ gogs_user }} --password {{ gogs_user }} --email {{ gogs_user }}@acmqe.io'         
 
-  # - name: Configre custom ca for GOGS 
-  #   import_tasks: configure-custom-ca.yml
+  - name: Add test git repositories
+    include_tasks:
+      file: add-git-repos.yml
+    loop: "{{ git_repos }}"
+
+  - name: Enable gogs server with custom certs 
+    import_tasks: configure-custom-ca.yml
