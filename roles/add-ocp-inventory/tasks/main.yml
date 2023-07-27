@@ -4,8 +4,10 @@
       name: common
       tasks_from: install-tools    
       
-  - name: Create {{ sa }}
-    import_tasks: create-service-account.yml
+  - name: Get SA token
+    include_role:
+      name: common
+      tasks_from: create-service-account
 
   - name: Create ocp credentials in Ansible Tower 
     awx.awx.credential:

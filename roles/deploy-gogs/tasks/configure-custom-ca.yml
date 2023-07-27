@@ -1,0 +1,16 @@
+---
+- name: Generate custom CA certs
+  include_role:
+    name: common
+    tasks_from: generate-certs
+
+- name: Recreate Gogs route with the generated self-signed certificates
+  shell: |
+    {{ oc_cmd }} -n {{ gogs_ns }} delete route gogs
+    {{ oc_cmd }} -n {{ gogs_ns }} create route edge --service=gogs --cert=server.crt --key=server.key --path=/ 
+
+- name: Generate gogs-ca-configmap.yaml
+  shell: >
+    {{ oc_cmd }} create configmap --dry-run=client gogs-ca 
+    --from-file=caCerts=rootCA.crt --output yaml > gogs-ca-configmap.yaml
+  

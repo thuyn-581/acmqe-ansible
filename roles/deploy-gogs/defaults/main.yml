@@ -1,1 +1,3 @@
+#GOGS
 gogs_ns: "acmqe-gogs"
+gogs_user: "gogs-admin"

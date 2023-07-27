@@ -4,30 +4,44 @@
     name: common
     tasks_from: create-service-account
 
-- name: Deloy GOGS
+- name: Deloy GOGS 
+  vars:
+    array: "{{ ocp_api_url.split(':6443')[0] | split('api.') }}"
   block:
-  # - name: Create {{ gogs_ns }}
-  #   shell: |
-  #     oc --token={{ sa_token.stdout }} create ns {{ gogs_ns }}
-  #   changed_when: true
-  #   ignore_errors: true
+  - name: Create ns {{ gogs_ns }}
+    shell: |
+      {{ oc_cmd }} --token={{ sa_token.stdout }} delete ns {{ gogs_ns }}
+      {{ oc_cmd }} create ns {{ gogs_ns }}
+    changed_when: true
+    ignore_errors: true
 
-  - name: Deloy GOGS on {{ cluster }}
-    shell: >
-      oc --token={{ sa_token.stdout }} process 
-      -f gogs.yml 
-      --param=HOSTNAME=gogs_ns
-      --param=GOGS_VERSION=0.11.4 
-      | oc create -f
-   
-  # - name: Deloy GOGS on {{ cluster }}
-  #   shell: >
-  #     oc new-app -f https://raw.githubusercontent.com/chengkuangan/templates/master/gogs-persistent-template.yaml 
-  #     -p SKIP_TLS_VERIFY=true 
-  #     -n acmqe-gogs    
+  - name: Deloy gogs on {{ cluster }}
+    block: 
+    - name: Deloy GOGS on {{ cluster }}
+      shell: >
+        {{ oc_cmd }} process 
+        -f roles/deploy-gogs/defaults/gogs.template.yml
+        -p HOSTNAME={{ gogs_ns }}.apps.{{ array[1] }}
+        -p SKIP_TLS_VERIFY=true 
+        -p DATABASE_VERSION=10-el8
+        | oc create -f - -n {{ gogs_ns }}
 
-  # - name: Add test git repositories
-  #   import_tasks: add-git-repos.yaml
+    - name: Wait for gogs deployment completed
+      shell: >
+        {{ oc_cmd }} -n {{ gogs_ns }} wait --for=condition=ready pod -l app=gogs 
+      changed_when: true    
+      register: wait
+      until: wait.rc == 0
+      retries: 10
+      delay: 15
+    
+    - debug:
+        msg: "{{ wait.stdout.split(' ')[0] }}"
+
+  - name: Add test git repositories
+    vars:
+      pod: "{{ wait.stdout.split(' ')[0] }}"
+    import_tasks: add-git-repos.yml
 
   # - name: Configre custom ca for GOGS 
   #   import_tasks: configure-custom-ca.yml

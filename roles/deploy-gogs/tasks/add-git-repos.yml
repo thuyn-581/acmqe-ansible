@@ -1,0 +1,8 @@
+---
+- name: Add gogs-admin user
+  shell: >
+    {{ oc_cmd }} -n {{ gogs_ns}} exec {{ pod }} --
+    /bin/bash -c 'USER=gogs /opt/gogs/gogs admin create-user --admin 
+    --config /etc/gogs/conf/app.ini
+    --name {{ gogs_user }} --password {{ gogs_user }} --email {{ gogs_user }}@acmqe.io' 
+  
