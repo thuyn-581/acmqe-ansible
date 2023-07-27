@@ -1,7 +1,7 @@
 #ocp creds
-ocp_api_url: "https://api.acmqe-410-grcgk-tests.dev09.red-chesterfield.com:6443"
+ocp_api_url: "https://api.ocp.red-chesterfield.com:6443"
 ocp_user: "kubeadmin"
-ocp_pwd: "JW2NV-g2SAF-JfstQ-PoMYU" 
+ocp_pwd: "" 
 
 #service account
 sa: "automation-service-account"
