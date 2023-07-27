@@ -16,8 +16,8 @@
     retries: 10
     delay: 10 
     
-  - debug: 
-      msg: "{{ token.json.access_token }}"   
+  # - debug: 
+  #     msg: "{{ token.json.access_token }}"   
   
   - name: Get manifest export jobID url
     uri:
