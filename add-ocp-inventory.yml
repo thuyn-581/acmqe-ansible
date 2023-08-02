@@ -2,7 +2,8 @@
   hosts: localhost
   any_errors_fatal: true 
   vars_files:
-  - ./vars/vars.yml    
+  - vars/vars.yml   
+  - roles/configure-ansible-controller/defaults/main.yml 
   vars:
     cluster: "{{ ocp_api_url.split('.')[1] }}"
     

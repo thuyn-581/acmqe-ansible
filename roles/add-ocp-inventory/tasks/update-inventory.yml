@@ -9,5 +9,6 @@
     project: "{{ project_name }}"
     playbook: "{{ job_name }}.yml"
     inventory: "openshift-inventory-{{ cluster }}"
+  when: job_name != ""
     
  

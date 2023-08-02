@@ -9,6 +9,9 @@
     name: common
     tasks_from: create-service-account
 
+- name: Install AAP operator
+  import_tasks: install-aap-operator.yml      
+
 - name: Create ocp credentials in Ansible Tower 
   awx.awx.credential:
     controller_username: "{{ tower_user }}"

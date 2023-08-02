@@ -1,0 +1,47 @@
+---
+- name: Check if AAP operator already installed
+  shell: |
+    {{ oc_cmd }} --token={{ sa_token.stdout }} get sub -n aap
+  register: aap_sub
+
+- name: Install AAP operator
+  block:
+  - name: Create operator group for AAP
+    shell: | 
+      {{ oc_cmd }} create ns {{ aap_project }}
+      {{ oc_cmd }} apply -f - <<EOF
+        apiVersion: operators.coreos.com/v1
+        kind: OperatorGroup
+        metadata:
+          name: ansible-automation-platform-operator
+          namespace: {{ aap_project }}
+        spec: {}
+      EOF            
+    changed_when: true     
+
+  - name: Install AAP operator
+    shell: |
+      {{ oc_cmd }} apply -f - <<EOF
+        apiVersion: operators.coreos.com/v1alpha1
+        kind: Subscription
+        metadata:
+          name: ansible-automation-platform-operator
+          namespace: {{ aap_project }}
+        spec:
+          channel: stable-2.4-cluster-scoped
+          installPlanApproval: Automatic
+          name: ansible-automation-platform-operator
+          source: redhat-operators
+          sourceNamespace: openshift-marketplace
+      EOF            
+    changed_when: true 
+
+  - name: Wait for AAP installation completed
+    shell: |
+      {{ oc_cmd }} get event -n {{ aap_project }} | grep "InstallSucceeded"
+    changed_when: true 
+    register: result
+    until: result.stdout | length > 0
+    retries: 10
+    delay: 30
+  when: aap_sub.stderr | length > 0   
