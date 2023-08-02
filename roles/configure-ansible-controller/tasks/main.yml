@@ -12,7 +12,7 @@
     register: task_result
     until: task_result.rc == 0
     retries: 5
-    delay: 30   
+    delay: 30     
 
   - name: Create AAP controller CR
     shell: |
@@ -55,7 +55,7 @@
     changed_when: true    
     register: aap_pwd  
 
-  - name: Download AAP subscription manifest file from RHSM
+  - name: Download AAP subscription manifest file from RHSM and apply license
     import_tasks: apply-aap-license.yml
 
   - name: Create a new token using username/password

@@ -3,11 +3,15 @@
   any_errors_fatal: true 
   vars_files:
   - vars/vars.yml   
-  - roles/configure-ansible-controller/defaults/main.yml 
   vars:
     cluster: "{{ ocp_api_url.split('.')[1] }}"
     
-  tasks:
-  - name: Add Openshift Inventory on local Tower
+  tasks:    
+  - name: Add Openshift Inventory of {{ cluster }} on local Tower
     import_role:
       name: add-ocp-inventory       
+     
+  - name: Install AAP operator on {{ cluster }}
+    include_role:
+      name: configure-ansible-controller
+      tasks_from: install-aap-operator  

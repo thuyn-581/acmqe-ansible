@@ -1,16 +1,13 @@
 ---
-- name: Install cli tools
-  include_role:
-    name: common
-    tasks_from: install-tools    
+# - name: Install cli tools
+#   include_role:
+#     name: common
+#     tasks_from: install-tools    
     
 - name: Get SA token
   include_role:
     name: common
     tasks_from: create-service-account
-
-- name: Install AAP operator
-  import_tasks: install-aap-operator.yml      
 
 - name: Create ocp credentials in Ansible Tower 
   awx.awx.credential:
