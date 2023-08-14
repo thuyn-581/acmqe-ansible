@@ -88,7 +88,7 @@
       name: 'Demo Job Template'
       project: 'Demo Project'
       ask_variables_on_launch: true
-      state: exists
+      state: present
       controller_username: "admin"
       controller_password: "{{ aap_pwd.stdout }}"
       controller_host: "https://{{ aap_url.stdout }}"    
