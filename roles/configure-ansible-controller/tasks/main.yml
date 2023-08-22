@@ -93,6 +93,10 @@
       controller_password: "{{ aap_pwd.stdout }}"
       controller_host: "https://{{ aap_url.stdout }}"    
       validate_certs: false  
+    register: update_result
+    until: update_result is not failed
+    retries: 5
+    delay: 10      
 
   - name: Create ansible project
     import_tasks: add-ansible-project.yml      
