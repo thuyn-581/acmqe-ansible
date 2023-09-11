@@ -13,8 +13,12 @@
 
 - name: Deloy GOGS 
   vars:
-    hostname: "{{ gogs_ns }}.apps.{{ array[1] }}"
+    # hostname: "{{ gogs_ns }}.apps.{{ array[1] }}"
+    hostname: "{{ gogs_ns }}.{{ ocp_api_url | urlsplit('hostname') | replace('api','apps') }}"
   block:
+  - debug:
+      msg: "{{ hostname }}"        
+
   - name: Create ns {{ gogs_ns }}
     shell: |
       {{ oc_cmd }} --token={{ sa_token.stdout }} delete ns {{ gogs_ns }}
@@ -43,7 +47,7 @@
       delay: 15
     
     - debug:
-        msg: "{{ wait.stdout | split(' ') }}"
+        msg: "{{ wait.stdout.split(' ')[0] }}"
 
     - name: Add gogs-admin user
       shell: >

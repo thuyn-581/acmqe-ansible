@@ -5,7 +5,6 @@
   - ./vars/vars.yml    
   vars:
     cluster: "{{ ocp_api_url.split('.')[1] }}"
-    array: "{{ ocp_api_url | urlsplit('hostname') | split('api.') }}" 
 
   tasks: 
   - name: Configure GOGS on {{ cluster }}
