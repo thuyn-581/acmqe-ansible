@@ -11,7 +11,7 @@
 
 - name: Generate gogs-ca-configmap.yaml
   shell: >
-    {{ oc_cmd }} create configmap --dry-run=client gogs-ca 
+    {{ oc_cmd }} create configmap gogs-ca 
     --from-file=caCerts={{ certs_dir }}/rootCA.crt 
-    --output yaml > gogs-ca-configmap.yaml
+    -n {{ gogs_ns }}
   

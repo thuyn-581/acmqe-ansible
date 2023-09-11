@@ -3,7 +3,7 @@
   block:  
   - name: Get gogs access token
     uri:
-      url: http://{{ gogs_ns }}.apps.o4-ibmvm-01.qe.red-chesterfield.com/api/v1/users/{{ gogs_user }}/tokens
+      url: http://{{ hostname }}/api/v1/users/{{ gogs_user }}/tokens
       user: "{{ gogs_user }}"
       password: "{{ gogs_user }}"
       method: POST

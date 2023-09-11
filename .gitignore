@@ -3,3 +3,7 @@
 *.tar.gz
 *.zip
 *test.yml
+
+# Ignore folders
+app-samples.git/*
+certs/*
