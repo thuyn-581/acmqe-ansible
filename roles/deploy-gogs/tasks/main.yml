@@ -41,6 +41,9 @@
       until: wait.rc == 0
       retries: 10
       delay: 15
+    
+    - debug:
+        msg: "{{ wait.stdout | split(' ') }}"
 
     - name: Add gogs-admin user
       shell: >

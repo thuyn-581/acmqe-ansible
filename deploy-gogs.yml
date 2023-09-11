@@ -5,9 +5,9 @@
   - ./vars/vars.yml    
   vars:
     cluster: "{{ ocp_api_url.split('.')[1] }}"
-    array: "{{ ocp_api_url.split(':6443')[0] | split('api.') }}" 
+    array: "{{ ocp_api_url | urlsplit('hostname') | split('api.') }}" 
 
-  tasks:
+  tasks: 
   - name: Configure GOGS on {{ cluster }}
     import_role:
       name: "deploy-gogs"
