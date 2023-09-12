@@ -28,7 +28,7 @@
         name: "{{ item.split('/') | last | replace('.git','') }}"
         private: false    
 
-  - name: test
+  - name: Install git
     shell: |
       microdnf install git        
 
