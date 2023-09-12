@@ -30,8 +30,8 @@
 
   - name: test
     shell: |
-      ls -al /usr/bin | grep dnf
-      # microdnf install git        
+      microdnf install git     
+    become: true   
   
   # - name: Install git
   #   vars:
