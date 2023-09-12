@@ -31,7 +31,7 @@
   - name: Install git
     dnf:
       name: 
-        - python3-dnf
+        - python3
         - git
       state: present     
 
