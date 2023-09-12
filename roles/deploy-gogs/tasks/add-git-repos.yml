@@ -49,9 +49,9 @@
       force: true
       update: true      
   
-  # - name: Push the repo {{ item.split('/') | last }} to gogs server
-  #   shell: |
-  #     cd {{ item.split('/') | last }}
-  #     git push --mirror 'http://{{ gogs_user }}:{{ gogs_user}}@{{ hostname }}/{{ gogs_user }}/app-samples'
+  - name: Push the repo {{ item.split('/') | last }} to gogs server
+    shell: |
+      cd {{ item.split('/') | last }}
+      git push --mirror 'http://{{ gogs_user }}:{{ gogs_user}}@{{ hostname }}/{{ gogs_user }}/app-samples'
   #     rm -rf {{ item.split('/') | last }}
 
