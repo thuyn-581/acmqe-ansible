@@ -44,6 +44,8 @@
         containers:
           - image: {{ image }}
             name: worker
+            securityContext:
+              privileged: true
             args:
               - ansible-runner
               - worker

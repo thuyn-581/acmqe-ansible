@@ -25,20 +25,12 @@
       body_format: json
       status_code: 201
       body:
-        name: app-samples
+        name: "{{ item.split('/') | last }}"
         private: false    
 
   - name: test
     shell: |
-      microdnf install git      
-  
-  # - name: Install git
-  #   vars:
-  #     ansible_python_interpreter: "/usr/bin/python3.9"  
-  #   dnf:
-  #     name: 
-  #       - git
-  #     state: present     
+      microdnf install git        
 
   - name: Clone the repo {{ item.split('/') | last }} to local
     git:
@@ -53,5 +45,5 @@
     shell: |
       cd {{ item.split('/') | last }}
       git push --mirror 'http://{{ gogs_user }}:{{ gogs_user}}@{{ hostname }}/{{ gogs_user }}/app-samples'
-  #     rm -rf {{ item.split('/') | last }}
+      rm -rf {{ item.split('/') | last }}
 
