@@ -28,6 +28,11 @@
         name: app-samples
         private: false    
 
+  - name: Install git
+    dnf:
+      name: git
+      state: present
+      
   - name: Clone the repo {{ item.split('/') | last }} to local
     git:
       repo: "{{ item }}"

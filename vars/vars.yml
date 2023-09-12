@@ -1,7 +1,7 @@
 #ocp creds
-ocp_api_url: "https://api.o4-ibmvm-02.qe.red-chesterfield.com:6443"
+ocp_api_url: "https://api.ocp.red-chesterfield.com:6443"
 ocp_user: "kubeadmin"
-ocp_pwd: "msyZq-st6Vt-4iEqh-oH6Qb" 
+ocp_pwd: "" 
 
 #service account
 sa: "automation-service-account"
