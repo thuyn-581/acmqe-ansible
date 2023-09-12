@@ -28,20 +28,20 @@
         name: app-samples
         private: false    
 
-  - name: Install git
-    vars:
-      ansible_python_interpreter: "/usr/bin/python3.9"  
-    yum:
-      name: 
-        # - python3
-        - git
-      state: present     
+  # - name: Install git
+  #   vars:
+  #     ansible_python_interpreter: "/usr/bin/python3.9"  
+  #   yum:
+  #     name: 
+  #       # - python3
+  #       - git
+  #     state: present     
 
-  # - name: test
-  #   shell: |
-  #     ls -al /usr/local/bin | grep python
-  #     ls -al /usr/bin | grep python
-  #     alternative --display python   
+  - name: test
+    shell: |
+      ls -al /usr/local/bin | grep python
+      ls -al /usr/bin | grep python
+      python3 --version
 
   # - name: Clone the repo {{ item.split('/') | last }} to local
   #   git:
