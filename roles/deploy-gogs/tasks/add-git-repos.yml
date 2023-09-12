@@ -14,15 +14,10 @@
         name: "sample-token"
         sha1: "8a4fc41b4868aecdd623b10cb1b64a36c6ee51f3"
     register: gogs_access_token
-  
+
   # - debug:
-  #     msg: "{{ gogs_access_token.json.sha1 }}"
-
-  - name: Clone the repo {{ item.split('/') | last }} from GH
-    shell: |
-      rm -rf {{ item.split('/') | last }}
-      git clone --bare {{ item }}
-
+  #     msg: "{{ gogs_access_token.json.sha1 }}"    
+  
   - name: Create the repo {{ item.split('/') | last }} on gogs server
     uri:
       url: http://{{ gogs_user }}:{{ gogs_user}}@{{ hostname }}/api/v1/user/repos?token={{ gogs_access_token.json.sha1 }}
@@ -31,7 +26,16 @@
       status_code: 201
       body:
         name: app-samples
-        private: false
+        private: false    
+
+  - name: Clone the repo {{ item.split('/') | last }} to local
+    git:
+      repo: "{{ item }}"
+      dest: app-samples
+      bare: true
+      clone: true
+      force: true
+      update: true      
   
   - name: Push the repo {{ item.split('/') | last }} to gogs server
     shell: |

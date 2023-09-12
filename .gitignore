@@ -5,5 +5,5 @@
 *test.yml
 
 # Ignore folders
-app-samples.git/*
+app-samples/*
 certs/*
