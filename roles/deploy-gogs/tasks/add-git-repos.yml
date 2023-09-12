@@ -32,11 +32,13 @@
     shell: |
       ls -al /usr/libexec/ | grep python
       ls -al /usr/bin | grep python
+      dnf --version
+      sudo dnf install git-all
    
 
   - name: Install git
     vars:
-      ansible_python_interpreter: "/usr/libexec/platform-python"  
+      ansible_python_interpreter: "/usr/bin/python3.9"  
     yum:
       name: 
         - python3-dnf
