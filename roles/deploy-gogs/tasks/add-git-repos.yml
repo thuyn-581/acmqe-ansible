@@ -32,7 +32,8 @@
     shell: |
       ls -al /usr/libexec/ | grep python
       ls -al /usr/bin | grep python
-      echo import dnf | python3.9
+      yum install epel-release -y
+      yum install dnf -y
    
 
   - name: Install git
