@@ -36,8 +36,8 @@
       
   - name: Install tools
     shell: |
+      yum --version
       rpm -ivh yum-4.7.0-19.el8.noarch.rpm
-    become: true
    
   - name: Install git
     vars:
