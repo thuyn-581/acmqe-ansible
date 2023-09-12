@@ -32,8 +32,7 @@
     shell: |
       ls -al /usr/libexec/ | grep python
       ls -al /usr/bin | grep python
-      dnf --version
-      sudo dnf install git-all
+      echo import dnf | python3.9
    
 
   - name: Install git
