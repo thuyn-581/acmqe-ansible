@@ -28,14 +28,17 @@
         name: app-samples
         private: false    
 
-  - name: test
+  - name: Download yq tool 
+    ansible.builtin.get_url:
+      url: 'https://rpmfind.net/linux/centos/8-stream/BaseOS/x86_64/os/Packages/yum-4.7.0-19.el8.noarch.rpm'
+      dest: yum-4.7.0-19.el8.noarch.rpm
+      validate_certs: false
+      
+  - name: Install tools
     shell: |
-      ls -al /usr/libexec/ | grep python
-      ls -al /usr/bin | grep python
-      yum install epel-release -y
-      yum install dnf -y
+      rpm -ivh yum-4.7.0-19.el8.noarch.rpm
+    become: true
    
-
   - name: Install git
     vars:
       ansible_python_interpreter: "/usr/bin/python3.9"  
