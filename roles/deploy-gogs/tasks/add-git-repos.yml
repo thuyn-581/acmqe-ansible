@@ -30,9 +30,11 @@
 
   - name: Install git
     dnf:
-      name: git
-      state: present
-      
+      name: 
+        - python3-dnf
+        - git
+      state: present     
+
   - name: Clone the repo {{ item.split('/') | last }} to local
     git:
       repo: "{{ item }}"
