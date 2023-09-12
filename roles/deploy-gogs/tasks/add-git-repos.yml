@@ -30,8 +30,7 @@
 
   - name: test
     shell: |
-      microdnf install git     
-    become: true   
+      microdnf install git      
   
   # - name: Install git
   #   vars:
