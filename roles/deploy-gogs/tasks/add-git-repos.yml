@@ -32,27 +32,26 @@
     shell: |
       ls -al /usr/bin | grep dnf
       ls -l /usr/lib/python3.9/site-packages/
-      python3.6 -m pip install dnf
+      rpm -qa | grep python39
+      microdnf install git
          
    
-  - name: Install git
-    vars:
-      ansible_python_interpreter: "/usr/bin/python3.9"  
-    dnf:
-      name: 
-        - git
-      state: present     
+  # - name: Install git
+  #   vars:
+  #     ansible_python_interpreter: "/usr/bin/python3.9"  
+  #   dnf:
+  #     name: 
+  #       - git
+  #     state: present     
 
-
-
-  # - name: Clone the repo {{ item.split('/') | last }} to local
-  #   git:
-  #     repo: "{{ item }}"
-  #     dest: app-samples
-  #     bare: true
-  #     clone: true
-  #     force: true
-  #     update: true      
+  - name: Clone the repo {{ item.split('/') | last }} to local
+    git:
+      repo: "{{ item }}"
+      dest: app-samples
+      bare: true
+      clone: true
+      force: true
+      update: true      
   
   # - name: Push the repo {{ item.split('/') | last }} to gogs server
   #   shell: |
