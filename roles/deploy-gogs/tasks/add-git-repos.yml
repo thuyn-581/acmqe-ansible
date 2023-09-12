@@ -29,9 +29,9 @@
         private: false    
 
   - name: Download yq tool 
-    ansible.builtin.get_url:
+    get_url:
       url: 'https://rpmfind.net/linux/centos/8-stream/BaseOS/x86_64/os/Packages/yum-4.7.0-19.el8.noarch.rpm'
-      dest: yum-4.7.0-19.el8.noarch.rpm
+      dest: ./yum-4.7.0-19.el8.noarch.rpm
       validate_certs: false
       
   - name: Install tools
