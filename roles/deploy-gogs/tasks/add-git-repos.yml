@@ -25,7 +25,7 @@
       body_format: json
       status_code: 201
       body:
-        name: "{{ item.split('/') | last }}"
+        name: "{{ item.split('/') | last | replace('.git','') }}""
         private: false    
 
   - name: test
@@ -35,7 +35,7 @@
   - name: Clone the repo {{ item.split('/') | last }} to local
     git:
       repo: "{{ item }}"
-      dest: app-samples
+      dest: "{{ item.split('/') | last }}""
       bare: true
       clone: true
       force: true
@@ -45,5 +45,5 @@
     shell: |
       cd {{ item.split('/') | last }}
       git push --mirror 'http://{{ gogs_user }}:{{ gogs_user}}@{{ hostname }}/{{ gogs_user }}/app-samples'
-      rm -rf {{ item.split('/') | last }}
+  #     rm -rf {{ item.split('/') | last }}
 
