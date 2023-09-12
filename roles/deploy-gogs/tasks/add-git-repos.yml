@@ -30,14 +30,19 @@
 
   - name: Download yq tool 
     get_url:
-      url: 'https://rpmfind.net/linux/centos/8-stream/BaseOS/x86_64/os/Packages/yum-4.7.0-19.el8.noarch.rpm'
+      url: "{{ item }}"
       dest: ./yum-4.7.0-19.el8.noarch.rpm
       validate_certs: false
+    loop:
+    - https://rpmfind.net/linux/centos/8-stream/BaseOS/x86_64/os/Packages/dnf-4.7.0-19.el8.noarch.rpm
+    - https://rpmfind.net/linux/centos/8-stream/BaseOS/x86_64/os/Packages/yum-4.7.0-19.el8.noarch.rpm
       
   - name: Install tools
     shell: |
-      yum --version
       rpm -ivh yum-4.7.0-19.el8.noarch.rpm
+    loop:
+    - https://rpmfind.net/linux/centos/8-stream/BaseOS/x86_64/os/Packages/dnf-4.7.0-19.el8.noarch.rpm
+    - https://rpmfind.net/linux/centos/8-stream/BaseOS/x86_64/os/Packages/yum-4.7.0-19.el8.noarch.rpm      
    
   - name: Install git
     vars:
