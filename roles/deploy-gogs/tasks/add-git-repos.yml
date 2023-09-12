@@ -28,25 +28,31 @@
         name: app-samples
         private: false    
 
-  - name: Install git
-    yum:
-      name: 
-        # - python3
-        - git
-      state: present     
+  # - name: Install git
+  #   yum:
+  #     name: 
+  #       # - python3
+  #       - git
+  #     state: present     
 
-  - name: Clone the repo {{ item.split('/') | last }} to local
-    git:
-      repo: "{{ item }}"
-      dest: app-samples
-      bare: true
-      clone: true
-      force: true
-      update: true      
-  
-  - name: Push the repo {{ item.split('/') | last }} to gogs server
+  - name: test
     shell: |
-      cd {{ item.split('/') | last }}
-      git push --mirror 'http://{{ gogs_user }}:{{ gogs_user}}@{{ hostname }}/{{ gogs_user }}/app-samples'
-      rm -rf {{ item.split('/') | last }}
+      ls -al /usr/local/bin | grep python
+      ls -al /usr/bin | grep python
+      alternative --display python   
+
+  # - name: Clone the repo {{ item.split('/') | last }} to local
+  #   git:
+  #     repo: "{{ item }}"
+  #     dest: app-samples
+  #     bare: true
+  #     clone: true
+  #     force: true
+  #     update: true      
+  
+  # - name: Push the repo {{ item.split('/') | last }} to gogs server
+  #   shell: |
+  #     cd {{ item.split('/') | last }}
+  #     git push --mirror 'http://{{ gogs_user }}:{{ gogs_user}}@{{ hostname }}/{{ gogs_user }}/app-samples'
+  #     rm -rf {{ item.split('/') | last }}
 
