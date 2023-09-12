@@ -35,7 +35,7 @@
   - name: Clone the repo {{ item.split('/') | last }} to local
     git:
       repo: "{{ item }}"
-      dest: "{{ item.split('/') | last }}""
+      dest: "{{ item.split('/') | last }}"
       bare: true
       clone: true
       force: true
@@ -45,5 +45,4 @@
     shell: |
       cd {{ item.split('/') | last }}
       git push --mirror 'http://{{ gogs_user }}:{{ gogs_user}}@{{ hostname }}/{{ gogs_user }}/app-samples'
-  #     rm -rf {{ item.split('/') | last }}
 
