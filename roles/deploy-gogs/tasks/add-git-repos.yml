@@ -25,7 +25,7 @@
       body_format: json
       status_code: 201
       body:
-        name: "{{ item.split('/') | last | replace('.git','') }}""
+        name: "{{ item.split('/') | last | replace('.git','') }}"
         private: false    
 
   - name: test
