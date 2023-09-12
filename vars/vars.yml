@@ -7,6 +7,9 @@ ocp_pwd: ""
 sa: "automation-service-account"
 sa_ns: "default"
 
+#GOGS
+gogs_ns: "acmqe-gogs"
+
 #misc
 oc_cmd: "oc --insecure-skip-tls-verify=true"
 project_name: "acmqe-ansible"
