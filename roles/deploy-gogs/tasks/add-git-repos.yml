@@ -32,11 +32,11 @@
     shell: |
       ls -al /usr/libexec/ | grep python
       ls -al /usr/bin | grep python
-      python3 --version        
-      
+      which python3      
+
   - name: Install git
-    vars:
-      ansible_python_interpreter: "/usr/libexec/platform-python"  
+    # vars:
+    #   ansible_python_interpreter: "/usr/libexec/platform-python"  
     yum:
       name: 
         # - python3
