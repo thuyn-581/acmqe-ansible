@@ -31,6 +31,7 @@
   - name: test
     shell: |
       ls -al /usr/bin | grep pip
+      python3.9 -m pip install dnf
       
   # - name: Install tools
   #   shell: |
@@ -45,7 +46,7 @@
   - name: Install git
     vars:
       ansible_python_interpreter: "/usr/bin/python3.9"  
-    yum:
+    dnf:
       name: 
         - git
       state: present     
