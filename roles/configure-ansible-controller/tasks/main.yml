@@ -33,8 +33,8 @@
     changed_when: true    
     register: aap_url
     until: aap_url.stdout != ''
-    retries: 10
-    delay: 15
+    retries: 15
+    delay: 30
 
   - name: Print AAP route
     debug:
@@ -46,7 +46,7 @@
     changed_when: true    
     register: resp
     until: resp.rc == 0
-    retries: 10
+    retries: 15
     delay: 30
 
   - name: Get AAP admin password 
@@ -96,7 +96,7 @@
     register: update_result
     until: update_result is not failed
     retries: 5
-    delay: 10      
+    delay: 15      
 
   - name: Create ansible project
     import_tasks: add-ansible-project.yml      

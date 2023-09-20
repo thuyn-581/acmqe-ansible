@@ -3,6 +3,8 @@
 *.tar.gz
 *.zip
 *test.yml
+roles/configure-ansible-controller/tasks/install-aap-operator.yml
+
 
 # Ignore folders
 app-samples/*
