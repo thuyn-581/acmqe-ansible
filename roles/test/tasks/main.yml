@@ -1,0 +1,19 @@
+---
+  - name: Test 1
+    block:
+    - debug:
+        msg: "{{ hostname }}"  
+
+    - name: task 1
+      shell: |
+        ls -al
+  
+      
+  - name: Test 2
+    block:
+    - debug:
+        msg: "{{ hostname }}"  
+
+    - name: task 2
+      shell: |
+        ls -al        

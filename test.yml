@@ -1,0 +1,24 @@
+- name: Test
+  hosts: localhost
+  any_errors_fatal: true 
+  vars_files:
+  - ./vars/vars.yml    
+  # vars:
+  #   cluster: "{{ ocp_api_url.split('.')[1] }}"
+  #   array: "{{ ocp_api_url.split(':6443')[0] | split('api.') }}" 
+  #   gogs_ns: "acmqe-gogs"
+  #   gogs_user: "gogs-admin"
+  #   repos: ['','']    
+  #   # hostname: "acmqe-gogs.apps.o4-ibmvm-01.qe.red-chesterfield.com"
+  #   repos: ["https://github.com/fxiang1/app-samples.git"]
+  #   ocp_release: "stable"
+  #   ocp_version: "candidate"
+  #   ocp_custom_version: "4.10"      
+  #   ocp_repo: "{% if ocp_release=='dev-preview' %}ocp-dev-release{% else %}ocp{% endif %}"
+  #   ocp_version_loc: "{% if ocp_custom_version=='' %}{{ ocp_version }}{% else %}{{ ocp_custom_version }}{% endif %}"
+
+
+  tasks:
+  - name: Test main
+    import_role:
+      name: "test role"  
