@@ -2,7 +2,7 @@
   - name: Test 1
     block:
     - debug:
-        msg: "{{ hostname }}"  
+        msg: "abc"  
 
     - name: task 1
       shell: |
@@ -12,7 +12,7 @@
   - name: Test 2
     block:
     - debug:
-        msg: "{{ hostname }}"  
+        msg: "def"  
 
     - name: task 2
       shell: |
