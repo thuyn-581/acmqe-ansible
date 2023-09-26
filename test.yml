@@ -21,4 +21,4 @@
   tasks:
   - name: Test main
     import_role:
-      name: "test role"  
+      name: "test"  
