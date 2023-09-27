@@ -1,6 +1,10 @@
 - name: Test
   hosts: localhost
   any_errors_fatal: true 
+  junit: 
+    include_setup_tasks_in_report: false
+    task_class: true
+    output_dir: "//rh"
   vars_files:
   - ./vars/vars.yml    
   # vars:
