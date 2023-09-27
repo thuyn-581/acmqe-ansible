@@ -1,14 +1,7 @@
----
+---  
   - name: RHACM4K-948
-    block:
-    - debug:
-        msg: "abc"  
+    import_tasks: RHACM4K-948.yml
 
-    - name: task 1
-      shell: |
-        ls -al
-  
-      
   - name: RHACM4K-10709
     block:
     - debug:

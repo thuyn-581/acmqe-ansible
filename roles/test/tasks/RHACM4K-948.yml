@@ -1,0 +1,8 @@
+- name: RHACM4K-948
+  block:
+  - debug:
+      msg: "abc"  
+
+  - name: task 1
+    shell: |
+      ls -al
