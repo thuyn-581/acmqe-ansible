@@ -5,6 +5,6 @@
     no_log: true
   
 
-  - name: RHACM4K-948
+  - name: "RHACM4K-948: test 2
     shell: |
       ls -al
