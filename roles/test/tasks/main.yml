@@ -1,5 +1,9 @@
 ---  
   - name: RHACM4K-948
+    junit: 
+      include_setup_tasks_in_report: false
+      task_class: true
+      output_dir: "//rh"
     import_tasks: RHACM4K-948.yml
 
   - name: RHACM4K-10709
