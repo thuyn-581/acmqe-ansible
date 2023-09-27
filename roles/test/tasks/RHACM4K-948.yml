@@ -1,7 +1,7 @@
 - name: RHACM4K-948
   block:
   - debug:
-    no_log: true
+      no_log: true
       msg: "abc"  
 
   - name: task 1

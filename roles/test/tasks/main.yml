@@ -5,7 +5,7 @@
   - name: RHACM4K-10709
     block:
     - debug:
-      no_log: true
+        no_log: true
         msg: "def"  
 
     - name: task 2
