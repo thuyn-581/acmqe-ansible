@@ -1,5 +1,5 @@
 ---
-  - name: Test 1
+  - name: RHACM4K-948
     block:
     - debug:
         msg: "abc"  
@@ -9,7 +9,7 @@
         ls -al
   
       
-  - name: Test 2
+  - name: RHACM4K-10709
     block:
     - debug:
         msg: "def"  
