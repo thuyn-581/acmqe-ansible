@@ -1,10 +1,10 @@
 - name: RHACM4K-948
   block:
   - name:
-    command: 'asdf'
+    command: 'echo $?'
     no_log: true
   
 
-  - name: task 1
+  - name: RHACM4K-948
     shell: |
       ls -al

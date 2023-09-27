@@ -8,6 +8,6 @@
       command: 'echo no_log'
       no_log: true  
 
-    - name: task 2
+    - name: RHACM4K-10709
       shell: |
         ls -al        
