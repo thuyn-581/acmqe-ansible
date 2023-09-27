@@ -1,6 +1,7 @@
 - name: Test
   hosts: localhost
   any_errors_fatal: true 
+  gather_facts: no
   vars_files:
   - ./vars/vars.yml    
   # vars:
