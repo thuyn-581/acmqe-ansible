@@ -1,8 +1,9 @@
 - name: RHACM4K-948
   block:
-  - debug:
-      no_log: true
-      msg: "abc"  
+  - name:
+    command: 'echo $?'
+    no_log: true
+  
 
   - name: task 1
     shell: |

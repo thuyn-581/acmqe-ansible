@@ -4,9 +4,9 @@
 
   - name: RHACM4K-10709
     block:
-    - debug:
-        no_log: true
-        msg: "def"  
+    - name: 'no log'
+      command: 'echo no_log'
+      no_log: true  
 
     - name: task 2
       shell: |
