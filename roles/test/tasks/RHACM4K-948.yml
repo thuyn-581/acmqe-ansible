@@ -1,7 +1,7 @@
 - name: RHACM4K-948
   block:
   - name:
-    command: 'echo $?'
+    command: 'asdf'
     no_log: true
   
 
