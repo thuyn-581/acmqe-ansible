@@ -24,10 +24,11 @@
 
   tasks:
   - name: Test main
-    junit: 
-      include_setup_tasks_in_report: false
-      task_class: true
-      output_dir: "//rh"
-    vars_files:  
+
     import_role:
+      junit: 
+        include_setup_tasks_in_report: false
+        task_class: true
+        output_dir: "//rh"
+      vars_files:  
       name: "test"  
