@@ -20,9 +20,5 @@
 
   tasks:
   - name: Test main
-    junit: 
-      include_setup_tasks_in_report: false
-      task_class: true
-      output_dir: "//rh"
     import_role:
       name: "test"  
