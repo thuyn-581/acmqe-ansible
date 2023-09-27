@@ -1,5 +1,8 @@
 - name: RHACM4K-948
-  no_log: true
+  junit: 
+    include_setup_tasks_in_report: false
+    task_class: true
+    output_dir: "//rh"
   block:
   - debug:
       msg: "abc"  
