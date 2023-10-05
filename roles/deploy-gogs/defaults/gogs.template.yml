@@ -219,7 +219,6 @@ objects:
                 path: app.ini
     test: false
     triggers:
-    - type: ConfigChange
     - imageChangeParams:
         automatic: true
         containerNames:
@@ -227,24 +226,36 @@ objects:
         from:
           kind: ImageStreamTag
           name: ${APPLICATION_NAME}:${GOGS_VERSION}
+          namespace: acmqe-gogs
       type: ImageChange
-- kind: ImageStream
-  apiVersion: v1
-  metadata:
-    labels:
-      app: ${APPLICATION_NAME}
-    name: ${APPLICATION_NAME}
-  spec:
-    tags:
-    - name: "${GOGS_VERSION}"
-      from:
-        kind: DockerImage
-        name: docker.io/openshiftdemos/gogs:${GOGS_VERSION}
-      importPolicy: {}
-      annotations:
-        description: The Gogs git server docker image
-        tags: gogs,go,golang
-        version: "${GOGS_VERSION}"
+    - type: ConfigChange
+      
+    # - type: ConfigChange
+    # - imageChangeParams:
+    #     automatic: true
+    #     containerNames:
+    #     - ${APPLICATION_NAME}
+    #     from:
+    #       kind: ImageStreamTag
+    #       name: ${APPLICATION_NAME}:${GOGS_VERSION}
+    #   type: ImageChange
+# - kind: ImageStream
+#   apiVersion: v1
+#   metadata:
+#     labels:
+#       app: ${APPLICATION_NAME}
+#     name: ${APPLICATION_NAME}
+#   spec:
+#     tags:
+#     - name: "${GOGS_VERSION}"
+#       from:
+#         kind: DockerImage
+#         name: "{{ gogs_src }}"/gogs:${GOGS_VERSION}
+#       importPolicy: {}
+#       annotations:
+#         description: The Gogs git server docker image
+#         tags: gogs
+#         version: "${GOGS_VERSION}"
 - kind: PersistentVolumeClaim
   apiVersion: v1
   metadata:

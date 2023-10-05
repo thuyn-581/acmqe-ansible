@@ -9,3 +9,4 @@ roles/configure-ansible-controller/tasks/install-aap-operator.yml
 # Ignore folders
 app-samples/*
 certs/*
+*.git/*

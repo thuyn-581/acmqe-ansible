@@ -4,7 +4,8 @@
   gather_facts: no
   vars_files:
   - ./vars/vars.yml    
-  # vars:
+  vars:
+    url: https://github.com/stolostron/cluster-backup-operator.git
   #   cluster: "{{ ocp_api_url.split('.')[1] }}"
   #   array: "{{ ocp_api_url.split(':6443')[0] | split('api.') }}" 
   #   gogs_ns: "acmqe-gogs"
@@ -18,12 +19,15 @@
   #   ocp_repo: "{% if ocp_release=='dev-preview' %}ocp-dev-release{% else %}ocp{% endif %}"
   #   ocp_version_loc: "{% if ocp_custom_version=='' %}{{ ocp_version }}{% else %}{{ ocp_custom_version }}{% endif %}"
 
-  pre_tasks:
-  - name: Get hostname
-    command: 'hostname'
-    register: hostname
+  # pre_tasks:
+  # - name: Get hostname
+  #   command: 'hostname'
+  #   register: hostname
 
   tasks:
-  - name: Test main
-    import_role:
-      name: "test"  
+  # - name: Test main
+  #   import_role:
+  #     name: "test"  
+
+  - debug:
+      msg: "{{ url.split('/')[3] }}" 

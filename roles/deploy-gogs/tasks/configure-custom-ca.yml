@@ -9,6 +9,19 @@
     {{ oc_cmd }} -n {{ gogs_ns }} delete route gogs
     {{ oc_cmd }} -n {{ gogs_ns }} create route edge --service=gogs --cert={{ certs_dir }}/server.crt --key={{ certs_dir }}/server.key --path=/ 
 
+- name: "Wait for gogs server new route"
+  uri:
+    url: "https://gogs-acmqe-gogs.apps.mist12-0.qe.red-chesterfield.com"
+    method: GET
+    timeout: 30
+    return_content: yes
+    validate_certs: no
+    status_code: 200
+  register: gogs_status    
+  until: gogs_status.status == 200
+  retries: 10
+  delay: 5  
+  
 - name: Generate gogs-ca-configmap.yaml
   shell: >
     {{ oc_cmd }} create configmap gogs-ca 

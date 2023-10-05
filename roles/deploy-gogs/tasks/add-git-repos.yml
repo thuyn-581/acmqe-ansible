@@ -1,36 +1,20 @@
 ---
 - name: Create the repo {{ item.split('/') | last }} on gogs server
   block:  
-  - name: Get gogs access token
-    uri:
-      url: http://{{ hostname }}/api/v1/users/{{ gogs_user }}/tokens
-      user: "{{ gogs_user }}"
-      password: "{{ gogs_user }}"
-      method: POST
-      body_format: json
-      force_basic_auth: true
-      status_code: 201
-      body:
-        name: "sample-token"
-        sha1: "8a4fc41b4868aecdd623b10cb1b64a36c6ee51f3"
-    register: gogs_access_token
-
-  # - debug:
-  #     msg: "{{ gogs_access_token.json.sha1 }}"    
-  
   - name: Create the repo {{ item.split('/') | last }} on gogs server
     uri:
-      url: http://{{ gogs_user }}:{{ gogs_user}}@{{ hostname }}/api/v1/user/repos?token={{ gogs_access_token.json.sha1 }}
+      url: https://{{ gogs_user }}:{{ gogs_user}}@gogs-{{ hostname }}/api/v1/user/repos?token={{ gogs_access_token.json.sha1 }}
       method: 'POST'
       body_format: json
       status_code: 201
+      validate_certs: no
       body:
-        name: "{{ item.split('/') | last | replace('.git','') }}"
+        name: "{{ item.split('/')[3] }}/{{ item.split('/') | last | replace('.git','') }}"
         private: false    
 
-  - name: Install git
-    shell: |
-      microdnf install git        
+  # - name: Install git
+  #   shell: |
+  #     microdnf install git        
 
   - name: Clone the repo {{ item.split('/') | last }} to local
     git:
@@ -39,10 +23,11 @@
       bare: true
       clone: true
       force: true
-      update: true      
+      update: true
+      version: "{{ git_branch }}"      
   
-  - name: Push the repo {{ item.split('/') | last }} to gogs server
+  - name: Push the repo {{ item.replace('.git','').split('/') | last }} to gogs server
     shell: |
       cd {{ item.split('/') | last }}
-      git push --mirror 'http://{{ gogs_user }}:{{ gogs_user}}@{{ hostname }}/{{ gogs_user }}/app-samples'
+      git push --mirror 'https://{{ gogs_user }}:{{ gogs_user}}@gogs-{{ hostname }}/{{ item.split('/')[3] }}/{{ item.replace('.git','').split('/') | last }}'
 
