@@ -1,0 +1,9 @@
+- name: Update Job Inventory
+  hosts: localhost
+  any_errors_fatal: true 
+    
+  tasks:    
+  - name: Update inventory for template {{ job_name }}
+    include_role:
+      name: add-ocp-inventory
+      tasks_from: update-inventory.yml    

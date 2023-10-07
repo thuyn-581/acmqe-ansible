@@ -1,0 +1,28 @@
+---
+- name: Generate custom CA certs for gogs server
+  include_tasks: tasks/generate-ca-certs.yml 
+
+- name: Recreate Gogs route with the generated self-signed certificates
+  shell: |
+    {{ oc_cmd }} -n {{ gogs_ns }} delete route gogs
+    {{ oc_cmd }} -n {{ gogs_ns }} create route edge --service=gogs --cert={{ certs_dir }}/server.crt --key={{ certs_dir }}/server.key --path=/ 
+
+- name: "Wait for gogs server new route"
+  uri:
+    url: "https://gogs-{{ hostname }}"
+    method: GET
+    timeout: 30
+    return_content: yes
+    validate_certs: no
+    status_code: 200
+  register: gogs_status    
+  until: gogs_status.status == 200
+  retries: 10
+  delay: 5  
+  
+- name: Generate gogs-ca-configmap.yaml
+  shell: >
+    {{ oc_cmd }} create configmap gogs-ca 
+    --from-file=caCerts={{ certs_dir }}/rootCA.crt 
+    -n {{ gogs_ns }}
+  

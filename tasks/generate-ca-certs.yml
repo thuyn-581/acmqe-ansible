@@ -1,0 +1,31 @@
+---
+  - name: Generate certs
+    block:
+    - name: Create certs folder
+      block:
+      - name: Delete certs folder if exists
+        file:
+          path: "{{ certs_dir }}"
+          state: absent
+      - name: Creat certs folder
+        file:
+          path: ./certs
+          state: directory
+          mode: 0775
+
+    - name: Populate certs config files
+      template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"     
+      loop: 
+        - { src: 'templates/ca.conf.j2', dest: '{{ certs_dir }}/ca.conf' }
+        - { src: 'templates/san.ext.j2', dest: '{{ certs_dir }}/san.ext' }      
+
+    - name: Generate certs
+      shell: |
+        cd {{ certs_dir }}
+        openssl genrsa -out rootCA.key 4096
+        openssl req -x509 -new -nodes -key rootCA.key -sha256 -days 1024 -out rootCA.crt -config ca.conf
+        openssl genrsa -out server.key 4096
+        openssl req -new -key server.key -out server.csr -config ca.conf
+        openssl x509 -req -in server.csr -CA rootCA.crt -CAkey rootCA.key -CAcreateserial -out server.crt -days 500 -sha256 -extfile san.ext

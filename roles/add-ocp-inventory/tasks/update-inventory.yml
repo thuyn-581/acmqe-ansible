@@ -6,8 +6,9 @@
     controller_host: "{{ tower }}"     
     validate_certs: false    
     name: "{{ job_name }}"
-    project: "{{ project_name }}"
-    playbook: "{{ job_name }}.yml"
-    inventory: "openshift-inventory-{{ cluster }}"
+    # project: "{{ project_name }}"
+    # playbook: "{{ job_name }}.yml"
+    inventory: "{{ inventory }}"
+  when: job_name != ""
     
  

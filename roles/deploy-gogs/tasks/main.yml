@@ -1,0 +1,75 @@
+---
+- name: Copy task modules to remote
+  copy:
+    src: '.'
+    dest: '.'
+    follow: yes
+    remote_src: true   
+    
+# - name: Get SA token
+#   include_role:
+#     name: common
+#     tasks_from: create-service-account
+
+- name: Deloy GOGS 
+  vars:
+    hostname: "{{ gogs_ns }}.{{ ocp_api_url | urlsplit('hostname') | replace('api','apps') }}"
+  block:
+  - debug:
+      msg: "{{ hostname }}"        
+
+  - name: Create ns {{ gogs_ns }}
+    shell: |
+      {{ oc_cmd }} --token={{ sa_token.stdout }} delete ns {{ gogs_ns }}
+      {{ oc_cmd }} create ns {{ gogs_ns }}
+    changed_when: true
+    ignore_errors: true
+
+  - name: Create imagestream for gogs app
+    shell: |
+      {{ oc_cmd }} import-image {{ gogs_src }}/gogs:0.9.97 --confirm -n {{ gogs_ns }}
+    changed_when: true   
+
+  - name: Deloy gogs on {{ cluster }}
+    block: 
+    - name: Deloy GOGS on {{ cluster }}
+      shell: >
+        {{ oc_cmd }} process 
+        -f roles/deploy-gogs/defaults/gogs.template.yml
+        -p HOSTNAME={{ hostname }}
+        -p SKIP_TLS_VERIFY=true 
+        -p DATABASE_VERSION=10-el8
+        | oc create -f - -n {{ gogs_ns }}
+
+    - name: Wait for gogs deployment completed
+      shell: >
+        {{ oc_cmd }} -n {{ gogs_ns }} wait --for=condition=ready pod -l app=gogs 
+      changed_when: true    
+      register: wait
+      until: wait.rc == 0
+      retries: 10
+      delay: 30
+    
+    - debug:
+        msg: "{{ wait.stdout.split(' ')[0] }}"
+
+    - name: Add gogs-admin user
+      shell: >
+        {{ oc_cmd }} -n {{ gogs_ns}} exec {{ wait.stdout.split(' ')[0] }} --
+        /bin/bash -c 'USER=gogs /opt/gogs/gogs admin create-user --admin 
+        --config /etc/gogs/conf/app.ini
+        --name {{ gogs_user }} --password {{ gogs_user }} --email {{ gogs_user }}@acmqe.io'         
+
+  - name: Enable gogs server with custom certs 
+    import_tasks: configure-custom-ca.yml        
+
+  - name: Add test git repositories
+    block:
+    - name: Generate gogs access token
+      include_tasks: gen-gogs-access-token.yml
+    
+    - name: Add git repos to gogs
+      include_tasks:
+        file: add-git-repos.yml
+      loop: "{{ git_repos }}"
+

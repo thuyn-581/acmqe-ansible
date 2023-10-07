@@ -2,11 +2,14 @@
   hosts: localhost
   any_errors_fatal: true 
   vars_files:
-  - ./vars/vars.yml    
+  - vars/vars.yml   
   vars:
     cluster: "{{ ocp_api_url.split('.')[1] }}"
     
-  tasks:
-  - name: Add Openshift Inventory on local Tower
+  tasks:    
+  - name: Get SA token
+    include_tasks: tasks/create-service-account.yml 
+
+  - name: Add Openshift Inventory of {{ cluster }} on Ansible Tower
     import_role:
       name: add-ocp-inventory       

@@ -7,6 +7,6 @@ image: "registry.redhat.io/ansible-automation-platform-23/platform-resource-runn
 
 #tower
 tower: "https://ansible.qe.red-chesterfield.com"
-tower_pwd: "thnguyen"
-tower_user: ""
+tower_pwd: ""
+tower_user: "thnguyen"
 job_name: ""

@@ -1,0 +1,15 @@
+- name: Configure GOGS on hub
+  hosts: localhost
+  any_errors_fatal: true 
+  vars_files:
+  - ./vars/vars.yml    
+  vars:
+    cluster: "{{ ocp_api_url.split('.')[1] }}"
+
+  tasks: 
+  - name: Get SA token
+    include_tasks: tasks/create-service-account.yml     
+
+  - name: Configure GOGS on {{ cluster }}
+    import_role:
+      name: "deploy-gogs"

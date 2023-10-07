@@ -1,0 +1,32 @@
+---
+- name: Create the repo {{ item.split('/') | last }} on gogs server
+  block:  
+  # - debug:
+  #     msg: "{{ item.split('/')[3] }}/{{ item.split('/') | last | replace('.git','') }}" 
+
+  - name: Create the repo {{ item.split('/') | last }} on gogs server
+    uri:
+      url: https://{{ gogs_user }}:{{ gogs_user}}@gogs-{{ hostname }}/api/v1/user/repos?token={{ gogs_access_token.json.sha1 }}
+      method: 'POST'
+      body_format: json
+      status_code: 201
+      validate_certs: no
+      body:
+        name: "{{ item.split('/') | last | replace('.git','') }}"
+        private: false           
+
+  - name: Clone the repo {{ item.split('/') | last }} to local
+    git:
+      repo: "{{ item }}"
+      dest: "{{ item.split('/') | last }}"
+      bare: true
+      clone: true
+      force: true
+      update: true
+      version: "{{ git_branch }}"      
+  
+  - name: Push the repo {{ item.replace('.git','').split('/') | last }} to gogs server
+    shell: |
+      cd {{ item.split('/') | last }}
+      git push --mirror 'https://{{ gogs_user }}:{{ gogs_user}}@gogs-{{ hostname }}/{{ gogs_user }}/{{ item.replace('.git','').split('/') | last }}'
+
