@@ -7,6 +7,12 @@
     cluster: "{{ ocp_api_url.split('.')[1] }}"
     
   tasks:    
+  - name: Login ocp
+    include_tasks: tasks/login-ocp.yml
+
+  - name: Create proxy config cm if applicable
+    include_tasks: tasks/create-proxy-config-cm.yml   
+
   - name: Get SA token
     include_tasks: tasks/create-service-account.yml 
 

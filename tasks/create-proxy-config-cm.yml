@@ -1,0 +1,20 @@
+- name: Get proxy details
+  shell: |
+    {{ oc_cmd }} get proxy/cluster -ojson | jq '.spec'
+  register: proxy_spec
+
+- set_fact:
+    http_proxy: "{{ proxy_spec.stdout | from_json | json_query('httpProxy') }}"
+    no_proxy: "{{ proxy_spec.stdout | from_json | json_query('noProxy') }}"
+
+- name: Create proxy-config configmap in default namespace
+  shell: |
+    {{ oc_cmd }} -n default create configmap proxy-config \
+    --from-literal=http_proxy={{ http_proxy }} \
+    --from-literal=HTTP_PROXY={{ http_proxy }} \
+    --from-literal=https_proxy={{ http_proxy }} \
+    --from-literal=HTTPS_PROXY={{ http_proxy }} \
+    --from-literal=no_proxy={{ no_proxy }} \
+    --from-literal=NO_PROXY={{no_proxy }}  -o yaml --dry-run | {{ oc_cmd }} apply -f -   
+  when: http_proxy | length > 0 
+
