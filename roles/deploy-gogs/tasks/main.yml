@@ -5,11 +5,12 @@
     dest: '.'
     follow: yes
     remote_src: true   
-    
-# - name: Get SA token
-#   include_role:
-#     name: common
-#     tasks_from: create-service-account
+
+- name: Login cluster at {{ ocp_api_url }}
+  import_tasks: tasks/login-ocp.yml      
+
+- name: Create automation SA if not exists
+  import_tasks: tasks/create-service-account.yml
 
 - name: Deloy GOGS 
   vars:
