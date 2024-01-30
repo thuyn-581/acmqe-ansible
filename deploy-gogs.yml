@@ -7,6 +7,9 @@
     cluster: "{{ ocp_api_url.split('.')[1] }}"
 
   tasks: 
+  - name: Login cluster at {{ ocp_api_url }}
+    import_tasks: tasks/login-ocp.yml      
+
   - name: Get SA token
     include_tasks: tasks/create-service-account.yml     
 

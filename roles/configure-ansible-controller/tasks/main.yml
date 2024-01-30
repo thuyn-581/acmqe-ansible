@@ -6,9 +6,6 @@
       follow: yes
       remote_src: true 
 
-  - name: Login cluster at {{ ocp_api_url }}
-    import_tasks: tasks/login-ocp.yml  
-
   - name: Create AAP controller CR
     shell: |
       {{ oc_cmd }} apply -f - <<EOF
