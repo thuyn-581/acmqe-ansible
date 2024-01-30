@@ -28,5 +28,5 @@
   - name: Push the repo {{ item.replace('.git','').split('/') | last }} to gogs server
     shell: |
       cd {{ item.split('/') | last }}
-      git push --mirror 'https://{{ gogs_user }}:{{ gogs_user}}@gogs-{{ hostname }}/{{ gogs_user }}/{{ item.replace('.git','').split('/') | last }}'
+      git -c http.sslVerify=false push --mirror 'https://{{ gogs_user }}:{{ gogs_user}}@gogs-{{ hostname }}/{{ gogs_user }}/{{ item.replace('.git','').split('/') | last }}'
 
