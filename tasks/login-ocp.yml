@@ -1,4 +1,4 @@
-- name: Login openshift
+- name: Login openshift at {{ ocp_api_url }}
   shell: |
     {{ oc_cmd }} login -u {{ ocp_user }} -p {{ ocp_pwd }} {{ ocp_api_url }}     
   register: task_result

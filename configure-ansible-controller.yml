@@ -5,7 +5,7 @@
   - ./vars/vars.yml    
   
   tasks:
-  - name: Login cluster at {{ ocp_api_url }}
+  - name: Login cluster
     import_tasks: tasks/login-ocp.yml      
     
   - name: Configure Ansible Automation Controller on hub

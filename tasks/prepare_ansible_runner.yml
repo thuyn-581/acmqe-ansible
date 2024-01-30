@@ -1,0 +1,6 @@
+- name: Install helper tools
+  shell: |
+    microdnf install {{ item }}
+  loop:
+    - jq
+    - openssl    

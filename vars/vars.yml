@@ -12,3 +12,4 @@ oc_cmd: "oc --insecure-skip-tls-verify=true"
 project_name: "acmqe-ansible"
 certs_dir: "./certs"
 http_proxy: ""
+skip_ansible_runner: false
