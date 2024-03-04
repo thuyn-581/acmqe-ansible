@@ -65,17 +65,17 @@
       - "openshift-container-group-{{ cluster }}"
   run_once: true
 
-- name: Create host in Ansible Tower
-  awx.awx.host:
-    controller_username: "{{ tower_user }}"
-    controller_password: "{{ tower_pwd }}"
-    controller_host: "{{ tower }}"        
-    validate_certs: false
-    name: "openshift-host-{{ cluster }}"
-    inventory: "openshift-inventory-{{ cluster }}"
-    enabled: true
-    variables:
-      ansible_host: '127.0.0.1'
-      ansible_connection: 'local'
-  run_once: true        
+# - name: Create host in Ansible Tower
+#   awx.awx.host:
+#     controller_username: "{{ tower_user }}"
+#     controller_password: "{{ tower_pwd }}"
+#     controller_host: "{{ tower }}"        
+#     validate_certs: false
+#     name: "openshift-host-{{ cluster }}"
+#     inventory: "openshift-inventory-{{ cluster }}"
+#     enabled: true
+#     variables:
+#       ansible_host: '127.0.0.1'
+#       ansible_connection: 'local'
+#   run_once: true        
     
