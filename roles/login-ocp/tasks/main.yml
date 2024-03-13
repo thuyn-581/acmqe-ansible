@@ -1,1 +1,2 @@
 - import_tasks: login-ocp/tasks/login-ocp.yml
+  vars_file: vars/vars.yml
