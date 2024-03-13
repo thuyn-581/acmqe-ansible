@@ -1,0 +1,10 @@
+galaxy_info:
+  role_name: add-ocp-inventory
+  author: thnguyen
+  description: Ansible role for adding ocp inventory
+  license: MIT
+  # min_ansible_version: 2.4
+  platforms: []
+  galaxy_tags: []
+
+dependencies: []
