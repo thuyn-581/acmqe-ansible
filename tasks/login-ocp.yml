@@ -1,6 +1,6 @@
 - name: Login openshift at {{ ocp_api_url }}
   shell: |
-    oc login -u {{ ocp_user }} -p {{ ocp_pwd }} {{ ocp_api_url }}     
+    oc --insecure-skip-tls-verify=true login -u {{ ocp_user }} -p {{ ocp_pwd }} {{ ocp_api_url }}     
   register: task_result
   until: task_result.rc == 0
   retries: 5
