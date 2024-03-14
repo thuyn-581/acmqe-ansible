@@ -1,6 +1,6 @@
 galaxy_info:
   author: thnguyen
-  description: Ansible role for adding ocp inventory
+  description: Ansible role for preparing ansible runner
   license: MIT
   min_ansible_version: 2.1
   galaxy_tags: []
