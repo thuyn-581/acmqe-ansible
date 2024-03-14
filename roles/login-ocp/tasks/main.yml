@@ -1,1 +1,1 @@
-- import_tasks: ../../requirement_roles/acmqe-ansible/tasks/login-ocp.yml
+- import_tasks: ../../requirements_roles/acmqe-ansible/tasks/login-ocp.yml
