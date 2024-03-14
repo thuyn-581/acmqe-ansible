@@ -1,1 +1,1 @@
-- import_tasks: ../acmqe-ansible/tasks/prepare-ansible-runner.yml
+- import_tasks: ../../acmqe-ansible/tasks/prepare-ansible-runner.yml
