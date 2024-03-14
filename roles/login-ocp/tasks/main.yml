@@ -1,1 +1,1 @@
-- import_tasks: ../login-ocp/tasks/login-ocp.yml
+- import_tasks: login-ocp/tasks/login-ocp.yml
