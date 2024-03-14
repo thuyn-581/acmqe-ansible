@@ -1,1 +1,1 @@
-- import_tasks: prepare-ansible-runner/tasks/prepare-ansible-runner.yml
+- import_tasks: ../tasks/prepare-ansible-runner.yml
