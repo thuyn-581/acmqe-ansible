@@ -1,4 +1,7 @@
 ---
 collections:
-- awx.awx
-- community.general
+- name: awx.awx
+  source: https://old-galaxy.ansible.com
+
+- name: community.general
+  source: https://old-galaxy.ansible.com  
