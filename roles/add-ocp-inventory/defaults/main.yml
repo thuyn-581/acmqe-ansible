@@ -3,7 +3,7 @@ sa: "automation-service-account"
 sa_ns: "default"
 
 #ansible-runner image:
-image: "registry.redhat.io/ansible-automation-platform-23/platform-resource-runner-rhel8@sha256:417c81554038460e4396c87eeba039a1f2b8b99b5b1575ccad7a6b72efde0aec"
+image: "registry.redhat.io/ansible-automation-platform-24/platform-resource-runner-rhel8:2.4-138"
 
 #tower
 tower: "https://ansible.qe.red-chesterfield.com"
