@@ -18,7 +18,7 @@ objects:
     labels:
       template: ocm-update-cron
   spec:
-    completionDeadlineSeconds: "1800"
+    completionDeadlineSeconds: 1800
     output:
       to:
         kind: ImageStreamTag
