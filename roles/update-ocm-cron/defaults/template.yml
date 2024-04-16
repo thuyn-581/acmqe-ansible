@@ -94,12 +94,12 @@ parameters:
 - name: SUCCESS_JOBS_HISTORY_LIMIT
   displayName: Successful Job History Limit
   description: The number of successful jobs that will be retained
-  value: '5'
+  value: 5
   required: true
 - name: FAILED_JOBS_HISTORY_LIMIT
   displayName: Failed Job History Limit
   description: The number of failed jobs that will be retained
-  value: '5'
+  value: 5
   required: true
 - name: NAMESPACE
   displayName: "Namespace where this is deployed"
@@ -114,7 +114,7 @@ parameters:
 - name: STARTING_DEADLINE_SECONDS
   description: Set the startingDeadlineSeconds for the cronjob
   required: false
-  value: "60"
+  value: 60
 - name: API_URL
   description: Openshift API endpoint
   required: true
