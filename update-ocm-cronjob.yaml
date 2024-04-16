@@ -12,11 +12,11 @@
     when: not skip_ansible_runner | bool    
 
   - name: Login cluster
-    import_tasks: tasks/login-ocp.yml     
-    
+    import_tasks: tasks/login-ocp.yml    
+
   - name: Test
     shell: >
       {{ oc_cmd }} process 
       -f roles/update-ocm-cron/defaults/template.yml
-      -p API_URL="https://api.o4-ibmvm-01.qe.red-chesterfield.com:6443"
+      -p API_URL={{ ocp_api_url }}
       | oc create -f - -n default 
