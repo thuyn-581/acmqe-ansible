@@ -55,13 +55,12 @@ objects:
           spec:
             containers:
             - name: "${JOB_NAME}"
-              # image: docker-registry.default.svc:5000/${NAMESPACE}/${NAME}:latest
-              image: image-registry.openshift-image-registry.svc:5000/${NAMESPACE}/${NAME}:latest
+              image: docker-registry.default.svc:5000/${NAMESPACE}/${NAME}:latest
+              # image: image-registry.openshift-image-registry.svc:5000/${NAMESPACE}/${NAME}:latest
               imagePullPolicy: Always
               env:
               - name: HOST
                 value: "${API_URL}"
-
             restartPolicy: Never
             terminationGracePeriodSeconds: 30
             activeDeadlineSeconds: 500
