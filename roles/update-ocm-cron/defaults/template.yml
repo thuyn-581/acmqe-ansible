@@ -45,7 +45,7 @@ objects:
     labels:
       template: ocm-update-cron
   spec:
-    schedule: "${SCHEDULE}"
+    schedule: "*/5 * * * *"
     concurrencyPolicy: Forbid
     successfulJobsHistoryLimit: "${SUCCESS_JOBS_HISTORY_LIMIT}"
     failedJobsHistoryLimit: "${FAILED_JOBS_HISTORY_LIMIT}"
@@ -159,3 +159,7 @@ parameters:
   description: Set the startingDeadlineSeconds for the cronjob
   required: false
   value: "60"
+- name: API_URL
+  description: Openshift API endpoint
+  required: true
+  value: ""
