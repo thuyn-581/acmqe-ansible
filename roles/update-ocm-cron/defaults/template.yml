@@ -41,89 +41,40 @@ objects:
       #     kind: DockerImage
       #     name: python:3.8
       # type: Docker
-    # triggers:
-    # - type: ConfigChange
-# - apiVersion: batch/v1
-#   kind: CronJob
-#   metadata:
-#     name: "${JOB_NAME}"
-#     labels:
-#       template: ocm-update-cron
-#   spec:
-#     schedule: "*/5 * * * *"
-#     concurrencyPolicy: Forbid
-#     successfulJobsHistoryLimit: "${SUCCESS_JOBS_HISTORY_LIMIT}"
-#     failedJobsHistoryLimit: "${FAILED_JOBS_HISTORY_LIMIT}"
-#     jobTemplate:
-#       spec:
-#         template:
-#           spec:
-#             containers:
-#             - name: "${JOB_NAME}"
-#               image: docker-registry.default.svc:5000/${NAMESPACE}/${NAME}:latest
-#               # image: image-registry.openshift-image-registry.svc:5000/${NAMESPACE}/${NAME}:latest
-#               imagePullPolicy: Always
-#               env:
-#               - name: HOST
-#                 value: "${API_URL}"
-#             restartPolicy: Never
-#             terminationGracePeriodSeconds: 30
-#             activeDeadlineSeconds: 500
-#             # dnsPolicy: ClusterFirst
-#             serviceAccountName: "${JOB_SERVICE_ACCOUNT}"
-#             serviceAccount: "${JOB_SERVICE_ACCOUNT}"
-#     startingDeadlineSeconds: ${{STARTING_DEADLINE_SECONDS}}
-# - apiVersion: v1
-#   kind: ClusterRole
-#   metadata:
-#     name: pvc-reader
-#     labels:
-#       template: ocm-update-cron
-#   rules:
-#     - apiGroups:
-#       - ""
-#       resources:
-#       - persistentvolumes
-#       verbs:
-#       - get
-#       - list
-#       - watch
-#     - apiGroups:
-#       - storage.k8s.io
-#       resources:
-#       - storageclasses
-#       verbs:
-#       - get
-#       - list
-#       - watch
-#     - apiGroups:
-#       - ""
-#       resources:
-#       - events
-#       - persistentvolumeclaims
-#       verbs:
-#       - get
-#       - list
-#       - watch
-# - apiVersion: v1
-#   kind: ClusterRoleBinding
-#   metadata:
-#     name: system:pvc-reader
-#     labels:
-#       template: ocm-update-cron
-#   roleRef:
-#     name: pvc-reader
-#   subjects:
-#   - kind: ServiceAccount
-#     name: ${JOB_SERVICE_ACCOUNT}
-#   userNames:
-#   - system:serviceaccount:${NAMESPACE}:${JOB_SERVICE_ACCOUNT}
-# - apiVersion: v1
-#   kind: ServiceAccount
-#   metadata:
-#     name: ${JOB_SERVICE_ACCOUNT}
-#     labels:
-#       template: ocm-update-cron
+    triggers:
+    - type: ConfigChange
+- apiVersion: batch/v1
+  kind: CronJob
+  metadata:
+    name: "${JOB_NAME}"
+    labels:
+      template: ocm-update-cron
+  spec:
+    schedule: "*/5 * * * *"
+    concurrencyPolicy: Forbid
+    successfulJobsHistoryLimit: "${SUCCESS_JOBS_HISTORY_LIMIT}"
+    failedJobsHistoryLimit: "${FAILED_JOBS_HISTORY_LIMIT}"
+    jobTemplate:
+      spec:
+        template:
+          spec:
+            containers:
+            - name: "${JOB_NAME}"
+              image: docker-registry.default.svc:5000/${NAMESPACE}/${NAME}:latest
+              # image: image-registry.openshift-image-registry.svc:5000/${NAMESPACE}/${NAME}:latest
+              imagePullPolicy: Always
+              env:
+              - name: HOST
+                value: "${API_URL}"
+              - name: OCM_TOKEN
+                value: "${RHOCM_TOKEN}"
+            restartPolicy: Never
+            terminationGracePeriodSeconds: 30
+            activeDeadlineSeconds: 500
+            # dnsPolicy: ClusterFirst
+            serviceAccountName: "${JOB_SERVICE_ACCOUNT}"
+            serviceAccount: "${JOB_SERVICE_ACCOUNT}"
+    startingDeadlineSeconds: ${{STARTING_DEADLINE_SECONDS}}
 parameters:
 - description: The name assigned to all of the frontend objects defined in this template.
   displayName: Name
@@ -168,3 +119,7 @@ parameters:
   description: Openshift API endpoint
   required: true
   value: ""
+- name: OCM_TOKEN
+  description: Red Hat OCM token
+  required: true
+  value: ""  
