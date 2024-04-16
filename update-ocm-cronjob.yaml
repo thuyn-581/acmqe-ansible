@@ -7,8 +7,13 @@
     cluster: "{{ ocp_api_url.split('.')[1] }}"  
     
   tasks:    
-  # - name: Login 
-  #   include_tasks: tasks/login-ocp.yml
+  - name: Prepare ansible runner host
+    include_tasks: tasks/prepare_ansible_runner.yml
+    when: not skip_ansible_runner | bool    
+
+  - name: Login cluster
+    import_tasks: tasks/login-ocp.yml     
+    
   - name: Test
     shell: >
       {{ oc_cmd }} process 
