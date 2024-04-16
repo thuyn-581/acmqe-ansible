@@ -52,8 +52,8 @@ objects:
   spec:
     schedule: "*/5 * * * *"
     concurrencyPolicy: Forbid
-    successfulJobsHistoryLimit: "${SUCCESS_JOBS_HISTORY_LIMIT}"
-    failedJobsHistoryLimit: "${FAILED_JOBS_HISTORY_LIMIT}"
+    successfulJobsHistoryLimit: 5
+    failedJobsHistoryLimit: 5
     jobTemplate:
       spec:
         template:
@@ -90,16 +90,6 @@ parameters:
   displayName: Cron Schedule
   description: Cron Schedule to Execute the Job
   value: "@daily"
-  required: true
-- name: SUCCESS_JOBS_HISTORY_LIMIT
-  displayName: Successful Job History Limit
-  description: The number of successful jobs that will be retained
-  value: 5
-  required: true
-- name: FAILED_JOBS_HISTORY_LIMIT
-  displayName: Failed Job History Limit
-  description: The number of failed jobs that will be retained
-  value: 5
   required: true
 - name: NAMESPACE
   displayName: "Namespace where this is deployed"
