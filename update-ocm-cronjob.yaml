@@ -1,0 +1,17 @@
+- name: Test
+  hosts: localhost
+  any_errors_fatal: true 
+  vars_files:
+  - vars/vars.yml
+  vars:
+    cluster: "{{ ocp_api_url.split('.')[1] }}"  
+    
+  tasks:    
+  # - name: Login 
+  #   include_tasks: tasks/login-ocp.yml
+  - name: Test
+    shell: >
+      {{ oc_cmd }} process 
+      -f roles/update-ocm-cron/defaults/template.yml
+      -p API_URL="https://api.o4-ibmvm-01.qe.red-chesterfield.com:6443"
+      | oc create -f - -n default 

@@ -1,0 +1,38 @@
+# - name: Copy task modules to remote
+#   copy:
+#     src: '.'
+#     dest: '.'
+#     follow: yes
+#     remote_src: true   
+
+# - name: Deloy GOGS 
+#   vars:
+#     hostname: "{{ gogs_ns }}.{{ ocp_api_url | urlsplit('hostname') | replace('api','apps') }}"
+#   block:
+#   - debug:
+#       msg: "{{ hostname }}"        
+
+#   - name: Create ns {{ gogs_ns }}
+#     shell: |
+#       {{ oc_cmd }} --token={{ sa_token.stdout }} delete ns {{ gogs_ns }}
+#       {{ oc_cmd }} create ns {{ gogs_ns }}
+#     changed_when: true
+#     ignore_errors: true
+
+#   - name: Create imagestream for gogs app
+#     shell: |
+#       {{ oc_cmd }} import-image {{ gogs_src }}/gogs:0.9.97 --confirm -n {{ gogs_ns }}
+#     changed_when: true   
+ 
+- name: Test
+  shell: >
+    {{ oc_cmd }} process 
+    -f roles/deploy-gogs/defaults/gogs.template.yml
+    -p HOSTNAME={{ hostname }}
+    -p SKIP_TLS_VERIFY=true 
+    -p DATABASE_VERSION=10-el8
+    | oc create -f - -n {{ gogs_ns }}
+
+
+  
+  
