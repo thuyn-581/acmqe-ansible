@@ -25,15 +25,22 @@ objects:
         name: ${NAME}:latest
     runPolicy: Serial
     source:
+      type: Git
       git:
         uri: https://github.com/thuyn-581/openshift-cronjob.git
         ref: main
     strategy:
-      dockerStrategy:
+      type: Source
+      sourceStrategy:
         from:
-          kind: DockerImage
+          kind: ImageStreamTag
           name: python:3.8
-      type: Docker
+          namespace: openshift
+      # dockerStrategy:
+      #   from:
+      #     kind: DockerImage
+      #     name: python:3.8
+      # type: Docker
     # triggers:
     # - type: ConfigChange
 # - apiVersion: batch/v1
