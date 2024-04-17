@@ -1,4 +1,4 @@
-- name: Test
+- name: Cron job to update ocm clusters
   hosts: localhost
   any_errors_fatal: true 
   vars_files:
@@ -14,10 +14,6 @@
   - name: Login cluster
     import_tasks: tasks/login-ocp.yml    
 
-  - name: Test
-    shell: >
-      {{ oc_cmd }} process 
-      -f roles/update-ocm-cron/defaults/template.yml
-      -p API_URL={{ ocp_api_url }}
-      -p OCM_TOKEN={{ rhocm_token }}
-      | oc create -f - -n default 
+  - name: Create cron job to update ocm clusters
+    import_role:
+      name: update-ocm-cron
