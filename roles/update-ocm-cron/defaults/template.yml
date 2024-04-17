@@ -36,11 +36,6 @@ objects:
           kind: ImageStreamTag
           name: python:3.8
           namespace: openshift
-      # dockerStrategy:
-      #   from:
-      #     kind: DockerImage
-      #     name: python:3.8
-      # type: Docker
     triggers:
     - type: ConfigChange
 - apiVersion: batch/v1
@@ -60,8 +55,7 @@ objects:
           spec:
             containers:
             - name: "${JOB_NAME}"
-              image: docker-registry.default.svc:5000/${NAMESPACE}/${NAME}:latest
-              # image: image-registry.openshift-image-registry.svc:5000/${NAMESPACE}/${NAME}:latest
+              image: image-registry.openshift-image-registry.svc:5000/${NAMESPACE}/${NAME}:latest
               imagePullPolicy: Always
               env:
               - name: HOST
@@ -71,7 +65,7 @@ objects:
             restartPolicy: Never
             terminationGracePeriodSeconds: 30
             activeDeadlineSeconds: 500
-            # dnsPolicy: ClusterFirst
+            dnsPolicy: ClusterFirst
             serviceAccountName: "${JOB_SERVICE_ACCOUNT}"
             serviceAccount: "${JOB_SERVICE_ACCOUNT}"
     startingDeadlineSeconds: ${{STARTING_DEADLINE_SECONDS}}
