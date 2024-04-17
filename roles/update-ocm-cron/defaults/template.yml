@@ -61,14 +61,13 @@ objects:
               - name: HOST
                 value: "${API_URL}"
               - name: OCM_TOKEN
-                value: "${RHOCM_TOKEN}"
+                value: "${OCM_TOKEN}"
             restartPolicy: Never
             terminationGracePeriodSeconds: 30
             activeDeadlineSeconds: 500
             dnsPolicy: ClusterFirst
             serviceAccountName: "${JOB_SERVICE_ACCOUNT}"
             serviceAccount: "${JOB_SERVICE_ACCOUNT}"
-    # startingDeadlineSeconds: ${{STARTING_DEADLINE_SECONDS}}
 parameters:
 - description: The name assigned to all of the frontend objects defined in this template.
   displayName: Name
@@ -95,10 +94,6 @@ parameters:
   description: "Name of the Service Account To Execute the Job As."
   value: "automation-service-account"
   required: true
-- name: STARTING_DEADLINE_SECONDS
-  description: Set the startingDeadlineSeconds for the cronjob
-  required: false
-  value: 60
 - name: API_URL
   description: Openshift API endpoint
   required: true
