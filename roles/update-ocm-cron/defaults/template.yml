@@ -68,7 +68,7 @@ objects:
             dnsPolicy: ClusterFirst
             serviceAccountName: "${JOB_SERVICE_ACCOUNT}"
             serviceAccount: "${JOB_SERVICE_ACCOUNT}"
-    startingDeadlineSeconds: ${{STARTING_DEADLINE_SECONDS}}
+    # startingDeadlineSeconds: ${{STARTING_DEADLINE_SECONDS}}
 parameters:
 - description: The name assigned to all of the frontend objects defined in this template.
   displayName: Name
