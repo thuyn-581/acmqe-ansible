@@ -34,7 +34,7 @@ objects:
       sourceStrategy:
         from:
           kind: ImageStreamTag
-          name: python:3.8
+          name: python:3.8-ubi8
           namespace: openshift
     triggers:
     - type: ConfigChange
