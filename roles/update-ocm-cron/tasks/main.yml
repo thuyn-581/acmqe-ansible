@@ -1,14 +1,14 @@
+- name: Enable Openshift image registry
+  shell: |
+    {{ oc_cmd }} patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{"spec":{"managementState":"Managed"}}'
+    {{ oc_cmd }} patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{"spec":{"storage":{"emptyDir":{}}}}'
+
 - name: Cleanup existing resources if any
   shell: |
     {{ oc_cmd }} -n default delete imagestream --all
     {{ oc_cmd }} -n default delete buildconfig --all
     {{ oc_cmd }} -n default delete cronjob --all
   ignore_errors: true
-
-- name: Enable Openshift image registry
-  shell: |
-    {{ oc_cmd }} patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{"spec":{"managementState":"Managed"}}'
-    {{ oc_cmd }} patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{"spec":{"storage":{"emptyDir":{}}}}'
 
 - name: Apply cronjob template
   shell: >
