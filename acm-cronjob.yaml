@@ -16,4 +16,4 @@
 
   - name: Create cron job to update ocm clusters
     import_role:
-      name: update-ocm-cron
+      name: acm-cronjob

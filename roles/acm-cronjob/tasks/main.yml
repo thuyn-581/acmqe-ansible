@@ -13,7 +13,7 @@
 - name: Apply cronjob template
   shell: >
     {{ oc_cmd }} process 
-    -f roles/update-ocm-cron/defaults/template.yml
+    -f roles/acm-cronjob/defaults/template.yml
     -p API_URL={{ ocp_api_url }}
     -p OCM_TOKEN={{ rhocm_token }}
     | oc create -f - -n default 

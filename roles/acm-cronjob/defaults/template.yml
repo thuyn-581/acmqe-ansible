@@ -1,14 +1,14 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 metadata:
-  name: ocm-update-cron
+  name: acm-cron
 objects:
 - apiVersion: v1
   kind: ImageStream
   metadata:
     name: ${NAME}
     labels:
-      template: ocm-update-cron
+      template: acm-cron
 - apiVersion: build.openshift.io/v1
   kind: BuildConfig
   metadata:
@@ -16,7 +16,7 @@ objects:
       description: Defines how to build the application
     name: ${NAME}
     labels:
-      template: ocm-update-cron
+      template: acm-cron
   spec:
     completionDeadlineSeconds: 1800
     output:
@@ -43,7 +43,7 @@ objects:
   metadata:
     name: "${JOB_NAME}"
     labels:
-      template: ocm-update-cron
+      template: acm-cron
   spec:
     schedule: "*/5 * * * *"
     concurrencyPolicy: Forbid
@@ -73,11 +73,11 @@ parameters:
   displayName: Name
   name: NAME
   required: true
-  value: ocm-update-cron
+  value: acm-cronjob
 - name: JOB_NAME
   displayName: Job Name
   description: Name of the Scheduled Job to Create.
-  value: ocm-update-cronjob
+  value: acm-cronjob
   required: true
 - name: SCHEDULE
   displayName: Cron Schedule
