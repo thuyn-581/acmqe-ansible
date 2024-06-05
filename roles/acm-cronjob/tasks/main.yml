@@ -19,7 +19,7 @@
     | jq -r .status.lastSuccessfulTime
   register: last_success
   until: last_success.stdout != ''
-  retry: 5
+  retries: 5
   delay: 30
        
 
