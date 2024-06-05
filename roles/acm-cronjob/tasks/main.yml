@@ -18,7 +18,7 @@
     {{ oc_cmd }} get cronjob -n default acm-cronjob -ojson 
     | jq -r .status.lastSuccessfulTime
   register: last_success
-  until: last_success.stdout != ''
+  until: last_success.stdout != 'null'
   retries: 5
   delay: 30
        
