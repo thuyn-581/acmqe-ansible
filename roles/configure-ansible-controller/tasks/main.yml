@@ -38,7 +38,7 @@
     changed_when: true    
     register: resp
     until: resp.rc == 0
-    retries: 15
+    retries: 20
     delay: 30
 
   - name: Get AAP admin password 
@@ -90,5 +90,5 @@
     retries: 5
     delay: 15      
 
-  - name: Create ansible project
-    import_tasks: add-ansible-project.yml      
+  # - name: Create ansible project
+  #   import_tasks: add-ansible-project.yml      
