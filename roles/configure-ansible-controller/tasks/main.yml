@@ -91,21 +91,21 @@
       scope: "write"
       state: present
       controller_username: "admin"
-      controller_password: "{{ aap_pwd.stdout }}"
-      controller_host: "https://{{ aap_url.stdout }}"    
+      controller_password: "{{ ac_pwd.stdout }}"
+      controller_host: "https://{{ ac_url.stdout }}"    
       validate_certs: false  
-    register: aap_token   
+    register: ac_token   
 
-  - name: Push admin token to secret/{{aap_name}}-admin-token
+  - name: Push admin token to secret/mycontroller-admin-token
     shell: |
       {{ oc_cmd }} apply -f - <<EOF
         kind: Secret
         apiVersion: v1
         metadata:
-          name: {{ aap_name }}-admin-token
+          name: mycontroller-admin-token
           namespace: aap
         data:
-          token: {{ aap_token.ansible_facts.tower_token.token|b64encode }}
+          token: {{ ac_token.ansible_facts.tower_token.token|b64encode }}
         type: Opaque
       EOF            
     changed_when: true        
@@ -117,8 +117,8 @@
       ask_variables_on_launch: true
       state: present
       controller_username: "admin"
-      controller_password: "{{ aap_pwd.stdout }}"
-      controller_host: "https://{{ aap_url.stdout }}"    
+      controller_password: "{{ ac_pwd.stdout }}"
+      controller_host: "https://{{ ac_url.stdout }}"    
       validate_certs: false  
     register: update_result
     until: update_result is not failed
