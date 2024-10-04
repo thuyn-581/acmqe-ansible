@@ -8,7 +8,7 @@
       body_format: form-urlencoded       
       body:
         grant_type: refresh_token
-        client_id: rhsm-api 
+        client_id: rhsm-api
         refresh_token: "{{ rhsm_token }}"
       return_content: yes
     register: token
@@ -55,15 +55,20 @@
         Authorization: "Bearer {{ token.json.access_token }}"
       validate_certs: false  
 
+- debug: 
+    msg: "{{ ac_url.stdout }}"         
+
 - name: Set AAP license using manifest file
   awx.awx.license:
     manifest: "./manifest.zip"
     controller_username: "admin"
-    controller_password: "{{ aap_pwd.stdout }}"
-    controller_host: "https://{{ aap_url.stdout }}"        
+    # controller_password: "{{ aap_pwd.stdout }}"
+    # controller_host: "https://{{ aap_url.stdout }}"      
+    controller_password: "{{ ac_pwd.stdout }}"
+    controller_host: "https://{{ ac_url.stdout }}"        
     validate_certs: false
     force: true 
   register: result
   until: result is not failed
   retries: 1
-  delay: 10
+  delay: 5
