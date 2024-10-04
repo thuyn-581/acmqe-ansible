@@ -57,9 +57,9 @@
     retries: 15
     delay: 30    
 
-  # - name: Print AAP route
-  #   debug:
-  #     msg: "{{ aap_url.stdout }}"    
+  - name: Print AAP route
+    debug:
+      msg: "{{ aap_url.stdout }}"    
     
   - name: Wait for AC web ready
     shell: |
