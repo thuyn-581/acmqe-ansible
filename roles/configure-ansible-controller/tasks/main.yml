@@ -31,7 +31,7 @@
           # Development purposes only
           no_log: false
           controller:
-            name: mycontroller
+            name: {{ ac_name }}
           eda:
             disabled: true
           hub:
@@ -50,7 +50,7 @@
 
   - name: Get AC route
     shell: |
-      {{ oc_cmd }}  get route -n {{ aap_project }} mycontroller | awk '{ if(NR>1) print $2 }'
+      {{ oc_cmd }}  get route -n {{ aap_project }} {{ ac_name }} | awk '{ if(NR>1) print $2 }'
     changed_when: true    
     register: ac_url
     until: ac_url.stdout != ''
@@ -78,7 +78,7 @@
 
   - name: Get AC admin password 
     shell: |
-      {{ oc_cmd }} -n {{ aap_project }} get secret/mycontroller-admin-password -oyaml | grep password: | tail -n1 | awk '{ print $2}' | base64 -d
+      {{ oc_cmd }} -n {{ aap_project }} get secret/{{ ac_name }}-admin-password -oyaml | grep password: | tail -n1 | awk '{ print $2}' | base64 -d
     changed_when: true    
     register: ac_pwd     
 
@@ -96,13 +96,13 @@
       validate_certs: false  
     register: ac_token   
 
-  - name: Push admin token to secret/mycontroller-admin-token
+  - name: Push admin token to secret/{{ ac_name }}-admin-token
     shell: |
       {{ oc_cmd }} apply -f - <<EOF
         kind: Secret
         apiVersion: v1
         metadata:
-          name: mycontroller-admin-token
+          name: {{ ac_name }}-admin-token
           namespace: aap
         data:
           token: {{ ac_token.ansible_facts.tower_token.token|b64encode }}
