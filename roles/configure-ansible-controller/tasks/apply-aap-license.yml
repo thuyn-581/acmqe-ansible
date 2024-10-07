@@ -70,5 +70,5 @@
     force: true 
   register: result
   until: result is not failed
-  retries: 1
+  retries: 3
   delay: 5
