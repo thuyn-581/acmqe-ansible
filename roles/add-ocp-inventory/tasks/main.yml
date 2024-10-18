@@ -1,5 +1,5 @@
 ---
-- name: Create ocp credentials in Ansible Tower 
+- name: Create ocp credentials openshift-creds-{{ cluster }} in Ansible Tower 
   awx.awx.credential:
     controller_username: "{{ tower_user }}"
     controller_password: "{{ tower_pwd }}"
@@ -14,7 +14,7 @@
       bearer_token: "{{ sa_token.stdout }}"
   run_once: true
 
-- name: Create ocp container group in Ansible Tower
+- name: Create ocp container group openshift-container-group-{{ cluster }} in Ansible Tower
   awx.awx.instance_group:
     controller_username: "{{ tower_user }}"
     controller_password: "{{ tower_pwd }}"
@@ -53,7 +53,7 @@
       {% endif %}  
   run_once: true    
 
-- name: Create ocp inventory in Ansible Tower 
+- name: Create ocp inventory openshift-inventory-{{ cluster }} in Ansible Tower 
   awx.awx.inventory:
     controller_username: "{{ tower_user }}"
     controller_password: "{{ tower_pwd }}"

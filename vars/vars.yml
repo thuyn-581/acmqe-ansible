@@ -1,5 +1,5 @@
 #ocp creds
-ocp_api_url: "https://api.ocp.red-chesterfield.com:6443"
+ocp_api_url: ""
 ocp_user: "kubeadmin"
 ocp_pwd: "" 
 
@@ -13,3 +13,9 @@ project_name: "acmqe-ansible"
 certs_dir: "./certs"
 http_proxy: ""
 skip_ansible_runner: false
+
+#tower
+tower: "https://ansible.qe.red-chesterfield.com"
+tower_pwd: ""
+tower_user: "thnguyen"
+job_name: ""

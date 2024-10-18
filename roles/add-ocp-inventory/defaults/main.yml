@@ -4,9 +4,3 @@ sa_ns: "default"
 
 #ansible-runner image:
 image: "registry.redhat.io/ansible-automation-platform-24/platform-resource-runner-rhel8:2.4-138"
-
-#tower
-tower: "https://ansible.qe.red-chesterfield.com"
-tower_pwd: ""
-tower_user: "thnguyen"
-job_name: ""
