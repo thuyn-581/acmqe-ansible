@@ -1,0 +1,11 @@
+- name: Delete Openshift Inventory
+  hosts: localhost
+  any_errors_fatal: true 
+  vars_files:
+  - vars/vars.yml   
+  vars:
+    cluster: "{{ ocp_api_url.split('.')[1] if ocp_api_url != '' else cluster_name }}"
+    
+  tasks:     
+  - import_role:
+      name: delete-ocp-inventory       
