@@ -55,7 +55,7 @@
         Authorization: "Bearer {{ token.json.access_token }}"
       validate_certs: false  
     register: download_result
-    until: "download_result | succeeded"
+    until: download_result | succeeded
     retries: 12
     delay: 5        
 
