@@ -1,4 +1,4 @@
-- name: Add Openshift Inventory
+- name: Delete Openshift Inventory
   hosts: localhost
   any_errors_fatal: true 
   vars_files:
@@ -7,5 +7,9 @@
     cluster: "{{ ocp_api_url.split('.')[1] if ocp_api_url != '' else cluster_name }}"
     
   tasks:    
+  - name: Prepare ansible runner host
+    include_tasks: tasks/prepare_ansible_runner.yml
+    when: not skip_ansible_runner | bool  
+      
   - import_role:
       name: delete-ocp-inventory       
