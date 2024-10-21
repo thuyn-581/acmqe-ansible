@@ -6,10 +6,6 @@
   vars:
     cluster: "{{ ocp_api_url.split('.')[1] if ocp_api_url != '' else cluster_name }}"
     
-  tasks:    
-  - name: Prepare ansible runner host
-    include_tasks: tasks/prepare_ansible_runner.yml
-    when: not skip_ansible_runner | bool  
-      
+  tasks:     
   - import_role:
       name: delete-ocp-inventory       
