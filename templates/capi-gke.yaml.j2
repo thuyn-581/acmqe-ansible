@@ -1,0 +1,65 @@
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: Cluster
+metadata:
+  name: {{ cluster_name }}
+  namespace: {{ capi_namespace }}
+  labels:
+    cleanup: ''    
+spec:
+  clusterNetwork:
+    pods:
+      cidrBlocks:
+      - 192.168.0.0/16
+  controlPlaneRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+    kind: GCPManagedControlPlane
+    name: {{ cluster_name }}
+  infrastructureRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+    kind: GCPManagedCluster
+    name: {{ cluster_name }}
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: GCPManagedCluster
+metadata:
+  name: {{ cluster_name }}
+  namespace: {{ capi_namespace }}
+spec:
+  network:
+    name: default
+  project: gc-acm-test
+  region: {{ region }}
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: GCPManagedControlPlane
+metadata:
+  name: {{ cluster_name }}
+  namespace: {{ capi_namespace }}
+spec:
+  location: {{ region }}
+  project: gc-acm-test
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachinePool
+metadata:
+  name: {{ cluster_name }}-mp-0
+  namespace: {{ capi_namespace }}
+spec:
+  clusterName: {{ cluster_name }}
+  replicas: 3
+  template:
+    spec:
+      bootstrap:
+        dataSecretName: ""
+      clusterName: {{ cluster_name }}
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+        kind: GCPManagedMachinePool
+        name: {{ cluster_name }}-mp-0
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: GCPManagedMachinePool
+metadata:
+  name: {{ cluster_name }}-mp-0
+  namespace: {{ capi_namespace }}
+spec: {}

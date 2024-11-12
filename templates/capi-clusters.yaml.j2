@@ -1,0 +1,14 @@
+{%- if capi_list | select("search", "-aws-") | length > 0 -%}
+EKS
+{% for item in capi_list | select("search", "-aws-") -%}{{ 'capi_' + item+ '\n' }} {%- endfor %}
+{{ '\n' }}
+{%- endif -%}
+{%- if capi_list | select("search", "-gcp-") | length > 0 -%}
+GKE
+{% for item in capi_list | select("search", "-gcp-") -%}{{ 'capi-' + item+ '\n' }} {%- endfor %}
+{{ '\n' }}
+{%- endif -%}
+{%- if capi_list | select("search", "-azure-") | length > 0 -%}
+AKS
+{% for item in capi_list | select("search", "-azure-") -%}{{ item+ '\n' }} {%- endfor %}
+{%- endif -%}

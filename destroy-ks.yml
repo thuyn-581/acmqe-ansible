@@ -1,0 +1,9 @@
+- name: Destroy K8S clusters
+  hosts: all
+  any_errors_fatal: true 
+  vars_files:
+  - ./vars/vars.yml    
+
+  tasks:
+  - import_role:
+      name: "destroy-ks"

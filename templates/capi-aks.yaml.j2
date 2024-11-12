@@ -1,0 +1,90 @@
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: Cluster
+metadata:
+  name: {{ cluster_name }} 
+  namespace: {{ capi_namespace }}
+  labels:
+    cleanup: ''  
+spec:
+  clusterNetwork:
+    services:
+      cidrBlocks:
+        - 192.168.0.0/16
+  controlPlaneRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+    kind: AzureManagedControlPlane
+    name: {{ cluster_name }}
+  infrastructureRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+    kind: AzureManagedCluster
+    name: {{ cluster_name }}
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AzureManagedControlPlane
+metadata:
+  name: {{ cluster_name }}
+  namespace: {{ capi_namespace }}
+spec:
+  identityRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+    kind: AzureClusterIdentity
+    name: cluster-identity
+  location: {{ region }}
+  oidcIssuerProfile:
+    enabled: true
+  resourceGroupName: {{ cluster_name }}
+  sshPublicKey: ""
+  subscriptionID: da057d84-6570-41ea-83f7-f0f61a70542f
+  version: v{{ k8s_version }}
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AzureManagedCluster
+metadata:
+  name: {{ cluster_name }}
+  namespace: {{ capi_namespace }}
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachinePool
+metadata:
+  name: {{ cluster_name }}-pool0
+  namespace: {{ capi_namespace }}
+spec:
+  clusterName: {{ cluster_name }}
+  replicas: {{ nodes_count }}
+  template:
+    metadata: {}
+    spec:
+      bootstrap:
+        dataSecretName: ""
+      clusterName: {{ cluster_name }}
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+        kind: AzureManagedMachinePool
+        name: {{ cluster_name }}-pool0
+      version: v1.30.0
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AzureManagedMachinePool
+metadata:
+  name: {{ cluster_name }}-pool0
+  namespace: {{ capi_namespace }}
+spec:
+  mode: System
+  name: pool0
+  sku: {{ instance_type }}
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AzureClusterIdentity
+metadata:
+  labels:
+    clusterctl.cluster.x-k8s.io/move-hierarchy: "true"
+  name: cluster-identity
+  namespace: {{ capi_namespace }}
+spec:
+  allowedNamespaces: {}
+  clientID: 85f7c9eb-eea5-4456-89ac-4f9814290d36
+  tenantID: 6047c7e9-b2ad-488d-a54e-dc3f6be6a7ee
+  type: ServicePrincipal
+  clientSecret:
+    name: cluster-identity-secret
+    namespace: {{ capi_namespace }}

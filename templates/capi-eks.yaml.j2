@@ -1,0 +1,79 @@
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: Cluster
+metadata:
+  name: {{ cluster_name }}
+  namespace: {{ capi_namespace }}
+  labels:
+    cleanup: ''
+spec:
+  clusterNetwork:
+    pods:
+      cidrBlocks:
+      - 192.168.0.0/16
+  controlPlaneRef:
+    apiVersion: controlplane.cluster.x-k8s.io/v1beta2
+    kind: AWSManagedControlPlane
+    name: {{ cluster_name }}
+  infrastructureRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
+    kind: AWSManagedCluster
+    name: {{ cluster_name }}
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
+kind: AWSManagedCluster
+metadata:
+  name: {{ cluster_name }}
+  namespace: {{ capi_namespace }}
+spec: {}
+---
+apiVersion: controlplane.cluster.x-k8s.io/v1beta2
+kind: AWSManagedControlPlane
+metadata:
+  name: {{ cluster_name }}
+  namespace: {{ capi_namespace }}
+spec:
+  region: {{ region }}
+  sshKeyName: capi-eks
+  version: v{{ k8s_version }}
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachinePool
+metadata:
+  name: {{ cluster_name }}-mp-0
+  namespace: {{ capi_namespace }}
+spec:
+  clusterName: {{ cluster_name }}
+  replicas: {{ nodes_count }}
+  template:
+    spec:
+      bootstrap:
+        configRef:
+          apiVersion: bootstrap.cluster.x-k8s.io/v1beta2
+          kind: EKSConfig
+          name: {{ cluster_name }}-mp-0
+      clusterName: {{ cluster_name }}
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
+        kind: AWSMachinePool
+        name: {{ cluster_name }}-mp-0
+      version: v{{ k8s_version }}
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
+kind: AWSMachinePool
+metadata:
+  name: {{ cluster_name }}-mp-0
+  namespace: {{ capi_namespace }}
+spec:
+  awsLaunchTemplate:
+    iamInstanceProfile: nodes.cluster-api-provider-aws.sigs.k8s.io
+    instanceType: {{ instance_type }}
+    sshKeyName: capi-eks
+  maxSize: 10
+  minSize: 1
+---
+apiVersion: bootstrap.cluster.x-k8s.io/v1beta2
+kind: EKSConfig
+metadata:
+  name: {{ cluster_name }}-mp-0
+  namespace: {{ capi_namespace }}
+spec: {}
