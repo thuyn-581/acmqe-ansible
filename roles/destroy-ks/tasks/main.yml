@@ -13,11 +13,15 @@
       dest: /rh/capi/capi_clusters.txt
   when: cleanup | bool
 
+- set_fact:
+    del_arg: "{{ ('{'+ cluster_names + '}') if cluster_names.split(',')|length > 1 else cluster_names }}"
+  when: not cleanup | bool
+
 - name: Destroy cluster(s)
   vars: 
     delete_cmd: >
       {% if not cleanup %}
-      kubectl -n {{ capi_namespace }} delete cluster {{ cluster_names }}
+      kubectl -n {{ capi_namespace }} delete cluster {{ del_arg }}
       {% elif clusters_list.stdout_lines | length == 0 %}
       ''
       {% elif clusters_list.stdout_lines | length < 2 %}
