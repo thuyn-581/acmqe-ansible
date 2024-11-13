@@ -14,7 +14,7 @@
     - absent
     - directory
 
-- name: Prepare deploy template
+- name: Prepare {{ cluster_name }} deploy template
   vars:
     instance_type: "{{ [infra_provider] | map('extract', infra_providers) | map(attribute='instance_type') | flatten | join('') }}"
     region: "{{ [infra_provider] | map('extract', infra_providers) | map(attribute='region') | flatten | join('') }}"
