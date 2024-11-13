@@ -20,7 +20,7 @@
 - name: Destroy cluster(s)
   vars: 
     delete_cmd: >
-      {% if not cleanup %}
+      {% if not cleanup|bool %}
       kubectl -n {{ capi_namespace }} delete cluster {{ del_arg }}
       {% elif clusters_list.stdout_lines | length == 0 %}
       ''
