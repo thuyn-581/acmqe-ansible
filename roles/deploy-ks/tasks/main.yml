@@ -41,7 +41,7 @@
     kubectl -n {{ capi_namespace }} get mp -ojson | jq -r '.items[] | select(.spec.clusterName == "{{ cluster_name }}") | .status.phase'
   register: mp_status
   until: mp_status.stdout == 'Running'
-  retries: 30
+  retries: 45
   delay: 60  
 
 - name: Generate kubeconfig
