@@ -32,7 +32,7 @@
     --dry-run=client -o yaml | kubectl apply -f -
   when: infra_provider == 'azure'
 
-- name: Apply {{ flavor|upper }} {{ cluster_name }} template
+- name: Apply {{ cluster_name }} template
   shell: |
     kubectl apply -f /rh/capi/{{ cluster_name }}/{{ cluster_name }}.yaml
   
