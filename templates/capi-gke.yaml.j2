@@ -66,4 +66,4 @@ metadata:
 spec: 
   instanceType: "{{ instance_type|trim if cloud_instance_type == '' else cloud_instance_type }}"
   nodeLocations: 
-  - {{ region if cloud_region == '' else cloud_region }}-b
+  - "{{ region if cloud_region == '' else cloud_region }}-b"
