@@ -1,0 +1,33 @@
+- block:
+  - name: Get clusters list to be destroyed
+    shell: |
+      kubectl -n {{ capi_namespace }} get cluster -l cleanup --no-headers --ignore-not-found | awk '{print $1}'
+    register: clusters_list
+
+  - name: Write clusters list to file
+    vars: 
+      capi_list: "{{ clusters_list.stdout_lines }}"
+      # providers: "{{ infra_providers.keys() | list }}"
+    template:
+      src: templates/capi-clusters.yaml.j2
+      dest: /rh/capi/capi_clusters.txt
+  when: cleanup | bool
+
+- set_fact:
+    del_arg: "{{ ('{'+ cluster_names + '}') if cluster_names.split(',')|length > 1 else cluster_names }}"
+  when: not cleanup | bool
+
+- name: Destroy cluster(s)
+  vars: 
+    delete_cmd: >
+      {% if not cleanup|bool %}
+      kubectl -n {{ capi_namespace }} delete cluster {{ del_arg }}
+      {% elif clusters_list.stdout_lines | length == 0 %}
+      ''
+      {% elif clusters_list.stdout_lines | length < 2 %}
+      kubectl -n {{ capi_namespace }} delete clusters {{ clusters_list.stdout }}
+      {% else %}
+      kubectl -n {{ capi_namespace }} delete clusters '{'{{ clusters_list.stdout_lines | join(',') }}'}'
+      {% endif %} 
+  shell: |
+    echo {{ delete_cmd | trim }} | sh

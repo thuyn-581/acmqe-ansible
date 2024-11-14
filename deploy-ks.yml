@@ -1,0 +1,11 @@
+- name: Deploy {{ flavor|upper }} cluster
+  hosts: all
+  any_errors_fatal: true 
+  vars_files:
+  - ./vars/vars.yml    
+
+  tasks:
+  - import_role:
+      name: "deploy-ks"
+    vars:
+      id_string: "{{ lookup('password', '/dev/null chars=ascii_lowercase,digits length=5') }}"

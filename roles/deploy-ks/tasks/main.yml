@@ -1,0 +1,49 @@
+- name: Create ns {{ capi_namespace }} if not exist
+  shell: |
+    kubectl create ns {{ capi_namespace }} --dry-run=client -o yaml | kubectl apply -f -  
+
+- set_fact:
+    cluster_name: "{{ (cluster_prefix +'-'+ id_string +'-'+ infra_provider +'-'+ flavor) if (infra_provider != 'azure') else ('capi-' + cluster_prefix +'-'+ id_string +'-'+ infra_provider +'-'+ flavor) }}"
+
+- name: Create output folder
+  file:
+    path: "/rh/capi/{{ cluster_name }}"
+    state: "{{ item }}"
+    mode: '0755'
+  with_items:
+    - absent
+    - directory
+
+- name: Prepare {{ cluster_name }} deploy template
+  vars:
+    instance_type: "{{ [infra_provider] | map('extract', infra_providers) | map(attribute='instance_type') | flatten | join('') }}"
+    region: "{{ [infra_provider] | map('extract', infra_providers) | map(attribute='region') | flatten | join('') }}"
+    k8s_version: "{{ [infra_provider] | map('extract', infra_providers) | map(attribute='version') | flatten | join('') }}"
+    nodes_count: "{{ [infra_provider] | map('extract', infra_providers) | map(attribute='nodes_count') | flatten | join('') }}"
+  template: 
+    src: "templates/capi-{{ flavor }}.yaml.j2" 
+    dest: "/rh/capi/{{ cluster_name }}/{{ cluster_name }}.yaml" 
+
+- name: Create Azure Cluster Identity secret
+  shell: |
+    kubectl create secret generic cluster-identity-secret \
+    --from-literal=clientSecret="{{ azure_client_secret }}" \
+    --namespace {{ capi_namespace }} \
+    --dry-run=client -o yaml | kubectl apply -f -
+  when: infra_provider == 'azure'
+
+- name: Apply {{ cluster_name }} template
+  shell: |
+    kubectl apply -f /rh/capi/{{ cluster_name }}/{{ cluster_name }}.yaml
+  
+- name: Wait for deployment completed
+  shell: |
+    kubectl -n {{ capi_namespace }} get mp -ojson | jq -r '.items[] | select(.spec.clusterName == "{{ cluster_name }}") | .status.phase'
+  register: mp_status
+  until: mp_status.stdout == 'Running'
+  retries: 45
+  delay: 60  
+
+- name: Generate kubeconfig
+  shell: |
+    clusterctl get kubeconfig {{ cluster_name }} -n {{ capi_namespace }} > /rh/capi/{{ cluster_name }}/{{ cluster_name }}.kubeconfig

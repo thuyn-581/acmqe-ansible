@@ -3,9 +3,11 @@
 *.tar.gz
 *.zip
 *test.yml
+inventory
 roles/configure-ansible-controller/tasks/install-aap-operator.yml
 
 # Ignore folders
 certs/*
 *.git/*
+capi/*
 

@@ -14,8 +14,22 @@ certs_dir: "./certs"
 http_proxy: ""
 skip_ansible_runner: false
 
-#tower
-tower: "https://ansible.qe.red-chesterfield.com"
-tower_pwd: ""
-tower_user: "thnguyen"
-job_name: ""
+#capi
+cleanup: false
+capi_namespace: "capi"
+infra_providers:
+  aws:
+    region: "us-east-1"
+    instance_type: "t3.large"
+    version: "1.31.0"
+    nodes_count: 2
+  gcp:
+    region: "us-east1"
+    instance_type: "n1-standard-8"
+    version: "1.30.0"
+    nodes_count: 2
+  azure:
+    region: "centralus"
+    instance_type: "Standard_D2s_v3"
+    version: "1.30.0"
+    nodes_count: 2
