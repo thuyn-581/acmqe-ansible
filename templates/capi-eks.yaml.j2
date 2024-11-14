@@ -32,7 +32,7 @@ metadata:
   name: {{ cluster_name }}
   namespace: {{ capi_namespace }}
 spec:
-  region: {{ region }}
+  region: {{ region if cloud_region == '' else cloud_region }}
   sshKeyName: capi-eks
   version: v{{ k8s_version }}
 ---
@@ -43,7 +43,7 @@ metadata:
   namespace: {{ capi_namespace }}
 spec:
   clusterName: {{ cluster_name }}
-  replicas: {{ nodes_count }}
+  replicas: {{ nodes_count if workers_count is undefined else workers_count|int }}
   template:
     spec:
       bootstrap:
@@ -66,7 +66,7 @@ metadata:
 spec:
   awsLaunchTemplate:
     iamInstanceProfile: nodes.cluster-api-provider-aws.sigs.k8s.io
-    instanceType: {{ instance_type }}
+    instanceType: "{{ instance_type|trim if cloud_instance_type == '' else cloud_instance_type }}"
     sshKeyName: capi-eks
   maxSize: 10
   minSize: 1

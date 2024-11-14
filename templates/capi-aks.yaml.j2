@@ -29,7 +29,7 @@ spec:
     apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
     kind: AzureClusterIdentity
     name: cluster-identity
-  location: {{ region }}
+  location: {{ region if cloud_region == '' else cloud_region }}
   oidcIssuerProfile:
     enabled: true
   resourceGroupName: {{ cluster_name }}
@@ -50,7 +50,7 @@ metadata:
   namespace: {{ capi_namespace }}
 spec:
   clusterName: {{ cluster_name }}
-  replicas: {{ nodes_count }}
+  replicas: {{ nodes_count if workers_count is undefined else workers_count|int }}
   template:
     metadata: {}
     spec:
@@ -71,7 +71,7 @@ metadata:
 spec:
   mode: System
   name: pool0
-  sku: {{ instance_type }}
+  sku: "{{ instance_type|trim if cloud_instance_type == '' else cloud_instance_type }}"
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
 kind: AzureClusterIdentity

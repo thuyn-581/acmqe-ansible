@@ -28,7 +28,7 @@ spec:
   network:
     name: default
   project: gc-acm-test
-  region: {{ region }}
+  region: {{ region if cloud_region == '' else cloud_region }}
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
 kind: GCPManagedControlPlane
@@ -36,7 +36,7 @@ metadata:
   name: {{ cluster_name }}
   namespace: {{ capi_namespace }}
 spec:
-  location: {{ region }}
+  location: {{ region if cloud_region == '' else cloud_region }}
   project: gc-acm-test
 ---
 apiVersion: cluster.x-k8s.io/v1beta1
@@ -46,7 +46,7 @@ metadata:
   namespace: {{ capi_namespace }}
 spec:
   clusterName: {{ cluster_name }}
-  replicas: 3
+  replicas: {{ nodes_count if workers_count is undefined else workers_count|int }}
   template:
     spec:
       bootstrap:
