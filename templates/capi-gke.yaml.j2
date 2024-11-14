@@ -56,10 +56,14 @@ spec:
         apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
         kind: GCPManagedMachinePool
         name: {{ cluster_name }}-mp-0
+      version: v{{ k8s_version if kubernetes_version = '' else kubernetes_version }}
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
 kind: GCPManagedMachinePool
 metadata:
   name: {{ cluster_name }}-mp-0
   namespace: {{ capi_namespace }}
-spec: {}
+spec: 
+  instanceType: "{{ instance_type|trim if cloud_instance_type == '' else cloud_instance_type }}"
+  nodeLocations: 
+  - "{{ region if cloud_region == '' else cloud_region }}"-b
