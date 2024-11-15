@@ -3,9 +3,28 @@
   any_errors_fatal: true 
   vars_files:
   - vars/vars.yml   
-  vars:
-    cluster: "{{ ocp_api_url.split('.')[1] if ocp_api_url != '' else cluster_name }}"
     
   tasks:     
+  - block:
+    - shell: |
+        cat /rh/clusters/ocm_subs.txt | awk 'NF'
+      register: clusters_list
+
+    - set_fact:
+        clusters_list: "{{ clusters_list.stdout_lines | reject('search', 'AWS') | reject('search', 'AZURE')| reject('search', 'GCP') | list }}"
+
+    - shell: |
+        kubectl get cd -A  -ojson | jq -r '.items[] | select(.spec.clusterMetadata.infraID == "{{ item }}") | .metadata.name'
+      register: cluster_names
+      loop: "{{ clusters_list }}"
+
+    - include_role:
+        name: delete-ocp-inventory
+      vars:
+        cluster: "{{ item }}"
+      loop: "{{ cluster_names | json_query('results[*].stdout') | flatten | select() }}"        
+    when: not cleanup | bool
+
   - import_role:
-      name: delete-ocp-inventory       
+      name: delete-ocp-inventory      
+    when: not cleanup | bool 
