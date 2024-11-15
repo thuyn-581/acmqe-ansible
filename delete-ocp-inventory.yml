@@ -11,7 +11,7 @@
       register: clusters_list
 
     - set_fact:
-        clusters_list: "{{ clusters_list.stdout_lines | reject('search', 'AWS') | reject('search', 'AZURE')| reject('search', 'GCP') | list }}"
+        clusters_list: "{{ clusters_list.stdout_lines | difference(['AWS','AZURE','GCP','ROSA','OSD','ARO']) | list }}"
 
     - shell: |
         kubectl get cd -A  -ojson | jq -r '.items[] | select(.spec.clusterMetadata.infraID == "{{ item }}") | .metadata.name'
