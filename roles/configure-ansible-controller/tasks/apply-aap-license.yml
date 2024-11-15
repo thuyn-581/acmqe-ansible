@@ -8,13 +8,13 @@
       body_format: form-urlencoded       
       body:
         grant_type: refresh_token
-        client_id: rhsm-api 
+        client_id: rhsm-api
         refresh_token: "{{ rhsm_token }}"
       return_content: yes
     register: token
     until: "'access_token' in token.content"
-    retries: 10
-    delay: 10 
+    retries: 12
+    delay: 5 
     
   # - debug: 
   #     msg: "{{ token.json.access_token }}"   
@@ -27,8 +27,8 @@
       return_content: yes
     register: exportJob
     until: "'href' in exportJob.content"
-    retries: 10
-    delay: 10 
+    retries: 12
+    delay: 5 
 
   - debug: 
       msg: "{{ exportJob.json.body.href }}"  
@@ -41,8 +41,8 @@
       return_content: yes
     register: manifest
     until: "'href' in manifest.content"
-    retries: 10
-    delay: 10 
+    retries: 12
+    delay: 5 
 
   - debug: 
       msg: "{{ manifest.json.body.href }}"       
@@ -54,16 +54,26 @@
       headers: 
         Authorization: "Bearer {{ token.json.access_token }}"
       validate_certs: false  
+    register: download_result
+    until: download_result is succeeded
+    retries: 12
+    delay: 5        
+
+- debug: 
+    msg: "{{ ac_url.stdout }}"         
 
 - name: Set AAP license using manifest file
   awx.awx.license:
     manifest: "./manifest.zip"
     controller_username: "admin"
-    controller_password: "{{ aap_pwd.stdout }}"
-    controller_host: "https://{{ aap_url.stdout }}"        
+    # controller_password: "{{ aap_pwd.stdout }}"
+    # controller_host: "https://{{ aap_url.stdout }}"      
+    controller_password: "{{ ac_pwd.stdout }}"
+    controller_host: "https://{{ ac_url.stdout }}"        
     validate_certs: false
     force: true 
   register: result
   until: result is not failed
-  retries: 1
-  delay: 10
+  retries: 3
+  delay: 5
+

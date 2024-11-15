@@ -1,6 +1,7 @@
 #aap
 aap_project: "aap"
-aap_name: "auto-con"
+aap_name: "aap"
+ac_name: "auto-con"
 
 #rhsm
 sub_alloc_uuid: "e7e31a01-6ab3-433f-ba7c-0422cd31c044"
