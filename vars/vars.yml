@@ -13,9 +13,15 @@ project_name: "acmqe-ansible"
 certs_dir: "./certs"
 http_proxy: ""
 skip_ansible_runner: false
+cleanup: false
+
+#tower
+tower: "https://ansible.qe.red-chesterfield.com"
+tower_pwd: ""
+tower_user: "thnguyen"
+job_name: ""
 
 #capi
-cleanup: false
 capi_namespace: "capi"
 infra_providers:
   aws:
