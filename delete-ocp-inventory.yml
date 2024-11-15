@@ -21,7 +21,7 @@
     - include_role:
         name: delete-ocp-inventory
       vars:
-        cluster: "{{ item }}"
+        cluster_name: "{{ item }}"
       loop: "{{ cluster_names | json_query('results[*].stdout') | flatten | select() }}"        
     when: not cleanup | bool
 
