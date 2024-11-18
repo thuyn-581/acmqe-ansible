@@ -1,5 +1,5 @@
 - name: Delete Openshift Inventory
-  hosts: localhost
+  hosts: all
   any_errors_fatal: true 
   vars_files:
   - vars/vars.yml   
@@ -10,21 +10,21 @@
         cat /rh/clusters/ocm_subs.txt | awk 'NF'
       register: clusters_list
 
-    - set_fact:
-        clusters_list: "{{ clusters_list.stdout_lines | reject('search', 'AWS') | reject('search', 'AZURE')| reject('search', 'GCP') | list }}"
-
     - shell: |
         kubectl get cd -A  -ojson | jq -r '.items[] | select(.spec.clusterMetadata.infraID == "{{ item }}") | .metadata.name'
+      loop: "{{ [] if clusters_list is undefined else clusters_list.stdout_lines | difference(['AWS','AZURE','GCP','ROSA','OSD','ARO']) | list }}"
       register: cluster_names
-      loop: "{{ clusters_list }}"
 
-    - include_role:
-        name: delete-ocp-inventory
-      vars:
-        cluster: "{{ item }}"
-      loop: "{{ cluster_names | json_query('results[*].stdout') | flatten | select() }}"        
+    - set_fact:
+        del_loop: "{{ cluster_names| json_query('results[*].stdout') | flatten | select() | list }}"
+    when: cleanup | bool
+
+  - set_fact:
+     del_loop: ["{{ cluster_name }}"]
     when: not cleanup | bool
 
-  - import_role:
-      name: delete-ocp-inventory      
-    when: not cleanup | bool 
+  - include_role:
+      name: delete-ocp-inventory
+    vars:
+      cluster_name: "{{ item }}"
+    loop: "{{ del_loop }}"    

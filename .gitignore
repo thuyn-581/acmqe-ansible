@@ -1,4 +1,5 @@
 #Ignore files
+inventory
 *.kubeconfig
 *.tar.gz
 *.zip
