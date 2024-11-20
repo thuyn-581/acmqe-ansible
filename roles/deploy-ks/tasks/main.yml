@@ -50,7 +50,8 @@
     -o jsonpath={.data.value} | base64 --decode \
     > /rh/capi/{{ cluster_name }}/{{ cluster_name }}.kubeconfig
 
-- block: Update kubeconfig SA token for AWS cluster 
+- name: Update kubeconfig SA token for AWS cluster    
+  block:
   - shell: |
       kubectl --kubeconfig {{ kubeconfig }} apply -f - <<EOF
         apiVersion: v1
