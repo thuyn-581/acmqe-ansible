@@ -46,7 +46,7 @@
 
 - name: Generate kubeconfig
   shell: |
-    kubectl --namespace={{ capi_namespace }} get secret {{ cluster_name }} \
+    kubectl --namespace={{ capi_namespace }} get secret {{ cluster_name }}-kubeconfig \
     -o jsonpath={.data.value} | base64 --decode \
     > /rh/capi/{{ cluster_name }}/{{ cluster_name }}.kubeconfig
 
