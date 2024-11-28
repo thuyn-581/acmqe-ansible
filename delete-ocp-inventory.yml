@@ -3,20 +3,29 @@
   any_errors_fatal: true 
   vars_files:
   - vars/vars.yml   
-    
+
   tasks:     
   - block:
     - shell: |
         cat /rh/clusters/ocm_subs.txt | awk 'NF'
       register: clusters_list
 
-    - shell: |
-        kubectl get cd -A  -ojson | jq -r '.items[] | select(.spec.clusterMetadata.infraID == "{{ item }}") | .metadata.name'
-      loop: "{{ [] if clusters_list is undefined else clusters_list.stdout_lines | difference(['AWS','AZURE','GCP','ROSA','OSD','ARO']) | list }}"
-      register: cluster_names
+    # - shell: |
+    #     kubectl get cd -A  -ojson | jq -r '.items[] | select(.spec.clusterMetadata.infraID == "{{ item }}") | .metadata.name'
+    #   loop: "{{ [] if clusters_list is undefined else clusters_list.stdout_lines | difference(['AWS','AZURE','GCP','ROSA','OSD','ARO']) | list }}"
+    #   register: cluster_names
 
-    - set_fact:
-        del_loop: "{{ cluster_names| json_query('results[*].stdout') | flatten | select() | list }}"
+    # - set_fact: 
+    #   del_loop: "{{ cluster_names| json_query('results[*].stdout') | flatten | select() | list }}"
+
+    # - name: Apply regex filter on list before loop
+    #   debug:
+    #     var: item
+    #   loop: >-
+    #     {{ clusters_list.stdout_lines | difference(['AWS','AZURE','GCP','ROSA','OSD','ARO']) | map('regex_replace', '^(.*)([^\-]){5}$', '\1') | map('regex_replace', '^(.*)(-)$', '\1') | list }}
+
+    - set_fact: 
+        del_loop: "{{ clusters_list.stdout_lines | difference(['AWS','AZURE','GCP','ROSA','OSD','ARO']) | map('regex_replace', '^(.*)([^\\-]){5}$', '\\1') | map('regex_replace', '^(.*)(-)$', '\\1') | list }}"
     when: cleanup | bool
 
   - set_fact:
