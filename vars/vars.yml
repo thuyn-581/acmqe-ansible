@@ -2,6 +2,7 @@
 ocp_api_url: ""
 ocp_user: "kubeadmin"
 ocp_pwd: "" 
+cluster_name: ""
 
 #service account
 sa: "automation-service-account"

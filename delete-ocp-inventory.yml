@@ -16,7 +16,7 @@
     #   register: cluster_names
 
     # - set_fact: 
-    #   del_loop: "{{ cluster_names| json_query('results[*].stdout') | flatten | select() | list }}"
+    #     del_loop: "{{ cluster_names| json_query('results[*].stdout') | flatten | select() | list }}"
 
     # - name: Apply regex filter on list before loop
     #   debug:

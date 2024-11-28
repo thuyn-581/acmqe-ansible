@@ -3,8 +3,6 @@
   any_errors_fatal: true 
   vars_files:
   - vars/vars.yml   
-  vars:
-    cluster: "{{ ocp_api_url.split('.')[1] }}"
     
   tasks:    
   - name: Prepare ansible runner host
@@ -14,6 +12,16 @@
   - name: Login ocp
     include_tasks: tasks/login-ocp.yml
 
+  - block:
+    - shell: |
+        oc get ingress.config.openshift.io/cluster -ojson | jq -r '.spec.domain' 
+      register: ingress_base_domain
+
+    - set_fact:
+        cluster_name_query: >-
+          {{ ingress_base_domain.stdout | split('.apps.') | first | split('.') | last if ingress_base_domain.stdout is search('.apps.') else ingress_base_domain.stdout | split('apps.') | last | split('.') | first }}
+    when: cluster_name | length < 1
+
   - name: Create proxy config cm if applicable
     include_tasks: tasks/create-proxy-config-cm.yml   
 
@@ -21,5 +29,7 @@
     include_tasks: tasks/create-service-account.yml 
 
   - name: Add Openshift Inventory of {{ cluster }} on Ansible Tower
+    vars:
+      cluster: "{{ cluster_name if cluster_name_query is undefined else cluster_name_query }}"  
     import_role:
       name: add-ocp-inventory       
