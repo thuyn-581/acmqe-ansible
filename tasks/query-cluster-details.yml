@@ -1,0 +1,8 @@
+---
+- shell: |
+    oc get ingress.config.openshift.io/cluster -ojson | jq -r '.spec.domain' 
+  register: ingress_base_domain
+
+- set_fact:
+    cluster_name_query: >-
+      {{ ingress_base_domain.stdout | split('.apps.') | first | split('.') | last if ingress_base_domain.stdout is search('.apps.') else ingress_base_domain.stdout | split('apps.') | last | split('.') | first }}

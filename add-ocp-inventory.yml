@@ -11,16 +11,10 @@
       
   - name: Login ocp
     include_tasks: tasks/login-ocp.yml
-
-  - block:
-    - shell: |
-        oc get ingress.config.openshift.io/cluster -ojson | jq -r '.spec.domain' 
-      register: ingress_base_domain
-
-    - set_fact:
-        cluster_name_query: >-
-          {{ ingress_base_domain.stdout | split('.apps.') | first | split('.') | last if ingress_base_domain.stdout is search('.apps.') else ingress_base_domain.stdout | split('apps.') | last | split('.') | first }}
-    when: cluster_name | length < 1
+  
+  - name: Query cluster name if not defined
+    include_tasks: tasks/query-cluster-details.yml
+    when: cluster_name | length < 1 
 
   - name: Create proxy config cm if applicable
     include_tasks: tasks/create-proxy-config-cm.yml   
