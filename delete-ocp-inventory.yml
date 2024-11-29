@@ -35,5 +35,5 @@
   - include_role:
       name: delete-ocp-inventory
     vars:
-      cluster_name: "{{ item }}"
+      cluster: "{{ item }}"
     loop: "{{ del_loop }}"    
