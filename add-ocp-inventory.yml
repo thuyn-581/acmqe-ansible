@@ -24,6 +24,6 @@
 
   - name: Add Openshift Inventory of {{ cluster }} on Ansible Tower
     vars:
-      cluster: "{{ cluster_name if cluster_name_query is undefined else cluster_name_query }}"  
+      cluster: "{{ cluster_name if cluster_name_query is undefined else cluster_name_query|trim }}"  
     import_role:
       name: add-ocp-inventory       

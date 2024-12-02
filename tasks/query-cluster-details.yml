@@ -4,5 +4,11 @@
   register: ingress_base_domain
 
 - set_fact:
-    cluster_name_query: >-
-      {{ ingress_base_domain.stdout | split('.apps.') | first | split('.') | last if ingress_base_domain.stdout is search('.apps.') else ingress_base_domain.stdout | split('apps.') | last | split('.') | first }}
+    cluster_name_query: >
+      {% if ingress_base_domain.stdout is search('.rosa.') %}
+      {{ ingress_base_domain.stdout | split('.rosa.') | last | split('.') | first }}
+      {% elif ingress_base_domain.stdout is search('.apps.') %}
+      {{ ingress_base_domain.stdout | split('.apps.') | last | split('.') | first }}
+      {% else %}
+      {{ ingress_base_domain.stdout | split('apps.') | last | split('.') | first }}
+      {% endif %}
