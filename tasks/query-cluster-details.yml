@@ -8,7 +8,7 @@
       {% if ingress_base_domain.stdout is search('.rosa.') %}
       {{ ingress_base_domain.stdout | split('.rosa.') | last | split('.') | first }}
       {% elif ingress_base_domain.stdout is search('.apps.') %}
-      {{ ingress_base_domain.stdout | split('.apps.') | last | split('.') | first }}
+      {{ ingress_base_domain.stdout | split('.apps.') | first | split('.') | last }}
       {% else %}
       {{ ingress_base_domain.stdout | split('apps.') | last | split('.') | first }}
       {% endif %}
