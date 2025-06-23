@@ -1,0 +1,35 @@
+---
+- name: Delete ocp credentials openshift-creds-{{ cluster }}
+  awx.awx.credential:
+    controller_username: "{{ tower_user }}"
+    controller_password: "{{ tower_pwd }}"
+    controller_host: "{{ tower }}"         
+    validate_certs: false
+    name: "openshift-creds-{{ cluster }}"
+    credential_type: "OpenShift or Kubernetes API Bearer Token"
+    organization: "acmqe"
+    state: "absent"
+  run_once: true
+
+- name: Delete ocp container group openshift-container-group-{{ cluster }}
+  awx.awx.instance_group:
+    controller_username: "{{ tower_user }}"
+    controller_password: "{{ tower_pwd }}"
+    controller_host: "{{ tower }}"        
+    validate_certs: false
+    name: "openshift-container-group-{{ cluster }}"
+    is_container_group: true
+    state: "absent"
+  run_once: true    
+
+- name: Delete ocp inventory openshift-inventory-{{ cluster }} in Ansible Tower 
+  awx.awx.inventory:
+    controller_username: "{{ tower_user }}"
+    controller_password: "{{ tower_pwd }}"
+    controller_host: "{{ tower }}"        
+    validate_certs: false
+    name: "openshift-inventory-{{ cluster }}"
+    organization: "acmqe"
+    state: "absent"
+  run_once: true   
+    

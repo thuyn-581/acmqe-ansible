@@ -3,8 +3,6 @@
   any_errors_fatal: true 
   vars_files:
   - vars/vars.yml   
-  vars:
-    cluster: "{{ ocp_api_url.split('.')[1] }}"
     
   tasks:    
   - name: Prepare ansible runner host
@@ -13,6 +11,10 @@
       
   - name: Login ocp
     include_tasks: tasks/login-ocp.yml
+  
+  - name: Query cluster name if not defined
+    include_tasks: tasks/query-cluster-details.yml
+    when: cluster_name | length < 1 
 
   - name: Create proxy config cm if applicable
     include_tasks: tasks/create-proxy-config-cm.yml   
@@ -21,5 +23,7 @@
     include_tasks: tasks/create-service-account.yml 
 
   - name: Add Openshift Inventory of {{ cluster }} on Ansible Tower
+    vars:
+      cluster: "{{ cluster_name if cluster_name_query is undefined else cluster_name_query|trim }}"  
     import_role:
       name: add-ocp-inventory       

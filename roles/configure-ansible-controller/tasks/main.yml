@@ -6,39 +6,68 @@
       follow: yes
       remote_src: true 
 
-  - name: Create AAP controller CR
+  # - name: Create Automation controller CR
+  #   shell: |
+  #     {{ oc_cmd }} apply -f - <<EOF
+  #       apiVersion: automationcontroller.ansible.com/v1beta1
+  #       kind: AutomationController
+  #       metadata:
+  #         name: mycontroller
+  #         namespace: {{ aap_project }}
+  #       spec:
+  #         replicas: 1
+  #     EOF            
+  #   changed_when: true     
+
+  - name: Create AAP CR
     shell: |
       {{ oc_cmd }} apply -f - <<EOF
-        apiVersion: automationcontroller.ansible.com/v1beta1
-        kind: AutomationController
+        apiVersion: aap.ansible.com/v1alpha1
+        kind: AnsibleAutomationPlatform
         metadata:
           name: {{ aap_name }}
           namespace: {{ aap_project }}
         spec:
-          replicas: 1
+          # Development purposes only
+          no_log: false
+          controller:
+            name: {{ ac_name }}
+          eda:
+            disabled: true
+          hub:
+            disabled: true
       EOF            
-    changed_when: true     
+    changed_when: true   
 
   - name: Get AAP route
     shell: |
-      {{ oc_cmd }}  get route -n {{ aap_project }} | grep {{ aap_name }} | awk '{ print $2 }'
+      {{ oc_cmd }}  get route -n {{ aap_project }} {{ aap_name }} | awk '{ if(NR>1) print $2 }'
     changed_when: true    
     register: aap_url
     until: aap_url.stdout != ''
     retries: 15
     delay: 30
 
+  - name: Get AC route
+    shell: |
+      {{ oc_cmd }}  get route -n {{ aap_project }} {{ ac_name }} | awk '{ if(NR>1) print $2 }'
+    changed_when: true    
+    register: ac_url
+    until: ac_url.stdout != ''
+    retries: 15
+    delay: 30    
+
   - name: Print AAP route
     debug:
       msg: "{{ aap_url.stdout }}"    
     
-  - name: Wait for aap web ready
+  - name: Wait for AC web ready
     shell: |
-      curl -k https://{{ aap_url.stdout }}/migrations_notran --fail --show-error 
+      curl -k https://{{ ac_url.stdout }}/migrations_notran --fail --show-error 
     changed_when: true    
     register: resp
     until: resp.rc == 0
-    retries: 15
+    retries: 20
     delay: 30
 
   - name: Get AAP admin password 
@@ -46,6 +75,12 @@
       {{ oc_cmd }} -n {{ aap_project }} get secret/{{ aap_name }}-admin-password -oyaml | grep password: | tail -n1 | awk '{ print $2}' | base64 -d
     changed_when: true    
     register: aap_pwd  
+
+  - name: Get AC admin password 
+    shell: |
+      {{ oc_cmd }} -n {{ aap_project }} get secret/{{ ac_name }}-admin-password -oyaml | grep password: | tail -n1 | awk '{ print $2}' | base64 -d
+    changed_when: true    
+    register: ac_pwd     
 
   - name: Download AAP subscription manifest file from RHSM and apply license
     import_tasks: apply-aap-license.yml
@@ -56,21 +91,21 @@
       scope: "write"
       state: present
       controller_username: "admin"
-      controller_password: "{{ aap_pwd.stdout }}"
-      controller_host: "https://{{ aap_url.stdout }}"    
+      controller_password: "{{ ac_pwd.stdout }}"
+      controller_host: "https://{{ ac_url.stdout }}"    
       validate_certs: false  
-    register: aap_token   
+    register: ac_token   
 
-  - name: Push admin token to secret/{{aap_name}}-admin-token
+  - name: Push admin token to secret/{{ ac_name }}-admin-token
     shell: |
       {{ oc_cmd }} apply -f - <<EOF
         kind: Secret
         apiVersion: v1
         metadata:
-          name: {{ aap_name }}-admin-token
+          name: {{ ac_name }}-admin-token
           namespace: aap
         data:
-          token: {{ aap_token.ansible_facts.tower_token.token|b64encode }}
+          token: {{ ac_token.ansible_facts.tower_token.token|b64encode }}
         type: Opaque
       EOF            
     changed_when: true        
@@ -82,13 +117,13 @@
       ask_variables_on_launch: true
       state: present
       controller_username: "admin"
-      controller_password: "{{ aap_pwd.stdout }}"
-      controller_host: "https://{{ aap_url.stdout }}"    
+      controller_password: "{{ ac_pwd.stdout }}"
+      controller_host: "https://{{ ac_url.stdout }}"    
       validate_certs: false  
     register: update_result
     until: update_result is not failed
     retries: 5
     delay: 15      
 
-  - name: Create ansible project
-    import_tasks: add-ansible-project.yml      
+  # - name: Create ansible project
+  #   import_tasks: add-ansible-project.yml      

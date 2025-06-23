@@ -8,7 +8,8 @@
 
 - name: Deloy GOGS 
   vars:
-    hostname: "{{ gogs_ns }}.{{ ocp_api_url | urlsplit('hostname') | replace('api','apps') }}"
+    # hostname: "{{ gogs_ns }}.{{ ocp_api_url | urlsplit('hostname') | replace('api','apps') }}"
+    hostname: "{{ gogs_ns }}.{{ ingress_base_domain.stdout }}"
   block:
   - debug:
       msg: "{{ hostname }}"        
@@ -67,4 +68,3 @@
       include_tasks:
         file: add-git-repos.yml
       loop: "{{ git_repos }}"
-

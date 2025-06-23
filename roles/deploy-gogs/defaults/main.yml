@@ -1,10 +1,11 @@
 #GOGS
 gogs_ns: "acmqe-gogs"
 gogs_user: "gogs-admin"
-gogs_src: "docker.io/openshiftdemos"
+# gogs_src: "docker.io/openshiftdemos"
+gogs_src: "quay.io/thuyn_581"
 git_branch: "main"  
 git_repos: ["https://github.com/fxiang1/app-samples.git",
             "https://github.com/thuyn-581/demo.git",
-            "https://github.com/open-cluster-management-io/policy-collection.git",
-            "https://github.com/stolostron/cluster-backup-operator.git"]     
+            "https://github.com/open-cluster-management-io/policy-collection.git"]
+            #"https://github.com/stolostron/cluster-backup-operator.git"]     
      

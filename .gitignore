@@ -1,4 +1,5 @@
 #Ignore files
+inventory
 *.kubeconfig
 *.tar.gz
 *.zip
@@ -8,4 +9,5 @@ roles/configure-ansible-controller/tasks/install-aap-operator.yml
 # Ignore folders
 certs/*
 *.git/*
+capi/*
 
