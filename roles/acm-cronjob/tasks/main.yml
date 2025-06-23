@@ -10,7 +10,7 @@
     {{ oc_cmd }} process 
     -f roles/acm-cronjob/defaults/template.yml
     -p API_URL={{ ocp_api_url }}
-    -p OCM_TOKEN={{ rhocm_token }}
+    -p OCM_TOKEN={{ rhapi_offline_token }}
     | oc create -f - -n default 
 
 - name: Wait for cronjob succeeded
