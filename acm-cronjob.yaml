@@ -14,6 +14,9 @@
   - name: Login cluster
     import_tasks: tasks/login-ocp.yml    
 
+  - name: Create SA/token if not exists
+    include_tasks: tasks/create-service-account.yml     
+
   - name: Create cron job to update ocm clusters
     import_role:
       name: acm-cronjob
