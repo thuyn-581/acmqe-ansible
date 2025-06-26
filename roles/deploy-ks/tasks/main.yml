@@ -50,7 +50,7 @@
     -o jsonpath={.data.value} | base64 --decode \
     > /rh/capi/{{ cluster_name }}/{{ cluster_name }}.kubeconfig
 
-- name: Update kubeconfig SA token for AWS cluster    
+- name: Update kubeconfig SA token    
   block:
   - shell: |
       kubectl --kubeconfig {{ kubeconfig }} apply -f - <<EOF
@@ -97,4 +97,12 @@
       sed -ri 's/^(\s*)(token\s*: .*$)/\1token: {{ autobot_sa_token.stdout }}/' {{ kubeconfig }}
   vars:
     kubeconfig: "/rh/capi/{{ cluster_name }}/{{ cluster_name }}.kubeconfig" 
-  when: infra_provider == "aws"  
+
+# push kubeconfig to minio
+- block: 
+  - slurp:
+      src: "/rh/capi/{{ cluster_name }}/{{ cluster_name }}.kubeconfig"
+
+- include_tasks: ../tasks/upload_files_to_minio.yml
+  vars:
+    file_path: "/rh/capi/{{ cluster_name }}/{{ cluster_name }}.kubeconfig"

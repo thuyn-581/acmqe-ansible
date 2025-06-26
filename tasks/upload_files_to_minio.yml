@@ -1,0 +1,36 @@
+- name: 'Upload output artifacts to minio'
+  block:
+    - set_fact:
+        retry_count: "{{ 0 if retry_count is undefined else retry_count|int + 1 }}"  
+        min_location: >
+          {% if "ocm_subs" in file_path %}
+          ocm/ocm_subs.txt
+          {% elif "kubeconfig" in file_path %}
+          {{ cluster_name }}/kubeconfig          
+          {% else %}
+          {{ cluster_name }}/output.json
+          {% endif %}
+
+    - aws_s3:
+        endpoint_url: "{{ minio_url }}"
+        bucket: "acmqe-infra"
+        object: "{{ min_location | trim }}"
+        encrypt: false
+        src: "{{ file_path }}"
+        mode: put
+        overwrite: always
+        aws_access_key: "{{ minio_user }}"
+        aws_secret_key: "{{ minio_pwd }}"    
+      become: true
+      vars:
+        ansible_python_interpreter: /usr/bin/python3
+
+  rescue:
+    - fail:
+        msg: Upload Ended after 5 retries
+      when: retry_count|int == 5  
+
+    - debug:
+        msg: "Failed to upload artifacts to minio - Retrying..."
+
+    - include_tasks: ../tasks/upload_files_to_minio.yml    

@@ -39,3 +39,9 @@ infra_providers:
     instance_type: "Standard_D2s_v3"
     version: "1.30.0"
     nodes_count: 2
+
+#===== Minio =====
+minio_url: http://minio-api.apps.int.prod-scale-spoke1-aws-us-east-1.itup.redhat.com
+minio_alias: qe_minio
+minio_user: minio
+minio_pwd: minio123
