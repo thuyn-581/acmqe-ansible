@@ -11,6 +11,13 @@
     template:
       src: templates/capi-clusters.yaml.j2
       dest: /rh/capi/capi_clusters.txt
+  
+  - slurp:
+      src: "/rh/capi/capi_clusters.txt"
+
+  - include_tasks: ../tasks/upload_files_to_minio.yml
+    vars:
+      file_path: "/rh/capi/capi_clusters.txt"  
   when: cleanup | bool
 
 - set_fact:
