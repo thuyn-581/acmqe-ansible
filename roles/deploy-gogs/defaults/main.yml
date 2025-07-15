@@ -6,6 +6,7 @@ gogs_src: "quay.io/thuyn_581"
 git_branch: "main"  
 git_repos: ["https://github.com/fxiang1/app-samples.git",
             "https://github.com/thuyn-581/demo.git",
-            "https://github.com/open-cluster-management-io/policy-collection.git"]
+            "https://github.com/open-cluster-management-io/policy-collection.git",
+            "https://github.com/ansible/ansible-tower-samples"]
             #"https://github.com/stolostron/cluster-backup-operator.git"]     
      
