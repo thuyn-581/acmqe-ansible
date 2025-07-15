@@ -8,9 +8,9 @@
           {% elif "ocm_subs" in file_path %}
           ocm/ocm_subs.txt
           {% elif "kubeconfig" in file_path %}
-          {{ cluster_name }}/kubeconfig     
+          {{ file_path | split('/') | last | split('.') | first }}/kubeconfig     
           {% else %}
-          {{ cluster_name }}/output.json
+          {{ file_path | split('/') | last | split('.') | first }}/output.json
           {% endif %}
 
     - aws_s3:
