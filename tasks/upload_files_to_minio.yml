@@ -3,10 +3,12 @@
     - set_fact:
         retry_count: "{{ 0 if retry_count is undefined else retry_count|int + 1 }}"  
         min_location: >
-          {% if "ocm_subs" in file_path %}
+          {% if "capi_clusters" in file_path %}
+          capi/capi_clusters.txt     
+          {% elif "ocm_subs" in file_path %}
           ocm/ocm_subs.txt
           {% elif "kubeconfig" in file_path %}
-          {{ cluster_name }}/kubeconfig          
+          {{ cluster_name }}/kubeconfig     
           {% else %}
           {{ cluster_name }}/output.json
           {% endif %}
@@ -24,7 +26,7 @@
       become: true
       vars:
         ansible_python_interpreter: /usr/bin/python3
-
+    
   rescue:
     - fail:
         msg: Upload Ended after 5 retries
