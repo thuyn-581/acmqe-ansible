@@ -21,6 +21,7 @@ metadata:
   name: acm-dev-catalog
   namespace: openshift-marketplace
 spec:
+  displayName: acm-dev-catalog:{{ acm_ds }}
   image: {{ registry }}/acm-d/acm-dev-catalog:{{ acm_ds }}
   sourceType: grpc
 ---
@@ -32,6 +33,7 @@ metadata:
   name: mce-dev-catalog
   namespace: openshift-marketplace
 spec:
+  displayName: mce-dev-catalog:{{ mce_ds }}
   image: {{ registry }}/acm-d/mce-dev-catalog:{{ mce_ds }}
   sourceType: grpc   
 {% endif %}
