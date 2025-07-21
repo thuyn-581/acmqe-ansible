@@ -9,7 +9,7 @@ metadata:
   namespace: openshift-marketplace
 spec:
   displayName: redhat-operators-disconnected
-  image:{{ cat_img | replace ('registry.redhat.io',registry) | replace ('registry-proxy.engineering.redhat.com',registry) }}
+  image: {{ cat_img | replace ('registry.redhat.io',registry) | replace ('registry-proxy.engineering.redhat.com',registry) }}
   sourceType: grpc
 {% else %}
 ---
@@ -21,7 +21,7 @@ metadata:
   name: acm-dev-catalog
   namespace: openshift-marketplace
 spec:
-  image:{{ registry }}/acm-d/acm-dev-catalog:{{ acm_ds }}
+  image: {{ registry }}/acm-d/acm-dev-catalog:{{ acm_ds }}
   sourceType: grpc
 ---
 apiVersion: operators.coreos.com/v1alpha1
@@ -32,6 +32,6 @@ metadata:
   name: mce-dev-catalog
   namespace: openshift-marketplace
 spec:
-  image:{{ registry }}/acm-d/mce-dev-catalog:{{ mce_ds }}
+  image: {{ registry }}/acm-d/mce-dev-catalog:{{ mce_ds }}
   sourceType: grpc   
 {% endif %}
