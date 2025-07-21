@@ -3,17 +3,18 @@
     oc get clusterversion version -ojson |\
       jq -r '.spec.channel' |\
       cut -d'-' -f2-
-  register: ocp_ver
-  
+  register: ocp_channel
+
 - set_fact:
     pkgs_list: "{{ ops_list | split(',') | trim }}"
+    ocp_ver: "{{ ocp_channel.stdout }}"
     acm_ver: "{{ acm_ds | split('.')  | reject('search', 'DOWNSTREAM') | join('.') }}"
     mce_ver: "{{ mce_ds | split('.')  | reject('search', 'DOWNSTREAM') | join('.') }}"
 
 - set_fact:
     cat_img: >
       {% if cat_src == "production" %}
-      registry.redhat.io/redhat/redhat-operator-index:v{{ ocp_ver.stdout }}
+      registry.redhat.io/redhat/redhat-operator-index:v{{ ocp_ver }}
       {% else %}
       registry-proxy.engineering.redhat.com/rh-osbs/iib:{{ iib }}
       {% endif %}
