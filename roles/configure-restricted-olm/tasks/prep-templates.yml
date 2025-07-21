@@ -1,0 +1,32 @@
+- set_fact:
+    pkgs_list: "{{ ops_list | split(',') }}"
+
+- block:
+  - name: Get OCP version 
+    register: ocp_ver
+    when: cat_src == "production"
+
+  - set_fact:
+      cat_img: >
+        {% if cat_src == "production" %}
+        registry.redhat.io/redhat/redhat-operator-index:v{{ ocp_ver.stdout }}
+        {% else %}
+        registry-proxy.engineering.redhat.com/rh-osbs/iib:{{ iib }}
+        {% endif %}
+  when: cat_src != "konflux"    
+
+- name: Populate ImageSetConfiguration
+  template:
+    src: templates/isc.yaml.j2
+    dest: "{{ working_dir }}/isc.yaml"
+
+- name: Populate ImageDigestMirrorSet
+  template:
+    src: templates/imds.yaml.j2
+    dest: "{{ working_dir }}/imds.yaml"   
+
+- name: Populate Catalog sources
+  template:
+    src: templates/cat_src.yaml.j2
+    dest: "{{ working_dir }}/cat_src.yaml"        
+

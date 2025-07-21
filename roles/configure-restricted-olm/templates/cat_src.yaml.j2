@@ -1,0 +1,37 @@
+{% if cat_src != "konflux" %}
+---
+apiVersion: olm.operatorframework.io/v1
+kind: ClusterCatalog
+metadata:
+  name: redhat-operators
+spec:
+  priority: 0
+  source:
+    image:
+      ref: {{ cat_img | replace ('registry.redhat.io',registry) | replace ('registry-proxy.engineering.redhat.com',registry) }} 
+    type: Image
+
+{% else %}
+---
+apiVersion: olm.operatorframework.io/v1
+kind: ClusterCatalog
+metadata:
+  name: acm-dev-catalog
+spec:
+  priority: 0
+  source:
+    image:
+      ref: {{ registry }}/acm-d/acm-dev-catalog:{{ acm_ds }}
+    type: Image
+---
+apiVersion: olm.operatorframework.io/v1
+kind: ClusterCatalog
+metadata:
+  name: mce-dev-catalog
+spec:
+  priority: 0
+  source:
+    image:
+      ref: {{ registry }}/acm-d/mce-dev-catalog:{{ mce_ds }}
+    type: Image    
+{% endif %}

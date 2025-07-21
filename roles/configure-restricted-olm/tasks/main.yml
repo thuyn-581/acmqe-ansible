@@ -1,0 +1,46 @@
+- import_tasks: prep-templates.yml
+
+- name: Mirror operators from {{ cat_src }} to {{ registry }}
+  shell: |
+    oc-mirror --v2 -c isc.yaml \
+    --workspace file:///{{ working_dir }}/mirror/ \
+    docker://{{ registry }}
+  when: cat_src == "production"
+
+- block: 
+  - name: Generate operators manifests
+    shell: |
+      oc-mirror --v2 -c isc.yaml \
+      --workspace file:///{{ working_dir }}/mirror/ \
+      docker://{{ registry }} --dry-run
+
+  - shell: |
+      cat {{ working_dir }}/mirror/working-dir/dry-run/mapping.txt |\
+      sed -i "s|registry.redhat.io/|registry.stage.redhat.io/|g" |\
+      sed -i "s|docker://||g"
+    when: cat_src == "stage"
+
+  - shell: |
+      cat {{ working_dir }}/mirror/working-dir/dry-run/mapping.txt |\
+      sed -i "s|registry.redhat.io/rhacm2/|quay.io:443/acm-d/|g" |\
+      sed -i "s|registry.redhat.io/multicluster-engine/|quay.io:443/acm-d/|g" |\
+      sed -i "s|docker://||g"
+    when: cat_src == "konflux"    
+
+  - name: Mirror images to {{ registry }}
+    shell: |
+      oc image mirror \
+        -f {{ working_dir }}/mirror/working-dir/dry-run/mapping.txt \
+        -a {{ pull_secret_loc }} \
+        --filter-by-os=.* \
+        --keep-manifest-list \
+        --continue-on-error=true      
+  when: cat_src != "production"  
+
+- name: Apply ImageDigestMirrorSet
+  shell: |
+    oc apply -f {{ working_dir }}/imds.yaml
+
+- name: Create Catalog sources
+  shell: |
+    oc apply -f {{ working_dir }}/cat_src.yaml    

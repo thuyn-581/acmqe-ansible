@@ -1,0 +1,12 @@
+- name: Configure Restricted OLM
+  hosts: localhost
+  any_errors_fatal: true 
+  environment:
+    KUBECONFIG: "/home/kni/clusterconfigs/auth/kubeconfig"   
+  vars:
+    working_dir: /tmp
+    pull_secret_loc: /home/kni/combined-secret.json
+  
+  tasks:
+  - import_role:
+      name: "configure-restricted-olm"

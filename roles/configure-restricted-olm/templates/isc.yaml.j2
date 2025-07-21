@@ -1,0 +1,23 @@
+kind: ImageSetConfiguration
+apiVersion: mirror.openshift.io/v1alpha2
+mirror:
+  operators:
+{% if cat_src != "konflux" %}
+  - catalog: {{ cat_img }}
+    full: false
+    packages: 
+{% for item in pkgs_list %}
+      - name: {{ item }}
+{% endfor %}       
+{% else %}      
+  - catalog: quay.io:443/acm-d/mce-dev-catalog:{{ mce_ds }}
+    packages:
+      - name: multicluster-engine
+        channels:
+        - name: stable-{{ mce_ver }}         
+  - catalog: quay.io:443/acm-d/acm-dev-catalog:{{ acm_ds }}
+    packages:
+      - name: advanced-cluster-management
+        channels:
+        - name: release-{{ acm_ver }}    
+{% endif %} 
