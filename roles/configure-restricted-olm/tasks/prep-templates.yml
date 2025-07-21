@@ -1,5 +1,7 @@
 - set_fact:
     pkgs_list: "{{ ops_list | split(',') | trim }}"
+    acm_ver: "{{ acm_ds | split('.')  | reject('search', 'DOWNSTREAM') | join('.') }}"
+    mce_ver: "{{ mce_ds | split('.')  | reject('search', 'DOWNSTREAM') | join('.') }}"
 
 - block:
   - name: Get OCP version 
