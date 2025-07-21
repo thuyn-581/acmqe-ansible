@@ -19,11 +19,5 @@ mirror:
     packages:
       - name: advanced-cluster-management
         channels:
-        - name: release-{{ acm_ver }}    
-  - catalog: registry.redhat.io/redhat/redhat-operator-index:v{{ ocp_ver }}
-    full: false
-    packages:
-{% for item in pkgs_list %}
-      - name: {{ item }}
-{% endfor %}    
+        - name: release-{{ acm_ver }}       
 {% endif %} 
