@@ -1,5 +1,5 @@
 - name: Configure Restricted OLM
-  hosts: localhost
+  hosts: all
   any_errors_fatal: true 
   environment:
     KUBECONFIG: "/home/kni/clusterconfigs/auth/kubeconfig"   
