@@ -1,5 +1,5 @@
 - set_fact:
-    pkgs_list: "{{ ops_list | split(',') }}"
+    pkgs_list: "{{ ops_list | split(',') | trim }}"
 
 - block:
   - name: Get OCP version 

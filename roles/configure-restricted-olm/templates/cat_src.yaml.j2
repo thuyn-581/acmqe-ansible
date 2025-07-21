@@ -8,6 +8,7 @@ metadata:
   name: redhat-operators
   namespace: openshift-marketplace
 spec:
+  displayName: redhat-operators-disconnected
   image:{{ cat_img | replace ('registry.redhat.io',registry) | replace ('registry-proxy.engineering.redhat.com',registry) }}
   sourceType: grpc
 {% else %}

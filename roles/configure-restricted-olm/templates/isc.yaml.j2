@@ -3,7 +3,7 @@ apiVersion: mirror.openshift.io/v1alpha2
 mirror:
   operators:
 {% if cat_src != "konflux" %}
-  - catalog: {{ cat_img }}
+  - catalog: {{ cat_img | trim }}
     full: false
     packages: 
 {% for item in pkgs_list %}
