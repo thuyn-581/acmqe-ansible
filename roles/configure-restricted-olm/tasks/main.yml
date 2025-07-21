@@ -15,16 +15,19 @@
       docker://{{ registry }} --dry-run
 
   - shell: |
-      cat {{ working_dir }}/mirror/working-dir/dry-run/mapping.txt |\
-      sed -i "s|registry.redhat.io/|registry.stage.redhat.io/|g" |\
-      sed -i "s|docker://||g"
+      sed -i "/localhost:55000/d" {{ mapping_file }}   
+      echo registry-proxy.engineering.redhat.com/rh-osbs/iib:{{iib}}={{registry}}/acm-d/acm-dev-catalog:{{acm_ds}} >> {{ mapping_file }}  
+      sed -i "s|registry.redhat.io/|registry.stage.redhat.io/|g" {{ mapping_file }}
+      sed -i "s|docker://||g" {{ mapping_file }}
     when: cat_src == "stage"
 
   - shell: |
-      cat {{ working_dir }}/mirror/working-dir/dry-run/mapping.txt |\
-      sed -i "s|registry.redhat.io/rhacm2/|quay.io:443/acm-d/|g" |\
-      sed -i "s|registry.redhat.io/multicluster-engine/|quay.io:443/acm-d/|g" |\
-      sed -i "s|docker://||g"
+      sed -i "/localhost:55000/d" {{ mapping_file }}   
+      echo quay.io:443/acm-d/acm-dev-catalog:{{acm_ds}}={{registry}}/acm-d/acm-dev-catalog:{{acm_ds}} >> {{ mapping_file }}  
+      echo quay.io:443/acm-d/mce-dev-catalog:{{mce_ds}}={{registry}}/acm-d/mce-dev-catalog:{{mce_ds}} >> {{ mapping_file }} 
+      sed -i "s|registry.redhat.io/rhacm2/|quay.io:443/acm-d/|g" {{ mapping_file }} 
+      sed -i "s|registry.redhat.io/multicluster-engine/|quay.io:443/acm-d/|g" {{ mapping_file }}
+      sed -i "s|docker://||g" {{ mapping_file }}
     when: cat_src == "konflux"    
 
   - name: Mirror images to {{ registry }}
@@ -34,7 +37,9 @@
         -a {{ pull_secret_loc }} \
         --filter-by-os=.* \
         --keep-manifest-list \
-        --continue-on-error=true      
+        --continue-on-error=true
+  vars:
+    mapping_file: "{{ working_dir }}/mirror/working-dir/dry-run/mapping.txt"
   when: cat_src != "production"  
 
 - name: Apply ImageDigestMirrorSet

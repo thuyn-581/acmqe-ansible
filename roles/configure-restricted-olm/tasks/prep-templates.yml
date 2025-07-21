@@ -1,24 +1,22 @@
+- name: Get OCP version 
+  shell: |
+    oc get clusterversion version -ojson |\
+      jq -r '.spec.channel' |\
+      cut -d'-' -f2-
+  register: ocp_ver
+  
 - set_fact:
     pkgs_list: "{{ ops_list | split(',') | trim }}"
     acm_ver: "{{ acm_ds | split('.')  | reject('search', 'DOWNSTREAM') | join('.') }}"
     mce_ver: "{{ mce_ds | split('.')  | reject('search', 'DOWNSTREAM') | join('.') }}"
 
-- block:
-  - name: Get OCP version 
-    shell: |
-      oc get clusterversion version -ojson |\
-        jq -r '.spec.channel' |\
-        cut -d'-' -f2-
-    register: ocp_ver
-    when: cat_src == "production"
-
-  - set_fact:
-      cat_img: >
-        {% if cat_src == "production" %}
-        registry.redhat.io/redhat/redhat-operator-index:v{{ ocp_ver.stdout }}
-        {% else %}
-        registry-proxy.engineering.redhat.com/rh-osbs/iib:{{ iib }}
-        {% endif %}
+- set_fact:
+    cat_img: >
+      {% if cat_src == "production" %}
+      registry.redhat.io/redhat/redhat-operator-index:v{{ ocp_ver.stdout }}
+      {% else %}
+      registry-proxy.engineering.redhat.com/rh-osbs/iib:{{ iib }}
+      {% endif %}
   when: cat_src != "konflux"    
 
 - name: Populate ImageSetConfiguration
