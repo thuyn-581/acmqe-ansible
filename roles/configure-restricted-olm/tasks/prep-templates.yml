@@ -3,6 +3,10 @@
 
 - block:
   - name: Get OCP version 
+    shell: |
+      oc get clusterversion version -ojson |\
+        jq -r '.spec.channel' |\
+        cut -d'-' -f2-
     register: ocp_ver
     when: cat_src == "production"
 

@@ -1,37 +1,36 @@
 {% if cat_src != "konflux" %}
 ---
-apiVersion: olm.operatorframework.io/v1
-kind: ClusterCatalog
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
 metadata:
+  annotations:
+    catImg:{{ cat_img }}
   name: redhat-operators
+  namespace: openshift-marketplace
 spec:
-  priority: 0
-  source:
-    image:
-      ref: {{ cat_img | replace ('registry.redhat.io',registry) | replace ('registry-proxy.engineering.redhat.com',registry) }} 
-    type: Image
-
+  image:{{ cat_img | replace ('registry.redhat.io',registry) | replace ('registry-proxy.engineering.redhat.com',registry) }}
+  sourceType: grpc
 {% else %}
 ---
-apiVersion: olm.operatorframework.io/v1
-kind: ClusterCatalog
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
 metadata:
+  annotations:
+    catImg: quay.io:443/acm-d/acm-dev-catalog:{{ acm_ds }}
   name: acm-dev-catalog
+  namespace: openshift-marketplace
 spec:
-  priority: 0
-  source:
-    image:
-      ref: {{ registry }}/acm-d/acm-dev-catalog:{{ acm_ds }}
-    type: Image
+  image:{{ registry }}/acm-d/acm-dev-catalog:{{ acm_ds }}
+  sourceType: grpc
 ---
-apiVersion: olm.operatorframework.io/v1
-kind: ClusterCatalog
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
 metadata:
+  annotations:
+    catImg: quay.io:443/acm-d/mce-dev-catalog:{{ mce_ds }}
   name: mce-dev-catalog
+  namespace: openshift-marketplace
 spec:
-  priority: 0
-  source:
-    image:
-      ref: {{ registry }}/acm-d/mce-dev-catalog:{{ mce_ds }}
-    type: Image    
+  image:{{ registry }}/acm-d/mce-dev-catalog:{{ mce_ds }}
+  sourceType: grpc   
 {% endif %}

@@ -2,7 +2,7 @@
 
 - name: Mirror operators from {{ cat_src }} to {{ registry }}
   shell: |
-    oc-mirror --v2 -c isc.yaml \
+    oc-mirror --v2 -c {{ working_dir }}/isc.yaml \
     --workspace file:///{{ working_dir }}/mirror/ \
     docker://{{ registry }}
   when: cat_src == "production"
@@ -10,7 +10,7 @@
 - block: 
   - name: Generate operators manifests
     shell: |
-      oc-mirror --v2 -c isc.yaml \
+      oc-mirror --v2 -c {{ working_dir }}/isc.yaml \
       --workspace file:///{{ working_dir }}/mirror/ \
       docker://{{ registry }} --dry-run
 
