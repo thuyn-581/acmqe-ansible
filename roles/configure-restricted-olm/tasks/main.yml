@@ -16,7 +16,7 @@
 
   - shell: |
       sed -i "/localhost:55000/d" {{ mapping_file }}   
-      echo registry-proxy.engineering.redhat.com/rh-osbs/iib:{{iib}}={{registry}}/acm-d/acm-dev-catalog:{{acm_ds}} >> {{ mapping_file }}  
+      echo registry-proxy.engineering.redhat.com/rh-osbs/iib:{{iib}}={{registry}}/rh-osbs/iib:{{iib}} >> {{ mapping_file }}  
       sed -i "s|registry.redhat.io/|registry.stage.redhat.io/|g" {{ mapping_file }}
       sed -i "s|docker://||g" {{ mapping_file }}
     when: cat_src == "stage"
