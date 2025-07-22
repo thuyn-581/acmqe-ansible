@@ -8,7 +8,13 @@ mirror:
     packages: 
 {% for item in pkgs_list %}
       - name: {{ item }}
-{% endfor %}       
+{% endfor %}
+  additionalImages:
+    - name: registry.redhat.io/rhel9/postgresql-13:latest
+    - name: registry.redhat.io/rhel8/postgresql-10:latest    
+    - name: quay.io/fxiang1/helloworld:0.0.1
+    - name: quay.io/fxiang1/mortgage:0.5.0
+    - name: quay.io/thuyn_581/gogs:0.9.97       
 {% else %}      
   - catalog: quay.io:443/acm-d/mce-dev-catalog:{{ mce_ds }}
     packages:
@@ -21,9 +27,4 @@ mirror:
         channels:
         - name: release-{{ acm_ver }}       
 {% endif %} 
-  additionalImages:
-    - name: registry.redhat.io/rhel9/postgresql-13:latest
-    - name: registry.redhat.io/rhel8/postgresql-10:latest    
-    - name: quay.io/fxiang1/helloworld:0.0.1
-    - name: quay.io/fxiang1/mortgage:0.5.0
-    - name: quay.io/thuyn_581/gogs:0.9.97
+
