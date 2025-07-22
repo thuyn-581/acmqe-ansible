@@ -19,7 +19,7 @@
       {% if cat_src == "production" %}
       registry.redhat.io/redhat/redhat-operator-index:v{{ ocp_ver }}
       {% else %}
-      registry-proxy.engineering.redhat.com/rh-osbs/iib:{{ iib }}
+      {{ iib_img }}
       {% endif %}
   when: cat_src != "konflux"    
 
