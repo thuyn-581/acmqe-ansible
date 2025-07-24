@@ -37,7 +37,15 @@
         -a {{ pull_secret_loc }} \
         --filter-by-os=.* \
         --keep-manifest-list \
-        --continue-on-error=true
+        --force=true \ 
+        --continue-on-error=false
+    register: mirror_output
+
+  - name: Print mirror output
+    debug:
+      msg: "{{ mirror_output.stdout_lines }}"
+    when: "{{ mirror_output.rc != 0 }}""
+
   vars:
     mapping_file: "{{ working_dir }}/mirror/working-dir/dry-run/mapping.txt"
   when: cat_src != "production"  
