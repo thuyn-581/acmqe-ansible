@@ -43,12 +43,12 @@
       register: mirror_output
     rescue:
       - debug:
-          msg: "{{ mirror_output.stdout_lines }}"
+          msg: "{{ mirror_output }}"
 
       - fail:
           msg: An error occurred during mirroring
         when: "{{ mirror_output.rc != 0 }}"  
-        
+
   vars:
     mapping_file: "{{ working_dir }}/mirror/working-dir/dry-run/mapping.txt"
   when: cat_src != "production"  
