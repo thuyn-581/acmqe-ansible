@@ -38,9 +38,9 @@
           -a {{ pull_secret_loc }} \
           --filter-by-os=.* \
           --keep-manifest-list \
-          --force=true \ 
+          --force=false \ 
           --continue-on-error=true > {{ working_dir }}/image_mirror.log 2>&1
-      register: result
+
     rescue:
       - shell: cat {{ working_dir }}/image_mirror.log | grep error
         register: mirror_output
@@ -52,7 +52,7 @@
 
       - fail:
           msg: Errors occurred during mirroring
-        when: "{{ result.rc != 0 }}"  
+        when: "{{ mirror_output.stdout_lines | list > 0 }}"  
 
   vars:
     mapping_file: "{{ working_dir }}/mirror/working-dir/dry-run/mapping.txt"
