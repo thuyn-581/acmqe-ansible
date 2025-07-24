@@ -44,7 +44,7 @@
   - name: Print mirror output
     debug:
       msg: "{{ mirror_output.stdout_lines }}"
-    when: "{{ mirror_output.rc != 0 }}""
+    when: "{{ mirror_output.rc != 0 }}"
 
   vars:
     mapping_file: "{{ working_dir }}/mirror/working-dir/dry-run/mapping.txt"
