@@ -46,7 +46,7 @@
           msg: "{{ mirror_output.stderr }}"
 
       - debug:
-          msg: "{{ mirror_output.stderr_lines }}"          
+          msg: "{{ mirror_output.stderr_lines | regex_search('error', multiline=True, ignorecase=True) }}"          
 
       - fail:
           msg: An error occurred during mirroring
