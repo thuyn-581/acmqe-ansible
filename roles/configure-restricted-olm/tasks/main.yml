@@ -31,21 +31,24 @@
     when: cat_src == "konflux"    
 
   - name: Mirror images to {{ registry }}
-    shell: |
-      oc image mirror \
-        -f {{ working_dir }}/mirror/working-dir/dry-run/mapping.txt \
-        -a {{ pull_secret_loc }} \
-        --filter-by-os=.* \
-        --keep-manifest-list \
-        --force=true \ 
-        --continue-on-error=false
-    register: mirror_output
+    block:
+    - shell: |
+        oc image mirror \
+          -f {{ working_dir }}/mirror/working-dir/dry-run/mapping.txt \
+          -a {{ pull_secret_loc }} \
+          --filter-by-os=.* \
+          --keep-manifest-list \
+          --force=true \ 
+          --continue-on-error=false
+      register: mirror_output
+    rescue:
+      - debug:
+          msg: "{{ mirror_output.stdout_lines }}"
 
-  - name: Print mirror output
-    debug:
-      msg: "{{ mirror_output.stdout_lines }}"
-    when: "{{ mirror_output.rc != 0 }}"
-
+      - fail:
+          msg: An error occurred during mirroring
+        when: "{{ mirror_output.rc != 0 }}"  
+        
   vars:
     mapping_file: "{{ working_dir }}/mirror/working-dir/dry-run/mapping.txt"
   when: cat_src != "production"  
