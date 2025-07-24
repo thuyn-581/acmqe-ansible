@@ -45,7 +45,7 @@
       - debug:
           msg: >-
             {{ mirror_output.stderr_lines | select('match', '^error')
-            | map('regex_findall', '([^]+).*')
+            | map('regex_findall', '([^ ]+).*')
             | map('first')
             | list }} 
 
