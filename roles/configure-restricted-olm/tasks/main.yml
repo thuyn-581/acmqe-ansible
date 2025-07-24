@@ -43,7 +43,7 @@
       register: mirror_output
     rescue:
       - debug:
-          msg: "{{ mirror_output }}"
+          msg: "{{ mirror_output.stderr }}"
 
       - fail:
           msg: An error occurred during mirroring
