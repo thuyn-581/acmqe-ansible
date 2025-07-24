@@ -30,9 +30,9 @@
       sed -i "s|registry.redhat.io/multicluster-engine/|quay.io:443/acm-d/|g" {{ mapping_file }}     
     when: cat_src == "konflux"    
 
-  - name: Mirror images to {{ registry }}
-    block:
-    - shell: |
+  - block:
+    - name: Mirror images to {{ registry }}
+      shell: |
         oc image mirror \
           -f {{ working_dir }}/mirror/working-dir/dry-run/mapping.txt \
           -a {{ pull_secret_loc }} \
@@ -43,10 +43,7 @@
       register: mirror_output
     rescue:
       - debug:
-          msg: "{{ mirror_output.stderr }}"
-
-      - debug:
-          msg: "{{ mirror_output.stderr_lines | regex_search('error', multiline=True, ignorecase=True) }}"          
+          msg: "{{ mirror_output.stderr_lines | regex_findall('error', multiline=True, ignorecase=True) }}"          
 
       - fail:
           msg: An error occurred during mirroring
