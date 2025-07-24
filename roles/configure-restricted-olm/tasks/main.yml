@@ -44,10 +44,10 @@
     rescue:
       - debug:
           msg: >-
-            {{ mirror_output.stderr_lines | select('match', '^error')
-            | map('regex_findall', '([^ ]+).*')
-            | map('first')
-            | list }} 
+            {{ mirror_output.stderr_lines | select('match', '^error$') }}
+        # | map('regex_findall', '([^ ]+).*')
+        # | map('first')
+        # | list }} 
 
       - fail:
           msg: An error occurred during mirroring
