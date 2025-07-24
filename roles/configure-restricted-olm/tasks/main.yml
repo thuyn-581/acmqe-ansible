@@ -39,19 +39,20 @@
           --filter-by-os=.* \
           --keep-manifest-list \
           --force=true \ 
-          --continue-on-error=false > {{ working_dir }}/image_mirror.log 2>&1
-      register: results
+          --continue-on-error=true > {{ working_dir }}/image_mirror.log 2>&1
+      register: result
     rescue:
-      - shell: cat {{ working_dir }}/image_mirror.log
+      - shell: cat {{ working_dir }}/image_mirror.log | grep error
         register: mirror_output
 
       - debug:
           msg: >-
-            {{ mirror_output.stdout_lines | select('search', '^error') | list }}
+            {{ mirror_output.stdout_lines }}
+          # {{ mirror_output.stdout_lines | select('search', '^error') | list }}
 
       - fail:
           msg: Errors occurred during mirroring
-        when: "{{ results.rc != 0 }}"  
+        when: "{{ result.rc != 0 }}"  
 
   vars:
     mapping_file: "{{ working_dir }}/mirror/working-dir/dry-run/mapping.txt"
