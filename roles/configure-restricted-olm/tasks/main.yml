@@ -45,6 +45,9 @@
       - debug:
           msg: "{{ mirror_output.stderr }}"
 
+      - debug:
+          msg: "{{ mirror_output.stderr_lines }}"          
+
       - fail:
           msg: An error occurred during mirroring
         when: "{{ mirror_output.rc != 0 }}"  
