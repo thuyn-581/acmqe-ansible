@@ -31,7 +31,7 @@
     when: cat_src == "konflux"    
 
   - block:
-    - name: Mirror images to {{ registry }}
+    - name: Mirror images from {{ cat_src }} to {{ registry }}
       shell: |
         oc image mirror \
           -f {{ working_dir }}/mirror/working-dir/dry-run/mapping.txt \
@@ -43,7 +43,11 @@
       register: mirror_output
     rescue:
       - debug:
-          msg: "{{ mirror_output.stderr_lines | regex_findall('error', multiline=True, ignorecase=True) }}"          
+          msg: >-
+            {{ mirror_output.stderr_lines | select('match', '^error')
+            | map('regex_findall', '([^ ]+) .*')
+            | map('first')
+            | list }}
 
       - fail:
           msg: An error occurred during mirroring
