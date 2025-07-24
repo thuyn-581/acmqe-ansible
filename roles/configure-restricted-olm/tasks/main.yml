@@ -52,7 +52,7 @@
 
       - fail:
           msg: Errors occurred during mirroring
-        when: "{{ mirror_output.stdout_lines | list > 0 }}"  
+        when: "{{ mirror_output.stdout_lines | length > 0 }}"  
 
   vars:
     mapping_file: "{{ working_dir }}/mirror/working-dir/dry-run/mapping.txt"
