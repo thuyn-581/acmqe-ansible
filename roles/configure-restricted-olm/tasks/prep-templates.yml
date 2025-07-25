@@ -37,4 +37,10 @@
   template:
     src: templates/cat_src.yaml.j2
     dest: "{{ working_dir }}/cat_src.yaml"        
-
+  vars:
+    cat_src_name: >
+      {% if cat_src == "production" %}
+      redhat-operators
+      {% else %}
+      redhat-operators-stage-iib-{{ cat_img | trim | split(':') | last }}
+      {% endif %}
