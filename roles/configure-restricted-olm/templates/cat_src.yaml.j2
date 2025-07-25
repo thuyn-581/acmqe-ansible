@@ -4,12 +4,16 @@ apiVersion: operators.coreos.com/v1alpha1
 kind: CatalogSource
 metadata:
   annotations:
-    catImg:{{ cat_img }}
+    catImg:{{ cat_img | trim }}
+{% if cat_src == "production" %}    
   name: redhat-operators
+{% else %}
+  name: redhat-operators-stage-iib-{{ cat_img | trim | split(':') | last }}
+{% endif %}
   namespace: openshift-marketplace
 spec:
   displayName: redhat-operators-disconnected
-  image: {{ cat_img | replace ('registry.redhat.io',registry) | replace ('registry-proxy.engineering.redhat.com',registry) }}
+  image: {{ cat_img | replace ('registry.redhat.io',registry) | replace ('registry-proxy.engineering.redhat.com',registry) | trim }}
   sourceType: grpc
 {% else %}
 ---
