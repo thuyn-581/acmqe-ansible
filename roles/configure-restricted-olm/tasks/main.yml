@@ -15,6 +15,7 @@
       docker://{{ registry }} --dry-run
 
   - shell: |
+      sed -i "/rhem/d" {{ mapping_file }}
       sed -i "/localhost:55000/d" {{ mapping_file }}
       sed -i "s|docker://||g" {{ mapping_file }}
 
