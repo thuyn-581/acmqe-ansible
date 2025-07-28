@@ -13,8 +13,8 @@
     mce_ver: "{{ mce_ds | split('.')  | reject('search', 'DOWNSTREAM') | join('.') }}"
   when: cat_src == "konflux"
   
-- set_fact:
-    pkgs_list: "{{ ops_list | split(',') | trim }}" 
+- set_fact: 
+    pkgs_list: "{{ ops_list | split(',') | map('split', '.v') | map('join',':') }}"
     cat_img: >
       {% if cat_src == "production" %}
       registry.redhat.io/redhat/redhat-operator-index:v{{ ocp_ver }}

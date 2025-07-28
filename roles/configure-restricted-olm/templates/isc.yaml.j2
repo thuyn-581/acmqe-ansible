@@ -7,7 +7,10 @@ mirror:
     full: false
     packages: 
 {% for item in pkgs_list %}
-      - name: {{ item }}
+      - name: {{ item | split(':') | first }}
+{% if (item | split(':') | length) > 1 %}
+        minVersion: {{ item | split(':') | last }}
+{% endif %} 
 {% endfor %}     
 {% else %}      
   - catalog: quay.io:443/acm-d/mce-dev-catalog:{{ mce_ds }}
@@ -17,7 +20,7 @@ mirror:
         - name: stable-{{ mce_ver }}         
   - catalog: quay.io:443/acm-d/acm-dev-catalog:{{ acm_ds }}
     packages:
-      - name: advanced-cluster-management
+      - name: advanced-cluster-management     
         channels:
         - name: release-{{ acm_ver }}     
   additionalImages:
