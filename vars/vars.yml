@@ -27,17 +27,17 @@ infra_providers:
   aws:
     region: "us-east-1"
     instance_type: "t3.large"
-    version: "1.31.0"
+    version: "1.32.0"
     nodes_count: 2
   gcp:
     region: "us-east1"
     instance_type: "n1-standard-8"
-    version: "1.30.5"
+    version: "1.33.4"
     nodes_count: 2
   azure:
     region: "centralus"
     instance_type: "Standard_D2s_v3"
-    version: "1.30.0"
+    version: "1.32.7"
     nodes_count: 2
 
 #===== Minio =====
