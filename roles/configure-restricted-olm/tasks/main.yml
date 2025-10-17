@@ -40,6 +40,7 @@
           --filter-by-os=.* \
           --keep-manifest-list \
           --force=false \ 
+          --skip-multiple-scopes \
           --continue-on-error=true > {{ working_dir }}/image_mirror.log 2>&1
 
     rescue:
