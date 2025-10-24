@@ -3,6 +3,7 @@
 - name: Mirror operators from {{ cat_src }} to {{ registry }}
   shell: |
     oc-mirror --v2 -c {{ working_dir }}/isc.yaml \
+    --authfile {{ pull_secret_loc }} \
     --workspace file:///{{ working_dir }}/mirror/ \
     docker://{{ registry }}
   when: cat_src == "production"
