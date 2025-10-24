@@ -14,15 +14,19 @@ mirror:
 {% endfor %}     
 {% else %}      
   - catalog: quay.io:443/acm-d/mce-dev-catalog:{{ mce_ds }}
+{% if mce_ds|length > 1 %}   
     packages:
-      - name: multicluster-engine
+      - name: multicluster-engine     
         channels:
-        - name: stable-{{ mce_ver }}         
+        - name: stable-{{ mce_ver }}    
+{% endif %} 
+{% if acm_ds|length > 1 %}             
   - catalog: quay.io:443/acm-d/acm-dev-catalog:{{ acm_ds }}
     packages:
-      - name: advanced-cluster-management     
+      - name: advanced-cluster-management          
         channels:
-        - name: release-{{ acm_ver }}     
+        - name: release-{{ acm_ver }}   
+{% endif %}          
   additionalImages:
     - name: registry.redhat.io/rhel9/postgresql-13:latest
     - name: registry.redhat.io/rhel8/postgresql-10:latest    
