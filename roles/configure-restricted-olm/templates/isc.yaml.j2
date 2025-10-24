@@ -13,8 +13,8 @@ mirror:
 {% endif %} 
 {% endfor %}     
 {% else %}      
-  - catalog: quay.io:443/acm-d/mce-dev-catalog:{{ mce_ds }}
 {% if mce_ds|length > 1 %}   
+  - catalog: quay.io:443/acm-d/mce-dev-catalog:{{ mce_ds }}
     packages:
       - name: multicluster-engine     
         channels:
