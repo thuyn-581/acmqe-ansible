@@ -12,6 +12,7 @@
   - name: Generate operators manifests
     shell: |
       oc-mirror --v2 -c {{ working_dir }}/isc.yaml \
+      --authfile {{ pull_secret_loc }} \
       --workspace file:///{{ working_dir }}/mirror/ \
       docker://{{ registry }} --dry-run
 
