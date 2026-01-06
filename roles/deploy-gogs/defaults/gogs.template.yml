@@ -184,12 +184,7 @@ objects:
           - containerPort: 3000
             protocol: TCP
           resources: {}
-          terminationMessagePath: /dev/termination-log
-          # command: # << chmod in the pod directly
-          # - chown
-          # - -R
-          # - git:root
-          # - /app/gogs/data         
+          terminationMessagePath: /dev/termination-log        
           volumeMounts:
           - name: gogs-data
             mountPath: /app/gogs/data
