@@ -13,6 +13,13 @@ objects:
     labels:
       app: ${APPLICATION_NAME}
     name: ${APPLICATION_NAME}
+- kind: ServiceAccount
+  apiVersion: v1
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}-postgresql    
 - kind: Service
   apiVersion: v1
   metadata:
@@ -48,7 +55,7 @@ objects:
           name: ${APPLICATION_NAME}-postgresql
         name: ${APPLICATION_NAME}-postgresql
       spec:
-        serviceAccountName: ${APPLICATION_NAME}
+        serviceAccountName: ${APPLICATION_NAME}-postgresql
         containers:
         - env:
           - name: POSTGRESQL_USER
@@ -168,7 +175,7 @@ objects:
           app: ${APPLICATION_NAME}
           deploymentconfig: ${APPLICATION_NAME}
       spec:
-        serviceAccountName: ${APPLICATION_NAME}
+        serviceAccountName: ${APPLICATION_NAME}     
         containers:
         - image: " "
           imagePullPolicy: Always
@@ -177,12 +184,12 @@ objects:
           - containerPort: 3000
             protocol: TCP
           resources: {}
-          terminationMessagePath: /dev/termination-log
+          terminationMessagePath: /dev/termination-log        
           volumeMounts:
           - name: gogs-data
-            mountPath: /opt/gogs/data
+            mountPath: /app/gogs/data
           - name: gogs-config
-            mountPath: /etc/gogs/conf
+            mountPath: /data/gogs/conf
           readinessProbe:
               httpGet:
                 path: /
@@ -289,17 +296,17 @@ objects:
   data:
     app.ini: |
       RUN_MODE = prod
-      RUN_USER = gogs
+      RUN_USER = git
 
       [database]
       DB_TYPE  = postgres
       HOST     = ${APPLICATION_NAME}-postgresql:5432
       NAME     = ${DATABASE_NAME}
       USER     = ${DATABASE_USER}
-      PASSWD   = ${DATABASE_PASSWORD}
+      PASSWORD   = ${DATABASE_PASSWORD}
 
       [repository]
-      ROOT = /opt/gogs/data/repositories
+      ROOT = /app/gogs/data/repositories
 
       [server]
       ROOT_URL=http://${HOSTNAME}
@@ -313,6 +320,33 @@ objects:
 
       [webhook]
       SKIP_TLS_VERIFY = ${SKIP_TLS_VERIFY}
+
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRole
+  metadata:
+    name: allow-anyuid-scc-${APPLICATION_NAME}
+  rules:
+    - apiGroups:
+        - "security.openshift.io"
+      resourceNames:
+        - "anyuid"
+      resources:
+        - "securitycontextconstraints"
+      verbs:
+        - "use"    
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRoleBinding
+  metadata:
+    name: allow-anyuid-binding-${APPLICATION_NAME} 
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: allow-anyuid-scc-${APPLICATION_NAME}
+  subjects:
+  - kind: ServiceAccount
+    name: ${APPLICATION_NAME}
+    namespace: acmqe-gogs
+
 parameters:
 - description: The name for the application.
   name: APPLICATION_NAME
@@ -356,7 +390,7 @@ parameters:
 - name: GOGS_VERSION
   displayName: Gogs Version
   description: 'Version of the Gogs container image to be used (check the available version https://hub.docker.com/r/openshiftdemos/gogs/tags)'
-  value: "0.9.97"
+  value: "latest"
   required: true
 - name: INSTALL_LOCK
   displayName: Installation lock

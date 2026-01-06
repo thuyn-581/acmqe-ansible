@@ -1,0 +1,46 @@
+- name: Get OCP version 
+  shell: |
+    oc get clusterversion version -ojson |\
+      jq -r '.spec.channel' |\
+      cut -d'-' -f2-
+  register: ocp_channel
+
+- set_fact:
+    ocp_ver: "{{ ocp_channel.stdout }}"
+
+- set_fact:
+    acm_ver: "{{ acm_ds | split('.')  | reject('search', 'DOWNSTREAM') | join('.') }}"
+    mce_ver: "{{ mce_ds | split('.')  | reject('search', 'DOWNSTREAM') | join('.') }}"
+  when: cat_src == "konflux"
+  
+- set_fact: 
+    pkgs_list: "{{ ops_list | split(',') | map('split', '.v') | map('join',':') }}"
+    cat_img: >
+      {% if cat_src == "production" %}
+      registry.redhat.io/redhat/redhat-operator-index:v{{ ocp_ver }}
+      {% else %}
+      {{ iib_img }}
+      {% endif %}
+  when: cat_src != "konflux"    
+
+- name: Populate ImageSetConfiguration
+  template:
+    src: templates/isc.yaml.j2
+    dest: "{{ working_dir }}/isc.yaml"
+
+- name: Populate ImageDigestMirrorSet
+  template:
+    src: templates/imds.yaml.j2
+    dest: "{{ working_dir }}/imds.yaml"   
+
+- name: Populate Catalog sources
+  template:
+    src: templates/cat_src.yaml.j2
+    dest: "{{ working_dir }}/cat_src.yaml"        
+  vars:
+    cat_src_name: >
+      {% if cat_src == "production" %}
+      redhat-operators
+      {% else %}
+      redhat-operators-stage-iib-{{ cat_img | trim | split(':') | last }}
+      {% endif %}

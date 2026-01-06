@@ -1,0 +1,9 @@
+apiVersion: config.openshift.io/v1
+kind: ImageDigestMirrorSet
+metadata:
+  name: idms-operator
+spec:
+  imageDigestMirrors:
+  - mirrors:
+    - {{ registry }}
+    source: registry.redhat.io

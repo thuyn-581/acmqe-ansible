@@ -16,6 +16,8 @@
 
   - name: Create ns {{ gogs_ns }}
     shell: |
+      {{ oc_cmd }} delete clusterrole allow-anyuid-scc-gogs --ignore-not-found
+      {{ oc_cmd }} delete clusterrolebinding allow-anyuid-binding-gogs --ignore-not-found
       {{ oc_cmd }} --token={{ sa_token.stdout }} delete ns {{ gogs_ns }}
       {{ oc_cmd }} create ns {{ gogs_ns }}
     changed_when: true
@@ -23,7 +25,7 @@
 
   - name: Create imagestream for gogs app
     shell: |
-      {{ oc_cmd }} import-image {{ gogs_src }}/gogs:0.9.97 --confirm -n {{ gogs_ns }}
+      {{ oc_cmd }} import-image {{ gogs_src }}/gogs --confirm -n {{ gogs_ns }}
     changed_when: true   
 
   - name: Deloy gogs on {{ cluster }}
@@ -49,11 +51,16 @@
     - debug:
         msg: "{{ wait.stdout.split(' ')[0] }}"
 
+    - name: Change the ownership of the gogs data directory
+      shell: >
+        {{ oc_cmd }} -n {{ gogs_ns}} exec {{ wait.stdout.split(' ')[0] }} --
+        /bin/bash -c 'chown -R git:root /app/gogs/data'
+
     - name: Add gogs-admin user
       shell: >
         {{ oc_cmd }} -n {{ gogs_ns}} exec {{ wait.stdout.split(' ')[0] }} --
-        /bin/bash -c 'USER=gogs /opt/gogs/gogs admin create-user --admin 
-        --config /etc/gogs/conf/app.ini
+        /bin/bash -c 'USER=git /app/gogs/gogs admin create-user --admin 
+        --config /data/gogs/conf/app.ini
         --name {{ gogs_user }} --password {{ gogs_user }} --email {{ gogs_user }}@acmqe.io'         
 
   - name: Enable gogs server with custom certs 

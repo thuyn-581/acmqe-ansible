@@ -1,0 +1,71 @@
+- import_tasks: prep-templates.yml
+
+- name: Mirror operators from {{ cat_src }} to {{ registry }}
+  shell: |
+    oc-mirror --v2 -c {{ working_dir }}/isc.yaml \
+    --authfile {{ pull_secret_loc }} \
+    --workspace file:///{{ working_dir }}/mirror/ \
+    docker://{{ registry }}
+  when: cat_src == "production"
+
+- block: 
+  - name: Generate operators manifests
+    shell: |
+      oc-mirror --v2 -c {{ working_dir }}/isc.yaml \
+      --authfile {{ pull_secret_loc }} \
+      --workspace file:///{{ working_dir }}/mirror/ \
+      docker://{{ registry }} --dry-run
+
+  - shell: |
+      sed -i "/rhem/d" {{ mapping_file }}
+      sed -i "/localhost:55000/d" {{ mapping_file }}
+      sed -i "s|docker://||g" {{ mapping_file }}
+
+  - shell: |
+      echo {{ iib_img }}={{registry}}/rh-osbs/iib:{{ iib_img | split(':') | last }} >> {{ mapping_file }}  
+      sed -i "s|registry.redhat.io/|registry.stage.redhat.io/|g" {{ mapping_file }}
+    when: cat_src == "stage"
+
+  - shell: | 
+      echo quay.io:443/acm-d/acm-dev-catalog:{{acm_ds}}={{registry}}/acm-d/acm-dev-catalog:{{acm_ds}} >> {{ mapping_file }}  
+      echo quay.io:443/acm-d/mce-dev-catalog:{{mce_ds}}={{registry}}/acm-d/mce-dev-catalog:{{mce_ds}} >> {{ mapping_file }} 
+      sed -i "s|registry.redhat.io/rhacm2/|quay.io:443/acm-d/|g" {{ mapping_file }} 
+      sed -i "s|registry.redhat.io/multicluster-engine/|quay.io:443/acm-d/|g" {{ mapping_file }}     
+    when: cat_src == "konflux"    
+
+  - block:
+    - name: Mirror images from {{ cat_src }} to {{ registry }}
+      shell: |
+        oc image mirror \
+          -f {{ working_dir }}/mirror/working-dir/dry-run/mapping.txt \
+          -a {{ pull_secret_loc }} \
+          --filter-by-os=.* \
+          --keep-manifest-list \
+          --force=false \ 
+          --skip-multiple-scopes \
+          --continue-on-error=true > {{ working_dir }}/image_mirror.log 2>&1
+
+    rescue:
+      - shell: cat {{ working_dir }}/image_mirror.log | grep error
+        register: mirror_output
+
+      - debug:
+          msg: >-
+            {{ mirror_output.stdout_lines }}
+          # {{ mirror_output.stdout_lines | select('search', '^error') | list }}
+
+      - fail:
+          msg: Errors occurred during mirroring
+        when: "{{ mirror_output.stdout_lines | length > 0 }}"  
+
+  vars:
+    mapping_file: "{{ working_dir }}/mirror/working-dir/dry-run/mapping.txt"
+  when: cat_src != "production"  
+
+- name: Apply ImageDigestMirrorSet
+  shell: |
+    oc apply -f {{ working_dir }}/imds.yaml
+
+- name: Create Catalog sources
+  shell: |
+    oc apply -f {{ working_dir }}/cat_src.yaml    

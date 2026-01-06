@@ -1,0 +1,104 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: acm-cron
+objects:
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: ${NAME}
+    labels:
+      template: acm-cron
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    annotations:
+      description: Defines how to build the application
+    name: ${NAME}
+    labels:
+      template: acm-cron
+  spec:
+    completionDeadlineSeconds: 1800
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ${NAME}:latest
+    runPolicy: Serial
+    source:
+      type: Git
+      git:
+        uri: https://github.com/thuyn-581/openshift-cronjob.git
+        ref: main
+    strategy:
+      type: Source
+      sourceStrategy:
+        from:
+          kind: ImageStreamTag
+          name: python:3.9-ubi8
+          namespace: openshift
+    triggers:
+    - type: ConfigChange
+- apiVersion: batch/v1
+  kind: CronJob
+  metadata:
+    name: "${JOB_NAME}"
+    labels:
+      template: acm-cron
+  spec:
+    schedule: "*/1 * * * *"
+    concurrencyPolicy: Forbid
+    successfulJobsHistoryLimit: 3
+    failedJobsHistoryLimit: 3
+    jobTemplate:
+      spec:
+        template:
+          spec:
+            containers:
+            - name: "${JOB_NAME}"
+              image: image-registry.openshift-image-registry.svc:5000/${NAMESPACE}/${NAME}:latest
+              imagePullPolicy: Always
+              env:
+              - name: HOST
+                value: "${API_URL}"
+              - name: OCM_TOKEN
+                value: "${OCM_TOKEN}"
+            restartPolicy: Never
+            terminationGracePeriodSeconds: 30
+            activeDeadlineSeconds: 500
+            dnsPolicy: ClusterFirst
+            serviceAccountName: "${JOB_SERVICE_ACCOUNT}"
+            serviceAccount: "${JOB_SERVICE_ACCOUNT}"
+parameters:
+- description: The name assigned to all of the frontend objects defined in this template.
+  displayName: Name
+  name: NAME
+  required: true
+  value: acm-cronjob
+- name: JOB_NAME
+  displayName: Job Name
+  description: Name of the Scheduled Job to Create.
+  value: acm-cronjob
+  required: true
+- name: SCHEDULE
+  displayName: Cron Schedule
+  description: Cron Schedule to Execute the Job
+  value: "@daily"
+  required: true
+- name: NAMESPACE
+  displayName: "Namespace where this is deployed"
+  description: "Namespace where this is deployed."
+  value: "default"
+  required: true
+- name: JOB_SERVICE_ACCOUNT
+  displayName: "Service Account Name"
+  description: "Name of the Service Account To Execute the Job As."
+  value: "automation-service-account"
+  required: true
+- name: API_URL
+  description: Openshift API endpoint
+  required: true
+  value: ""
+- name: OCM_TOKEN
+  description: Red Hat OCM token
+  required: true
+  value: ""  

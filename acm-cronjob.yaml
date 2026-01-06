@@ -1,0 +1,22 @@
+- name: Cron job to update ocm clusters
+  hosts: localhost
+  any_errors_fatal: true 
+  vars_files:
+  - vars/vars.yml
+  vars:
+    cluster: "{{ ocp_api_url.split('.')[1] }}"  
+    
+  tasks:    
+  - name: Prepare ansible runner host
+    include_tasks: tasks/prepare_ansible_runner.yml
+    when: not skip_ansible_runner | bool    
+
+  - name: Login cluster
+    import_tasks: tasks/login-ocp.yml    
+
+  - name: Create SA/token if not exists
+    include_tasks: tasks/create-service-account.yml     
+
+  - name: Create cron job to update ocm clusters
+    import_role:
+      name: acm-cronjob

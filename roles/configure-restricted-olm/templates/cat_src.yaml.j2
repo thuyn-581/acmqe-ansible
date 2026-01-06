@@ -1,0 +1,39 @@
+{% if cat_src != "konflux" %}
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  annotations:
+    catImg: {{ cat_img | trim }}
+  name: {{ cat_src_name | trim }}
+  namespace: openshift-marketplace
+spec:
+  displayName: {{ cat_src_name | trim }}
+  image: {{ cat_img | replace ('registry.redhat.io',registry) | replace ('registry-proxy.engineering.redhat.com',registry) | trim }}
+  sourceType: grpc
+{% else %}
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  annotations:
+    catImg: quay.io:443/acm-d/acm-dev-catalog:{{ acm_ds }}
+  name: acm-dev-catalog
+  namespace: openshift-marketplace
+spec:
+  displayName: acm-dev-catalog:{{ acm_ds }}
+  image: {{ registry }}/acm-d/acm-dev-catalog:{{ acm_ds }}
+  sourceType: grpc
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  annotations:
+    catImg: quay.io:443/acm-d/mce-dev-catalog:{{ mce_ds }}
+  name: mce-dev-catalog
+  namespace: openshift-marketplace
+spec:
+  displayName: mce-dev-catalog:{{ mce_ds }}
+  image: {{ registry }}/acm-d/mce-dev-catalog:{{ mce_ds }}
+  sourceType: grpc   
+{% endif %}
