@@ -175,10 +175,7 @@ objects:
           app: ${APPLICATION_NAME}
           deploymentconfig: ${APPLICATION_NAME}
       spec:
-        serviceAccountName: ${APPLICATION_NAME}
-        securityContext:
-          # This ensures any new files written to the volume will be owned by the root group
-          fsGroup: 0         
+        serviceAccountName: ${APPLICATION_NAME}     
         containers:
         - image: " "
           imagePullPolicy: Always
@@ -188,6 +185,11 @@ objects:
             protocol: TCP
           resources: {}
           terminationMessagePath: /dev/termination-log
+          command: # << chmod in the pod directly
+          - /bin/chown
+          - -R
+          - "git:root"
+          - /app/gogs/data         
           volumeMounts:
           - name: gogs-data
             mountPath: /app/gogs/data
