@@ -55,7 +55,7 @@
       shell: >
         {{ oc_cmd }} -n {{ gogs_ns}} exec {{ wait.stdout.split(' ')[0] }} --
         /bin/bash -c 'USER=gogs /app/gogs/gogs admin create-user --admin 
-        --config /etc/gogs/conf/app.ini
+        --config /data/gogs/conf/app.ini
         --name {{ gogs_user }} --password {{ gogs_user }} --email {{ gogs_user }}@acmqe.io'         
 
   - name: Enable gogs server with custom certs 

@@ -37,7 +37,7 @@ objects:
   subjects:
   - kind: ServiceAccount
     name: ${APPLICATION_NAME}
-    namespace: "{{ gogs_ns }}"
+    namespace: acmqe-gogs
 - kind: Service
   apiVersion: v1
   metadata:
@@ -207,7 +207,7 @@ objects:
           - name: gogs-data
             mountPath: /app/gogs/data
           - name: gogs-config
-            mountPath: /etc/gogs/conf
+            mountPath: /data/gogs/conf
           readinessProbe:
               httpGet:
                 path: /
