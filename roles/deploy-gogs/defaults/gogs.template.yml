@@ -186,9 +186,9 @@ objects:
           resources: {}
           terminationMessagePath: /dev/termination-log
           command: # << chmod in the pod directly
-          - /bin/chown
+          - chown
           - -R
-          - "git:root"
+          - git:root
           - /app/gogs/data         
           volumeMounts:
           - name: gogs-data
