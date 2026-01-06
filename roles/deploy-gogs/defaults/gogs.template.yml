@@ -13,6 +13,13 @@ objects:
     labels:
       app: ${APPLICATION_NAME}
     name: ${APPLICATION_NAME}
+- kind: ServiceAccount
+  apiVersion: v1
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}-postgresql    
 - kind: Service
   apiVersion: v1
   metadata:
@@ -48,7 +55,7 @@ objects:
           name: ${APPLICATION_NAME}-postgresql
         name: ${APPLICATION_NAME}-postgresql
       spec:
-        serviceAccountName: ${APPLICATION_NAME}
+        serviceAccountName: ${APPLICATION_NAME}-postgresql
         containers:
         - env:
           - name: POSTGRESQL_USER
@@ -313,31 +320,31 @@ objects:
 
       [webhook]
       SKIP_TLS_VERIFY = ${SKIP_TLS_VERIFY}
-# - apiVersion: rbac.authorization.k8s.io/v1
-#   kind: ClusterRole
-#   metadata:
-#     name: allow-anyuid-scc-${APPLICATION_NAME}
-#   rules:
-#     - apiGroups:
-#         - "security.openshift.io"
-#       resourceNames:
-#         - "anyuid"
-#       resources:
-#         - "securitycontextconstraints"
-#       verbs:
-#         - "use"    
-# - apiVersion: rbac.authorization.k8s.io/v1
-#   kind: ClusterRoleBinding
-#   metadata:
-#     name: allow-anyuid-binding-${APPLICATION_NAME} 
-#   roleRef:
-#     apiGroup: rbac.authorization.k8s.io
-#     kind: ClusterRole
-#     name: allow-anyuid-scc-${APPLICATION_NAME}
-#   subjects:
-#   - kind: ServiceAccount
-#     name: ${APPLICATION_NAME}
-#     namespace: acmqe-gogs
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRole
+  metadata:
+    name: allow-anyuid-scc-${APPLICATION_NAME}
+  rules:
+    - apiGroups:
+        - "security.openshift.io"
+      resourceNames:
+        - "anyuid"
+      resources:
+        - "securitycontextconstraints"
+      verbs:
+        - "use"    
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRoleBinding
+  metadata:
+    name: allow-anyuid-binding-${APPLICATION_NAME} 
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: allow-anyuid-scc-${APPLICATION_NAME}
+  subjects:
+  - kind: ServiceAccount
+    name: ${APPLICATION_NAME}
+    namespace: acmqe-gogs
 
 parameters:
 - description: The name for the application.
