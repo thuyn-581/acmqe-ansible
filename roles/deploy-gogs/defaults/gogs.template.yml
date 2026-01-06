@@ -176,6 +176,9 @@ objects:
           deploymentconfig: ${APPLICATION_NAME}
       spec:
         serviceAccountName: ${APPLICATION_NAME}
+        securityContext:
+          # This ensures any new files written to the volume will be owned by the root group
+          fsGroup: 0         
         containers:
         - image: " "
           imagePullPolicy: Always
@@ -187,7 +190,7 @@ objects:
           terminationMessagePath: /dev/termination-log
           volumeMounts:
           - name: gogs-data
-            mountPath: /opt/gogs/data
+            mountPath: /app/gogs/data
           - name: gogs-config
             mountPath: /data/gogs/conf
           readinessProbe:
@@ -306,7 +309,7 @@ objects:
       PASSWORD   = ${DATABASE_PASSWORD}
 
       [repository]
-      ROOT = /opt/gogs/data/repositories
+      ROOT = /app/gogs/data/repositories
 
       [server]
       ROOT_URL=http://${HOSTNAME}
