@@ -16,6 +16,8 @@
 
   - name: Create ns {{ gogs_ns }}
     shell: |
+      {{ oc_cmd }} delete clusterrole allow-anyuid-scc-gogs --ignore-not-found
+      {{ oc_cmd }} delete clusterrolebinfing allow-anyuid-binding-gogs --ignore-not-found
       {{ oc_cmd }} --token={{ sa_token.stdout }} delete ns {{ gogs_ns }}
       {{ oc_cmd }} create ns {{ gogs_ns }}
     changed_when: true
