@@ -13,6 +13,17 @@ objects:
     labels:
       app: ${APPLICATION_NAME}
     name: ${APPLICATION_NAME}
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRoleBinding
+  metadata:
+    name: allow-anyuid-{{.namespace}} # Use a template parameter for uniqueness across projects
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: system:openshift:scc:anyuid
+  subjects:
+  - kind: ServiceAccount
+    name: ${APPLICATION_NAME}
 - kind: Service
   apiVersion: v1
   metadata:
