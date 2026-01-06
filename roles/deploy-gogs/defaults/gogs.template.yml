@@ -289,7 +289,7 @@ objects:
   data:
     app.ini: |
       RUN_MODE = prod
-      RUN_USER = gogs
+      RUN_USER = git
 
       [database]
       DB_TYPE  = postgres
