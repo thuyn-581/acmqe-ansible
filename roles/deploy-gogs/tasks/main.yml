@@ -51,6 +51,11 @@
     - debug:
         msg: "{{ wait.stdout.split(' ')[0] }}"
 
+    - name: Change the ownership of the gogs data directory
+      shell: >
+        {{ oc_cmd }} -n {{ gogs_ns}} exec {{ wait.stdout.split(' ')[0] }} --
+        /bin/bash -c 'chown -R git:root /app/gogs/data'
+
     - name: Add gogs-admin user
       shell: >
         {{ oc_cmd }} -n {{ gogs_ns}} exec {{ wait.stdout.split(' ')[0] }} --
