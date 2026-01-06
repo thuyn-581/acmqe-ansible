@@ -1,4 +1,16 @@
 ---
+- name: Wait for GOGS server available
+  uri:
+    url: https://{{ gogs_user }}:{{ gogs_user}}@gogs-{{ hostname }}/api/v1/user/repos?token={{ gogs_access_token.json.sha1 }}
+    method: HEAD
+    status_code: 200
+    return_content: false
+    validate_certs: false 
+  register: head_result
+  until: head_result.status == 200
+  retries: 12
+  delay: 15
+
 - name: Create the repo {{ item.split('/') | last }} on gogs server
   block:  
   # - debug:
