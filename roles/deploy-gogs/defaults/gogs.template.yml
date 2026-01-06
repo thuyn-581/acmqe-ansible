@@ -187,7 +187,7 @@ objects:
           terminationMessagePath: /dev/termination-log
           volumeMounts:
           - name: gogs-data
-            mountPath: /app/gogs/data
+            mountPath: /opt/gogs/data
           - name: gogs-config
             mountPath: /data/gogs/conf
           readinessProbe:
@@ -306,7 +306,7 @@ objects:
       PASSWORD   = ${DATABASE_PASSWORD}
 
       [repository]
-      ROOT = /app/gogs/data/repositories
+      ROOT = /opt/gogs/data/repositories
 
       [server]
       ROOT_URL=http://${HOSTNAME}
