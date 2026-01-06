@@ -24,6 +24,7 @@ objects:
   subjects:
   - kind: ServiceAccount
     name: ${APPLICATION_NAME}
+    namespace: "{{ gogs_ns }}"
 - kind: Service
   apiVersion: v1
   metadata:
