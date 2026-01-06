@@ -37,6 +37,10 @@
         -p DATABASE_VERSION=10-el8
         | oc create -f - -n {{ gogs_ns }}
 
+    - name: Update GOGS Security Context
+      shell: >
+        {{ oc_cmd }} adm policy add-scc-to-user anyuid -z gogs -n {{ gogs_ns }}
+
     - name: Wait for gogs deployment completed
       shell: >
         {{ oc_cmd }} -n {{ gogs_ns }} wait --for=condition=ready pod -l app=gogs 
