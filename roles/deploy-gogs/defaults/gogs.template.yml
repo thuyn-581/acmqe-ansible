@@ -308,7 +308,7 @@ objects:
       HOST     = ${APPLICATION_NAME}-postgresql:5432
       NAME     = ${DATABASE_NAME}
       USER     = ${DATABASE_USER}
-      PASSWD   = ${DATABASE_PASSWORD}
+      PASSWORD   = ${DATABASE_PASSWORD}
 
       [repository]
       ROOT = /opt/gogs/data/repositories
