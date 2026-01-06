@@ -185,11 +185,11 @@ objects:
             protocol: TCP
           resources: {}
           terminationMessagePath: /dev/termination-log
-          command: # << chmod in the pod directly
-          - chown
-          - -R
-          - git:root
-          - /app/gogs/data         
+          # command: # << chmod in the pod directly
+          # - chown
+          # - -R
+          # - git:root
+          # - /app/gogs/data         
           volumeMounts:
           - name: gogs-data
             mountPath: /app/gogs/data
