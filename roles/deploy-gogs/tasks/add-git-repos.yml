@@ -6,8 +6,12 @@
 
   - name: Create the repo {{ item.split('/') | last }} on gogs server
     uri:
-      url: https://{{ gogs_user }}:{{ gogs_user}}@gogs-{{ hostname }}/api/v1/user/repos?token={{ gogs_access_token.json.sha1 }}
+      url: https://{{ gogs_user }}:{{ gogs_user}}@gogs-{{ hostname }}/api/v1/user/repos
       method: 'POST'
+      headers:
+        # The full header value is "Bearer <token_value>"
+        Authorization: "token {{ gogs_access_token.json.sha1 }}"
+        Content-Type: "application/json"      
       body_format: json
       status_code: 201
       validate_certs: no
