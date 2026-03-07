@@ -3,4 +3,5 @@ sa: "automation-service-account"
 sa_ns: "default"
 
 #ansible-runner image:
-image: "registry.redhat.io/ansible-automation-platform-24/platform-resource-runner-rhel8:2.4-138"
+#image: "registry.redhat.io/ansible-automation-platform-24/platform-resource-runner-rhel8:2.4-138"
+image: "registry.redhat.io/ansible-automation-platform-24/ee-supported-rhel8@sha256:b1caab055b36f279091e80dfc36ae5db477defbb5528ff3b7c4fb31c50ab32e5"

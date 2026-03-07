@@ -17,8 +17,8 @@ skip_ansible_runner: false
 cleanup: false
 
 #tower
-tower: "https://ansible.qe.red-chesterfield.com"
+tower: "https://tower.apps.int.prod-scale-spoke1-aws-us-east-1.itup.redhat.com"
 tower_pwd: ""
-tower_user: "thnguyen"
+tower_user: "admin"
 job_name: ""
 
