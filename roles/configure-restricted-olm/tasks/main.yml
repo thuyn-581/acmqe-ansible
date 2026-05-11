@@ -41,7 +41,7 @@
           -a {{ pull_secret_loc }} \
           --filter-by-os=.* \
           --keep-manifest-list \
-          --force=false \ 
+          --force=false \
           --skip-multiple-scopes \
           --continue-on-error=true > {{ working_dir }}/image_mirror.log 2>&1
 

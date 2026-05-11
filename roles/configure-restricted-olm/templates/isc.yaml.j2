@@ -18,20 +18,20 @@ mirror:
     full: false
     packages:
       - name: multicluster-engine     
-#        channels:
-#        - name: stable-{{ mce_ver }}    
+        defaultChannel: stable-{{ mce_ver }}      
+        channels:
+        - name: stable-{{ mce_ver }}    
 {% endif %} 
 {% if acm_ds|length > 1 %}             
   - catalog: quay.io:443/acm-d/acm-dev-catalog:{{ acm_ds }}
     full: false
     packages:
-      - name: advanced-cluster-management          
-#        channels:
-#        - name: release-{{ acm_ver }}   
+      - name: advanced-cluster-management
+        defaultChannel: release-{{ acm_ver }}   
+        channels:
+        - name: release-{{ acm_ver }}   
 {% endif %}          
-  additionalImages:
-    - name: registry.redhat.io/rhel9/postgresql-13:latest
-    - name: registry.redhat.io/rhel8/postgresql-10:latest    
+  additionalImages: 
     - name: quay.io/fxiang1/helloworld:0.0.1
     - name: quay.io/fxiang1/mortgage:0.5.0
     - name: docker.io/gogs/gogs:latest          
