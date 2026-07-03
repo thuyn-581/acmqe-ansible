@@ -27,18 +27,21 @@ infra_providers:
   aws:
     region: "us-east-1"
     instance_type: "t3.large"
-    version: "1.32.0"
+    version: "1.36.2"
     nodes_count: 2
+    # /usr/local/bin/aws eks describe-cluster-versions --query "clusterVersions[*].[clusterVersion,kubernetesPatchVersion, clusterVersionStatus, supportType]" --output table
   gcp:
     region: "us-east1"
     instance_type: "n1-standard-8"
-    version: "1.33.4"
+    version: "1.36.0"
     nodes_count: 2
+    # gcloud container get-server-config --region=us-east1 --format="table(validMasterVersions)"
   azure:
     region: "centralus"
     instance_type: "Standard_D2s_v3"
-    version: "1.32.7"
+    version: "1.36.1"
     nodes_count: 2
+    # az aks get-versions --location centralus --query "values[?version=='1.36'].patchVersions.keys(@) | [-1]" --output tsv
 
 #===== Minio =====
 minio_url: http://minio-api.apps.int.prod-scale-spoke1-aws-us-east-1.itup.redhat.com
