@@ -57,7 +57,7 @@ spec:
     metadata:
       annotations:
         serviceoperator.azure.com/credential-from: aso-controller-settings
-      name: capi-k8s-tenew-azure-aks
+      name: {{ cluster_name }}
     spec: 
       location: {{ region if cloud_region == '' else cloud_region }}
 ---
