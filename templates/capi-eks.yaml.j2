@@ -39,7 +39,7 @@ spec:
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: MachinePool
 metadata:
-  name: {{ cluster_name }}-mp-0
+  name: {{ cluster_name }}-pool-0
   namespace: {{ capi_namespace }}
 spec:
   clusterName: {{ cluster_name }}
@@ -49,31 +49,25 @@ spec:
       bootstrap:
         configRef:
           apiVersion: bootstrap.cluster.x-k8s.io/v1beta2
-          kind: EKSConfig
-          name: {{ cluster_name }}-mp-0
+          kind: NodeadmConfig
+          name: {{ cluster_name }}-pool-0
       clusterName: {{ cluster_name }}
       infrastructureRef:
         apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
-        kind: AWSMachinePool
-        name: {{ cluster_name }}-mp-0
-      version: v{{ k8s_version if kubernetes_version == '' else kubernetes_version }}
+        kind: AWSManagedMachinePool
+        name: {{ cluster_name }}-pool-0
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
-kind: AWSMachinePool
+kind: AWSManagedMachinePool
 metadata:
-  name: {{ cluster_name }}-mp-0
+  name: {{ cluster_name }}-pool-0
   namespace: {{ capi_namespace }}
 spec:
-  awsLaunchTemplate:
-    iamInstanceProfile: nodes.cluster-api-provider-aws.sigs.k8s.io
-    instanceType: "{{ instance_type|trim if cloud_instance_type == '' else cloud_instance_type }}"
-    sshKeyName: capi-eks
-  maxSize: 10
-  minSize: 1
+  amiType: AL2023_x86_64_STANDARD
 ---
 apiVersion: bootstrap.cluster.x-k8s.io/v1beta2
-kind: EKSConfig
+kind: NodeadmConfig
 metadata:
-  name: {{ cluster_name }}-mp-0
+  name: {{ cluster_name }}-pool-0
   namespace: {{ capi_namespace }}
 spec: {}
