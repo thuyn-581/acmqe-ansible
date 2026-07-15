@@ -33,7 +33,7 @@ infra_providers:
   gcp:
     region: "us-east1"
     instance_type: "n1-standard-8"
-    version: "1.36.0"
+    version: "1.35.5"
     nodes_count: 2
     # gcloud container get-server-config --region=us-east1 --format="table(validMasterVersions)"
   azure:
