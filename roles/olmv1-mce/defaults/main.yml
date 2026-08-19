@@ -17,7 +17,7 @@ mce_channel: stable-5.0
 
 # Timeout settings (in seconds)
 mce_install_timeout: 300
-mce_ready_timeout: 6
+mce_ready_timeout: 600
 
 # MultiClusterHub configuration
 mce_name: multiclusterengine

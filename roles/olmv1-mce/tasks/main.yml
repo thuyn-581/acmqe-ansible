@@ -142,7 +142,7 @@
       retries: "{{ (mce_ready_timeout / 15) | int }}"
       delay: 15
 
-    - name: Display MultiClusterHub status
+    - name: Display MultiClusterEngine status
       ansible.builtin.debug:
         msg: "MultiClusterEngine {{ mce_name }} is Available"
 
