@@ -8,7 +8,7 @@ version: 1.0.0
 
 # 2. Metadata details
 description: Collection shared roles
-#readme: README.md
+readme: README.md
 authors:
   - thnguyen@redhat.com
 
