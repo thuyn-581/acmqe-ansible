@@ -1,0 +1,27 @@
+# galaxy.yml
+RCS: false
+
+# 1. Namespaces and Names MUST use underscores, NEVER dashes.
+namespace: acmqe
+name: roles
+version: 1.0.0
+
+# 2. Metadata details
+description: Collection shared roles
+#readme: README.md
+authors:
+  - thnguyen@redhat.com
+
+# 3. Licensing and Links
+license:
+  - MIT
+tags:
+  - openshift
+  - kubernetes
+  - acm
+  - mce
+
+repository: https://github.com/thuyn-581/acmqe-ansible.git
+
+# 4. Independent dependencies (Optional)
+dependencies: {}
