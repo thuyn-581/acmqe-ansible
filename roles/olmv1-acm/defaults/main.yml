@@ -1,0 +1,26 @@
+---
+# defaults file for rhacm-olmv1
+
+# RHACM namespace
+acm_namespace: open-cluster-management
+
+# OLM v1 ClusterExtension configuration
+acm_cluster_extension_name: advanced-cluster-management
+
+# Catalog source
+acm_catalog_name: acm-dev-catalog
+acm_catalog_namespace: openshift-marketplace
+
+# Package and channel
+acm_package_name: advanced-cluster-management
+acm_channel: release-5.0
+
+# Timeout settings (in seconds)
+acm_install_timeout: 600
+acm_ready_timeout: 900
+
+# MultiClusterHub configuration
+acm_mch_name: multiclusterhub
+acm_mch_enable_observability: false
+acm_mch_enable_search_v2: true
+acm_mch_availability_config: High

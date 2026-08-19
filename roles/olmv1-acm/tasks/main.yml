@@ -1,0 +1,170 @@
+---
+# tasks file for rhacm-olmv1
+
+- name: Install RHACM using OLM v1
+  block:
+    - name: Create RHACM namespace
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: "{{ acm_namespace }}"
+            labels:
+              openshift.io/cluster-monitoring: "true"
+
+    - name: Create acm-installer service account
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: ServiceAccount
+          metadata:
+            name: acm-installer-sa
+            namespace: "{{ acm_namespace }}"        
+
+    - name: Create acm-installer-sa clusterrolebinding
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: rbac.authorization.k8s.io/v1
+          kind: ClusterRoleBinding
+          metadata:
+            name: acm-cluster-extension-installer-role-binding
+          roleRef:
+            apiGroup: rbac.authorization.k8s.io
+            kind: ClusterRole
+            name: cluster-admin
+          subjects:
+          - kind: ServiceAccount
+            name: acm-installer-sa
+            namespace: "{{ acm_namespace }}"        
+
+    - name: Create ClusterExtension for RHACM
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: olm.operatorframework.io/v1
+          kind: ClusterExtension
+          metadata:
+            name: "{{ acm_cluster_extension_name }}"
+          spec:
+            config:
+              configType: Inline
+              inline:
+                watchNamespace: "{{ acm_namespace }}"
+            namespace: "{{ acm_namespace }}"
+            serviceAccount:
+              name: acm-installer-sa
+            source:
+              catalog:
+                packageName: "{{ acm_package_name }}"
+                channels: ["{{ acm_channel }}"]
+                upgradeConstraintPolicy: CatalogProvided
+                selector:
+                  matchLabels:
+                    olm.operatorframework.io/metadata.name: acm-dev-catalog           
+              sourceType: Catalog          
+
+    - name: Wait for ClusterExtension to be installed
+      kubernetes.core.k8s_info:
+        api_version: olm.operatorframework.io/v1
+        kind: ClusterExtension
+        name: "{{ acm_cluster_extension_name }}"
+      register: cluster_extension_result
+      until:
+        - cluster_extension_result.resources is defined
+        - cluster_extension_result.resources | length > 0
+        - cluster_extension_result.resources[0].status is defined
+        - cluster_extension_result.resources[0].status.conditions is defined
+        - cluster_extension_result.resources[0].status.conditions | selectattr('type', 'equalto', 'Installed') | selectattr('status', 'equalto', 'True') | list | length > 0
+      retries: "{{ (acm_install_timeout / 15) | int }}"
+      delay: 10
+      failed_when: false
+
+    - name: Check ClusterExtension installation status
+      ansible.builtin.fail:
+        msg: "RHACM ClusterExtension installation failed or timed out"
+      when:
+        - cluster_extension_result.resources is not defined or
+          cluster_extension_result.resources | length == 0 or
+          cluster_extension_result.resources[0].status.conditions | selectattr('type', 'equalto', 'Installed') | selectattr('status', 'equalto', 'True') | list | length == 0
+
+    - name: Display ClusterExtension status
+      ansible.builtin.debug:
+        msg: "ClusterExtension {{ acm_cluster_extension_name }} installed successfully"
+
+    - name: Wait for RHACM operator deployment to be ready
+      kubernetes.core.k8s_info:
+        api_version: apps/v1
+        kind: Deployment
+        namespace: "{{ acm_namespace }}"
+        label_selectors:
+          - "control-plane=multiclusterhub-operator"
+          - "olm.operatorframework.io/owner-kind=ClusterExtension"
+      register: operator_deployment
+      until:
+        - operator_deployment.resources is defined
+        - operator_deployment.resources | length > 0
+        - operator_deployment.resources[0].status.availableReplicas is defined
+        - operator_deployment.resources[0].status.availableReplicas > 0
+      retries: "{{ (acm_install_timeout / 15) | int }}"
+      delay: 10
+
+    - name: Create MultiClusterHub instance
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: operator.open-cluster-management.io/v1
+          kind: MultiClusterHub
+          metadata:
+            name: "{{ acm_mch_name }}"
+            namespace: "{{ acm_namespace }}"
+            annotations:   
+              installer.open-cluster-management.io/mce-clusterextension-spec: '{{ {"source": "mce-dev-catalog"} if acm_repo == "konflux" else omit }}' 
+          spec:
+            localClusterName: acm-local-cluster
+
+    - name: Wait for MultiClusterHub to be running
+      kubernetes.core.k8s_info:
+        api_version: operator.open-cluster-management.io/v1
+        kind: MultiClusterHub
+        name: "{{ acm_mch_name }}"
+        namespace: "{{ acm_namespace }}"
+      register: mch_result
+      until:
+        - mch_result.resources is defined
+        - mch_result.resources | length > 0
+        - mch_result.resources[0].status is defined
+        - mch_result.resources[0].status.phase is defined
+        - mch_result.resources[0].status.phase == "Running"
+      retries: "{{ (acm_ready_timeout / 15) | int }}"
+      delay: 15
+
+    - name: Display MultiClusterHub status
+      ansible.builtin.debug:
+        msg: "MultiClusterHub {{ acm_mch_name }} is Running"
+
+  rescue:
+    - name: Display error message
+      ansible.builtin.debug:
+        msg: "RHACM installation failed. Check ClusterExtension and MultiClusterHub resources for details."
+
+    - name: Get ClusterExtension status
+      kubernetes.core.k8s_info:
+        api_version: olm.operatorframework.io/v1
+        kind: ClusterExtension
+        name: "{{ acm_cluster_extension_name }}"
+      register: failed_cluster_extension
+
+    - name: Display ClusterExtension details
+      ansible.builtin.debug:
+        var: failed_cluster_extension.resources[0].status
+      when:
+        - failed_cluster_extension.resources is defined
+        - failed_cluster_extension.resources | length > 0
+
+    - name: Fail the playbook
+      ansible.builtin.fail:
+        msg: "RHACM installation encountered errors"

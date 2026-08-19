@@ -1,0 +1,77 @@
+---
+# Playbook to uninstall RHACM installed via OLM v1
+#
+# Usage:
+#   ansible-playbook -i localhost, uninstall-rhacm.yml
+
+- name: Uninstall Red Hat Multicluster Engine
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    mce_namespace: multicluster-engine
+    mce_cluster_extension_name: multiclusterengine
+    mce_name: multiclusterengine
+
+  tasks:
+    - name: Delete MultiClusterEngine instance
+      kubernetes.core.k8s:
+        api_version: multicluster.openshift.io/v1
+        kind: MultiClusterEngine
+        name: "{{ mce_name }}"
+        namespace: "{{ mce_namespace }}"
+        state: absent
+        wait: true
+        wait_timeout: 600
+
+    - name: Wait for MultiClusterEngine to be deleted
+      kubernetes.core.k8s_info:
+        api_version: multicluster.openshift.io/v1
+        kind: MultiClusterEngine      
+        name: "{{ mce_name }}"
+        namespace: "{{ mce_namespace }}"
+      register: mce_check
+      until: mce_check.resources | length == 0
+      retries: 60
+      delay: 10
+
+    - name: Delete ClusterExtension
+      kubernetes.core.k8s:
+        api_version: olm.operatorframework.io/v1
+        kind: ClusterExtension
+        name: "{{ mce_cluster_extension_name }}"
+        state: absent
+        wait: true
+        wait_timeout: 300
+
+    - name: Wait for operator deployment to be deleted
+      kubernetes.core.k8s_info:
+        api_version: apps/v1
+        kind: Deployment
+        namespace: "{{ mce_namespace }}"
+        label_selectors:
+          - "control-plane=backplane-operator"
+          - "olm.operatorframework.io/owner-kind=ClusterExtension"
+      register: operator_deployment
+      until: operator_deployment.resources | length == 0
+      retries: 30
+      delay: 10
+
+    - name: Delete MCE namespace (optional)
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Namespace
+        name: "{{ mce_namespace }}"
+        state: absent
+        wait: true
+        wait_timeout: 300
+      when: delete_namespace | default(true) | bool
+
+    - name: Display completion message
+      ansible.builtin.debug:
+        msg:
+          - "MCE uninstallation completed"
+          - "ClusterExtension deleted: {{ mce_cluster_extension_name }}"
+          - "MultiClusterEngine deleted: {{ mce_name }}"
+          - "Namespace preserved: {{ mce_namespace }} (use -e delete_namespace=true to remove)"

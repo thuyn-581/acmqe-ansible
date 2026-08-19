@@ -1,0 +1,170 @@
+---
+# tasks file for olmv1-mce
+
+- name: Install MCE using OLM v1
+  block:
+    - name: Create MCE namespace
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: "{{ mce_namespace }}"
+            labels:
+              openshift.io/cluster-monitoring: "true"
+
+    - name: Create mce-installer service account
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: ServiceAccount
+          metadata:
+            name: mce-installer-sa
+            namespace: "{{ mce_namespace }}"        
+
+    - name: Create mce-installer-sa clusterrolebinding
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: rbac.authorization.k8s.io/v1
+          kind: ClusterRoleBinding
+          metadata:
+            name: mce-cluster-extension-installer-role-binding
+          roleRef:
+            apiGroup: rbac.authorization.k8s.io
+            kind: ClusterRole
+            name: cluster-admin
+          subjects:
+          - kind: ServiceAccount
+            name: mce-installer-sa
+            namespace: "{{ mce_namespace }}"        
+
+    - name: Create ClusterExtension for MCE
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: olm.operatorframework.io/v1
+          kind: ClusterExtension
+          metadata:
+            name: "{{ mce_cluster_extension_name }}"
+          spec:
+            config:
+              configType: Inline
+              inline:
+                watchNamespace: "{{ mce_namespace }}"
+            namespace: "{{ mce_namespace }}"
+            serviceAccount:
+              name: mce-installer-sa
+            source:
+              catalog:
+                packageName: "{{ mce_package_name }}"
+                channels: ["{{ mce_channel }}"]
+                upgradeConstraintPolicy: CatalogProvided
+                selector:
+                  matchLabels:
+                    olm.operatorframework.io/metadata.name: mce-dev-catalog           
+              sourceType: Catalog          
+
+    - name: Wait for ClusterExtension to be installed
+      kubernetes.core.k8s_info:
+        api_version: olm.operatorframework.io/v1
+        kind: ClusterExtension
+        name: "{{ mce_cluster_extension_name }}"
+      register: cluster_extension_result
+      until:
+        - cluster_extension_result.resources is defined
+        - cluster_extension_result.resources | length > 0
+        - cluster_extension_result.resources[0].status is defined
+        - cluster_extension_result.resources[0].status.conditions is defined
+        - cluster_extension_result.resources[0].status.conditions | selectattr('type', 'equalto', 'Installed') | selectattr('status', 'equalto', 'True') | list | length > 0
+      retries: "{{ (mce_install_timeout / 15) | int }}"
+      delay: 10
+      failed_when: false
+
+    - name: Check ClusterExtension installation status
+      ansible.builtin.fail:
+        msg: "MCE ClusterExtension installation failed or timed out"
+      when:
+        - cluster_extension_result.resources is not defined or
+          cluster_extension_result.resources | length == 0 or
+          cluster_extension_result.resources[0].status.conditions | selectattr('type', 'equalto', 'Installed') | selectattr('status', 'equalto', 'True') | list | length == 0
+
+    - name: Display ClusterExtension status
+      ansible.builtin.debug:
+        msg: "ClusterExtension {{ mce_cluster_extension_name }} installed successfully"
+
+    - name: Wait for MCE operator deployment to be ready
+      kubernetes.core.k8s_info:
+        api_version: apps/v1
+        kind: Deployment
+        namespace: "{{ mce_namespace }}"
+        label_selectors:
+          - "control-plane=backplane-operator"
+          - "olm.operatorframework.io/owner-kind=ClusterExtension"
+      register: operator_deployment
+      until:
+        - operator_deployment.resources is defined
+        - operator_deployment.resources | length > 0
+        - operator_deployment.resources[0].status.availableReplicas is defined
+        - operator_deployment.resources[0].status.availableReplicas > 0
+      retries: "{{ (mce_install_timeout / 15) | int }}"
+      delay: 10
+
+    - name: Create MultiClusterEngine instance
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: multicluster.openshift.io/v1
+          kind: MultiClusterEngine
+          metadata:
+            name: "{{ mce_name }}"
+            namespace: "{{ mce_namespace }}"
+            annotations:   
+              installer.open-cluster-management.io/image-repository: "{{ 'quay.io:443/acm-d' if acm_repo == 'konflux' else omit }}"
+          spec:
+            localClusterName: mce-local-cluster
+
+    - name: Wait for MultiClusterEngine to be Available
+      kubernetes.core.k8s_info:
+        api_version: multicluster.openshift.io/v1
+        kind: MultiClusterEngine
+        name: "{{ mce_name }}"
+        namespace: "{{ mce_namespace }}"
+      register: mce_result
+      until:
+        - mce_result.resources is defined
+        - mce_result.resources | length > 0
+        - mce_result.resources[0].status is defined
+        - mce_result.resources[0].status.phase is defined
+        - mce_result.resources[0].status.phase == "Available"
+      retries: "{{ (mce_ready_timeout / 15) | int }}"
+      delay: 15
+
+    - name: Display MultiClusterHub status
+      ansible.builtin.debug:
+        msg: "MultiClusterEngine {{ mce_name }} is Available"
+
+  rescue:
+    - name: Display error message
+      ansible.builtin.debug:
+        msg: "MCE installation failed. Check ClusterExtension and MultiClusterHub resources for details."
+
+    - name: Get ClusterExtension status
+      kubernetes.core.k8s_info:
+        api_version: olm.operatorframework.io/v1
+        kind: ClusterExtension
+        name: "{{ mce_cluster_extension_name }}"
+      register: failed_cluster_extension
+
+    - name: Display ClusterExtension details
+      ansible.builtin.debug:
+        var: failed_cluster_extension.resources[0].status
+      when:
+        - failed_cluster_extension.resources is defined
+        - failed_cluster_extension.resources | length > 0
+
+    - name: Fail the playbook
+      ansible.builtin.fail:
+        msg: "MCE installation encountered errors"

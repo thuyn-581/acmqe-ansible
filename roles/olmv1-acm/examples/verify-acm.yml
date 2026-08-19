@@ -1,0 +1,99 @@
+---
+# Playbook to verify RHACM installation
+#
+# Usage:
+#   ansible-playbook -i localhost, verify-rhacm.yml
+
+- name: Verify RHACM Installation
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    rhacm_namespace: open-cluster-management
+    rhacm_cluster_extension_name: advanced-cluster-management
+    rhacm_mch_name: multiclusterhub
+
+  tasks:
+    - name: Check if ClusterExtension exists
+      kubernetes.core.k8s_info:
+        api_version: olm.operatorframework.io/v1alpha1
+        kind: ClusterExtension
+        name: "{{ rhacm_cluster_extension_name }}"
+      register: cluster_extension
+
+    - name: Verify ClusterExtension is installed
+      ansible.builtin.assert:
+        that:
+          - cluster_extension.resources | length > 0
+          - cluster_extension.resources[0].status.conditions | selectattr('type', 'equalto', 'Installed') | selectattr('status', 'equalto', 'True') | list | length > 0
+        success_msg: "ClusterExtension is installed successfully"
+        fail_msg: "ClusterExtension is not installed or in failed state"
+
+    - name: Check MultiClusterHub status
+      kubernetes.core.k8s_info:
+        api_version: operator.open-cluster-management.io/v1
+        kind: MultiClusterHub
+        name: "{{ rhacm_mch_name }}"
+        namespace: "{{ rhacm_namespace }}"
+      register: mch
+
+    - name: Verify MultiClusterHub is running
+      ansible.builtin.assert:
+        that:
+          - mch.resources | length > 0
+          - mch.resources[0].status.phase == "Running"
+        success_msg: "MultiClusterHub is running"
+        fail_msg: "MultiClusterHub is not in Running state"
+
+    - name: Get all ACM component status
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Pod
+        namespace: "{{ rhacm_namespace }}"
+      register: acm_pods
+
+    - name: Count running pods
+      ansible.builtin.set_fact:
+        running_pods: "{{ acm_pods.resources | selectattr('status.phase', 'equalto', 'Running') | list | length }}"
+        total_pods: "{{ acm_pods.resources | length }}"
+
+    - name: Display pod statistics
+      ansible.builtin.debug:
+        msg:
+          - "Total ACM pods: {{ total_pods }}"
+          - "Running pods: {{ running_pods }}"
+          - "Pods not running: {{ total_pods | int - running_pods | int }}"
+
+    - name: List non-running pods
+      ansible.builtin.debug:
+        msg: "Pod {{ item.metadata.name }} is in {{ item.status.phase }} state"
+      loop: "{{ acm_pods.resources | selectattr('status.phase', 'ne', 'Running') | list }}"
+      when: acm_pods.resources | selectattr('status.phase', 'ne', 'Running') | list | length > 0
+
+    - name: Get RHACM console route
+      kubernetes.core.k8s_info:
+        api_version: route.openshift.io/v1
+        kind: Route
+        namespace: "{{ rhacm_namespace }}"
+        label_selectors:
+          - "app=multicloud-console"
+      register: console_route
+
+    - name: Display RHACM console URL
+      ansible.builtin.debug:
+        msg: "RHACM Console: https://{{ console_route.resources[0].spec.host }}"
+      when:
+        - console_route.resources | length > 0
+
+    - name: Summary
+      ansible.builtin.debug:
+        msg:
+          - "================================================"
+          - "RHACM Verification Summary"
+          - "================================================"
+          - "ClusterExtension: Installed ✓"
+          - "MultiClusterHub: {{ mch.resources[0].status.phase }}"
+          - "Running Pods: {{ running_pods }}/{{ total_pods }}"
+          - "Console URL: https://{{ console_route.resources[0].spec.host if console_route.resources | length > 0 else 'Not available' }}"
+          - "================================================"

@@ -1,0 +1,24 @@
+---
+# defaults file for rhacm-olmv1
+
+# MCE namespace
+mce_namespace: multicluster-engine
+
+# OLM v1 ClusterExtension configuration
+mce_cluster_extension_name: multiclusterengine
+
+# Catalog source
+mce_catalog_name: mce-dev-catalog
+mce_catalog_namespace: openshift-marketplace
+
+# Package and channel
+mce_package_name: multicluster-engine
+mce_channel: stable-5.0
+
+# Timeout settings (in seconds)
+mce_install_timeout: 300
+mce_ready_timeout: 6
+
+# MultiClusterHub configuration
+mce_name: multiclusterengine
+

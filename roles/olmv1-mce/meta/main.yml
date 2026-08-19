@@ -1,0 +1,23 @@
+---
+galaxy_info:
+  author: Automation Team
+  description: Install Red Hat MultiCluster Engine using OLM v1
+  company: Red Hat
+  license: Apache-2.0
+  min_ansible_version: "2.14"
+  platforms:
+    - name: OpenShift
+      versions:
+        - ">4.20"
+  galaxy_tags:
+    - openshift
+    - kubernetes
+    - mce
+    - multiclusterengine
+    - olmv1
+    - operator
+
+dependencies: []
+
+collections:
+  - kubernetes.core

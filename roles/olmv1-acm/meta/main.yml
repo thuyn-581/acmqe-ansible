@@ -1,0 +1,24 @@
+---
+galaxy_info:
+  author: Automation Team
+  description: Install Red Hat Advanced Cluster Management using OLM v1
+  company: Red Hat
+  license: Apache-2.0
+  min_ansible_version: "2.14"
+  platforms:
+    - name: OpenShift
+      versions:
+        - ">4.20"
+  galaxy_tags:
+    - openshift
+    - kubernetes
+    - rhacm
+    - acm
+    - multicluster
+    - olmv1
+    - operator
+
+dependencies: []
+
+collections:
+  - kubernetes.core

@@ -1,0 +1,51 @@
+---
+# Example playbook to install RHACM using OLM v1
+#
+# Usage:
+#   ansible-playbook -i localhost, install-rhacm.yml
+#
+# With custom kubeconfig:
+#   KUBECONFIG=/path/to/kubeconfig ansible-playbook -i localhost, install-rhacm.yml
+
+- name: Install Red Hat Multicluster Engine using OLM v1
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    # Uncomment and modify these variables as needed
+    # rhacm_namespace: open-cluster-management
+    # rhacm_channel: release-2.13
+    # rhacm_mch_enable_search_v2: true
+    # rhacm_mch_availability_config: High
+
+  pre_tasks:
+    - name: Verify OpenShift connection
+      kubernetes.core.k8s_cluster_info:
+      register: cluster_info
+
+    - name: Display cluster version
+      ansible.builtin.debug:
+        msg: "Installing MCE on OpenShift {{ cluster_info.version.server.kubernetes.gitVersion }}"
+
+  roles:
+    - role: ../../olmv1-mce
+      # Or if installed via ansible-galaxy:
+      # - role: rhacm-olmv1
+
+  post_tasks:
+    - name: Wait for all MCE components to be ready
+      ansible.builtin.pause:
+        seconds: 30
+        prompt: "Waiting for MCE components to stabilize..."
+
+    - name: List all MCE pods
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Pod
+        namespace: "{{ mce_namespace | default('multicluster-engine') }}"
+      register: mce_pods
+
+    - name: Display pod status
+      ansible.builtin.debug:
+        msg: "Found {{ mce_pods.resources | length }} MCE pods in {{ mce_namespace | default('multicluster-engine') }} namespace"
