@@ -1,6 +1,6 @@
 ---
 galaxy_info:
-  author: Automation Team
+  author: thnguyen@redhat.com
   description: Install Red Hat Advanced Cluster Management using OLM v1
   company: Red Hat
   license: Apache-2.0
