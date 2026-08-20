@@ -65,7 +65,7 @@
                 upgradeConstraintPolicy: CatalogProvided
                 selector:
                   matchLabels:
-                    olm.operatorframework.io/metadata.name: acm-dev-catalog           
+                    olm.operatorframework.io/metadata.name: "{{ 'acm-dev-catalog' if acm_repo == 'konflux' else 'redhat-operators' }}"           
               sourceType: Catalog          
 
     - name: Wait for ClusterExtension to be installed
@@ -120,7 +120,7 @@
           apiVersion: operator.open-cluster-management.io/v1
           kind: MultiClusterHub
           metadata:
-            name: "{{ acm_mch_name }}"
+            name: "{{ mch_name }}"
             namespace: "{{ acm_namespace }}"
             annotations:   
               installer.open-cluster-management.io/mce-clusterextension-spec: '{{ {"source": "mce-dev-catalog"} if acm_repo == "konflux" else omit }}' 
@@ -131,7 +131,7 @@
       kubernetes.core.k8s_info:
         api_version: operator.open-cluster-management.io/v1
         kind: MultiClusterHub
-        name: "{{ acm_mch_name }}"
+        name: "{{ mch_name }}"
         namespace: "{{ acm_namespace }}"
       register: mch_result
       until:
@@ -145,7 +145,7 @@
 
     - name: Display MultiClusterHub status
       ansible.builtin.debug:
-        msg: "MultiClusterHub {{ acm_mch_name }} is Running"
+        msg: "MultiClusterHub {{ mch_name }} is Running"
 
   rescue:
     - name: Display error message

@@ -20,4 +20,4 @@ acm_install_timeout: 300
 acm_ready_timeout: 900
 
 # MultiClusterHub configuration
-acm_mch_name: multiclusterhub
+mch_name: multiclusterhub

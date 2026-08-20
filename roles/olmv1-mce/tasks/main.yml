@@ -65,7 +65,7 @@
                 upgradeConstraintPolicy: CatalogProvided
                 selector:
                   matchLabels:
-                    olm.operatorframework.io/metadata.name: mce-dev-catalog           
+                    olm.operatorframework.io/metadata.name: "{{ 'mce-dev-catalog' if acm_repo == 'konflux' else 'redhat-operators' }}"           
               sourceType: Catalog          
 
     - name: Wait for ClusterExtension to be installed
