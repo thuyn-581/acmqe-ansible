@@ -1,5 +1,4 @@
 # galaxy.yml
-RCS: false
 
 # 1. Namespaces and Names MUST use underscores, NEVER dashes.
 namespace: acmqe

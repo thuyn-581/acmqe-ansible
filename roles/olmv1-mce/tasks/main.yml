@@ -1,5 +1,6 @@
 ---
-# tasks file for olmv1-mce
+- include_tasks: ../../tasks/create-cluster-catalogs.yml
+  when: acm_repo == "konflux"
 
 - name: Install MCE using OLM v1
   block:

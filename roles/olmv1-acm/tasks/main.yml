@@ -1,5 +1,6 @@
 ---
-# tasks file for rhacm-olmv1
+- include_tasks: ../../tasks/create-cluster-catalogs.yml
+  when: acm_repo == "konflux"
 
 - name: Install RHACM using OLM v1
   block:

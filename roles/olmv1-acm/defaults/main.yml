@@ -16,11 +16,8 @@ acm_package_name: advanced-cluster-management
 acm_channel: release-5.0
 
 # Timeout settings (in seconds)
-acm_install_timeout: 600
+acm_install_timeout: 300
 acm_ready_timeout: 900
 
 # MultiClusterHub configuration
 acm_mch_name: multiclusterhub
-acm_mch_enable_observability: false
-acm_mch_enable_search_v2: true
-acm_mch_availability_config: High
