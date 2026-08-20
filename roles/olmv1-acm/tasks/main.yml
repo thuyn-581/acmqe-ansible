@@ -122,8 +122,13 @@
           metadata:
             name: "{{ mch_name }}"
             namespace: "{{ acm_namespace }}"
-            annotations:   
-              installer.open-cluster-management.io/mce-clusterextension-spec: '{{ {"source": "mce-dev-catalog"} if acm_repo == "konflux" else omit }}' 
+            annotations: >-
+              {{
+                {} | combine (
+                  { 'installer.open-cluster-management.io/image-repository': 'quay.io:443/acm-d',
+                  'installer.open-cluster-management.io/mce-clusterextension-spec': '{"source": "mce-dev-catalog","channels": ["' ~ mce_channel ~ '"]}'}  if acm_repo == 'konflux' else {}
+                )
+              }}
           spec:
             localClusterName: acm-local-cluster
 

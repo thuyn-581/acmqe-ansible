@@ -6,6 +6,7 @@
   block:
     - name: Create MCE namespace
       kubernetes.core.k8s:
+        validate_certs: false
         state: present
         definition:
           apiVersion: v1
