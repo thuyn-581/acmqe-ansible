@@ -10,11 +10,9 @@ objects:
     labels:
       template: acm-cron
 - apiVersion: build.openshift.io/v1
-  kind: BuildConfig
+  kind: Build
   metadata:
-    annotations:
-      description: Defines how to build the application
-    name: ${NAME}
+    name: ${NAME}-1
     labels:
       template: acm-cron
   spec:
@@ -23,7 +21,6 @@ objects:
       to:
         kind: ImageStreamTag
         name: ${NAME}:latest
-    runPolicy: Serial
     source:
       type: Git
       git:
@@ -34,10 +31,8 @@ objects:
       sourceStrategy:
         from:
           kind: ImageStreamTag
-          name: python:3.11-ubi8
+          name: python:latest
           namespace: openshift
-    triggers:
-    - type: ConfigChange
 - apiVersion: batch/v1
   kind: CronJob
   metadata:

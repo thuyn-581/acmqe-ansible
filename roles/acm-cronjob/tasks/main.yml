@@ -1,27 +1,33 @@
 - name: Cleanup existing resources if any
   shell: |
     {{ oc_cmd }} -n default delete imagestream --all
-    {{ oc_cmd }} -n default delete buildconfig --all
+    {{ oc_cmd }} -n default delete build --all
     {{ oc_cmd }} -n default delete cronjob --all
   ignore_errors: true
 
 - name: Apply cronjob template
   shell: >
-    {{ oc_cmd }} process 
+    {{ oc_cmd }} process
     -f roles/acm-cronjob/defaults/template.yml
     -p API_URL={{ ocp_api_url }}
     -p OCM_TOKEN={{ rhapi_offline_token }}
-    | oc create -f - -n default 
+    | oc create -f - -n default
+
+- name: Wait for build to complete
+  shell: >
+    {{ oc_cmd }} get build -n default acm-cronjob-1
+    -o jsonpath='{.status.phase}'
+  register: build_status
+  until: build_status.stdout == 'Complete'
+  retries: 30
+  delay: 30
+  failed_when: build_status.stdout == 'Failed' or build_status.stdout == 'Error'
 
 - name: Wait for cronjob succeeded
   shell: >
-    {{ oc_cmd }} get cronjob -n default acm-cronjob -ojson 
+    {{ oc_cmd }} get cronjob -n default acm-cronjob -ojson
     | jq -r .status.lastSuccessfulTime
   register: last_success
   until: last_success.stdout != 'null'
   retries: 10
   delay: 30
-       
-
-  
-  
