@@ -1,6 +1,6 @@
 ---
 - include_tasks: ../../tasks/create-cluster-catalogs.yml
-  when: acm_repo == "konflux"
+  when: acm_repo != "production"
 
 - name: Install RHACM using OLM v1
   block:
@@ -65,7 +65,7 @@
                 upgradeConstraintPolicy: CatalogProvided
                 selector:
                   matchLabels:
-                    olm.operatorframework.io/metadata.name: "{{ 'acm-dev-catalog' if acm_repo == 'konflux' else 'redhat-operators' }}"           
+                    olm.operatorframework.io/metadata.name: "{{ 'acm-dev-catalog' if acm_repo == 'konflux' else 'acm-fbc-catalog' if acm_repo == 'art' else 'openshift-redhat-operators' }}"          
               sourceType: Catalog          
 
     - name: Wait for ClusterExtension to be installed
@@ -126,7 +126,8 @@
               {{
                 {} | combine (
                   { 'installer.open-cluster-management.io/image-repository': 'quay.io:443/acm-d',
-                  'installer.open-cluster-management.io/mce-clusterextension-spec': '{"source": "mce-dev-catalog","channels": ["' ~ mce_channel ~ '"]}'}  if acm_repo == 'konflux' else {}
+                  'installer.open-cluster-management.io/mce-clusterextension-spec': '{"source": "mce-dev-catalog","channels": ["' ~ mce_channel ~ '"]}'}  if acm_repo == 'konflux' else
+                  { 'installer.open-cluster-management.io/mce-clusterextension-spec': '{"source": "mce-fbc-catalog","channels": ["' ~ mce_channel ~ '"]}'}  if acm_repo == 'art' else {}
                 )
               }}
           spec:
