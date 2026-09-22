@@ -1,6 +1,6 @@
 ---
 - include_tasks: ../../tasks/create-cluster-catalogs.yml
-  when: acm_repo == "konflux"
+  when: acm_repo != "production"
 
 - name: Install MCE using OLM v1
   block:

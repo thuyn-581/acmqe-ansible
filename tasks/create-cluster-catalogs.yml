@@ -1,23 +1,12 @@
-- name: Create ClusterCatalog acm-dev-catalog
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: olm.operatorframework.io/v1
-      kind: ClusterCatalog
-      metadata:
-        labels:
-          olm.operatorframework.io/metadata.name: acm-dev-catalog
-        name: acm-dev-catalog
-      spec:
-        availabilityMode: Available
-        priority: 0
-        source:
-          image:
-            ref: quay.io:443/acm-d/acm-dev-catalog:{{ acm_snapshot_tag | default('latest-5.0') }}
-          type: Image 
-  when: not (mce_only | default(false) | bool)   
+- name: Set catalog source vars
+  set_fact:
+    image_src: "{{ 'quay.io:443/acm-d' if acm_repo == 'konflux' else 'quay.io/redhat-user-workloads/ocp-art-tenant' }}"
+    acm_cat_name: "{{ 'acm-dev-catalog' if acm_repo == 'konflux' else 'acm-fbc-catalog' }}"
+    acm_image_name: "{{ 'acm-dev-catalog' if acm_repo == 'konflux' else 'art-fbc' }}"
+    mce_cat_name: "{{ 'mce-dev-catalog' if acm_repo == 'konflux' else 'mce-fbc-catalog' }}"
+    mce_image_name: "{{ 'mce-dev-catalog' if acm_repo == 'konflux' else 'art-fbc' }}"
 
-- name: Create ClusterCatalog mce-dev-catalog
+- name: Create ClusterCatalog for ACM operator
   kubernetes.core.k8s:
     state: present
     definition:
@@ -25,14 +14,33 @@
       kind: ClusterCatalog
       metadata:
         labels:
-          olm.operatorframework.io/metadata.name: mce-dev-catalog
-        name: mce-dev-catalog
+          olm.operatorframework.io/metadata.name: "{{ acm_cat_name }}"
+        name: "{{ acm_cat_name }}"
       spec:
         availabilityMode: Available
         priority: 0
         source:
           image:
-            ref: quay.io:443/acm-d/mce-dev-catalog:{{ mce_snapshot_tag | default('latest-5.0') }}
+            ref: "{{ image_src }}/{{ acm_image_name }}:{{ acm_snapshot_tag | default('latest-5.0') }}"
+          type: Image
+  when: not (mce_only | default(false) | bool)
+
+- name: Create ClusterCatalog for MCE operator
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: olm.operatorframework.io/v1
+      kind: ClusterCatalog
+      metadata:
+        labels:
+          olm.operatorframework.io/metadata.name: "{{ mce_cat_name }}"
+        name: "{{ mce_cat_name }}"
+      spec:
+        availabilityMode: Available
+        priority: 0
+        source:
+          image:
+            ref: "{{ image_src }}/{{ mce_image_name }}:{{ mce_snapshot_tag | default('latest-5.0') }}"
           type: Image
 
 - name: Wait for ClusterCatalogs to be running
@@ -41,14 +49,14 @@
     kind: ClusterCatalog
     name: "{{ item.name }}"
   register: clustercatalog_results
-  until: 
+  until:
     - clustercatalog_results.resources | length > 0
     - clustercatalog_results.resources[0].status is defined
     - clustercatalog_results.resources[0].status.conditions is defined
     - clustercatalog_results.resources[0].status.conditions | selectattr('type', 'equalto', 'Serving') | selectattr('status', 'equalto', 'True') | list | length > 0
   retries: 4
-  delay: 15  
+  delay: 15
   loop:
-    - { name: 'mce-dev-catalog', included: True }
-    - { name: 'acm-dev-catalog', included: "{{ not mce_only|bool }}"}
+    - { name: "{{ mce_cat_name }}", included: True }
+    - { name: "{{ acm_cat_name }}", included: "{{ not mce_only|bool }}"}
   when: item.included
