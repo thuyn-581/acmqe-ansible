@@ -1,129 +1,220 @@
 ---
-  - name: Copy task modules to remote
-    copy:
-      src: '.'
-      dest: '.'
-      follow: yes
-      remote_src: true 
+  # Step 1: Install AAP operator if not already installed
+  - name: Check if AAP operator is already installed
+    shell: |
+      {{ oc_cmd }} get csv -n aap -o jsonpath='{.items[?(@.metadata.name matches "aap-operator.*")].metadata.name}' 2>/dev/null || echo ""
+    register: aap_csv
+    changed_when: false
 
-  # - name: Create Automation controller CR
-  #   shell: |
-  #     {{ oc_cmd }} apply -f - <<EOF
-  #       apiVersion: automationcontroller.ansible.com/v1beta1
-  #       kind: AutomationController
-  #       metadata:
-  #         name: mycontroller
-  #         namespace: {{ aap_project }}
-  #       spec:
-  #         replicas: 1
-  #     EOF            
-  #   changed_when: true     
+  - name: Install AAP operator
+    when: aap_csv.stdout == ''
+    block:
+      - name: Ensure AAP namespace exists
+        shell: |
+          {{ oc_cmd }} create namespace {{ aap_project }} --dry-run=client -o yaml | {{ oc_cmd }} apply -f -
+        changed_when: true    
 
+      - name: Get latest AAP channel from PackageManifest
+        shell: |
+          {{ oc_cmd }} get packagemanifest ansible-automation-platform-operator -n openshift-marketplace -o jsonpath='{.status.defaultChannel}'
+        register: aap_channel
+        changed_when: false
+
+      - name: Create OperatorGroup for AAP
+        shell: |
+          {{ oc_cmd }} apply -f - <<EOF
+          apiVersion: operators.coreos.com/v1
+          kind: OperatorGroup
+          metadata:
+            name: aap-operator-group
+            namespace: "{{ aap_project }}"
+          spec:
+            targetNamespaces:
+              - "{{ aap_project }}"
+          EOF
+        changed_when: true
+
+      - name: Create AAP operator Subscription
+        shell: |
+          {{ oc_cmd }} apply -f - <<EOF
+          apiVersion: operators.coreos.com/v1alpha1
+          kind: Subscription
+          metadata:
+            name: ansible-automation-platform-operator
+            namespace: "{{ aap_project }}"
+          spec:
+            channel: "{{ aap_channel.stdout }}-cluster-scoped"
+            installPlanApproval: Automatic
+            name: ansible-automation-platform-operator
+            source: redhat-operators
+            sourceNamespace: openshift-marketplace
+          EOF
+        changed_when: true
+
+      - name: Wait for AAP operator CSV to succeed
+        shell: |
+          {{ oc_cmd }} get csv -n {{ aap_project }} -o jsonpath='{.items[?(@.metadata.name matches "aap-operator.*")].status.phase}' 2>/dev/null || echo ""
+        register: csv_phase
+        until: csv_phase.stdout == 'Succeeded'
+        retries: 30
+        delay: 15
+        changed_when: false
+
+  # Step 2: Create AAP CR
   - name: Create AAP CR
     shell: |
       {{ oc_cmd }} apply -f - <<EOF
-        apiVersion: aap.ansible.com/v1alpha1
-        kind: AnsibleAutomationPlatform
-        metadata:
-          name: {{ aap_name }}
-          namespace: {{ aap_project }}
-        spec:
-          # Development purposes only
-          no_log: false
-          controller:
-            name: {{ ac_name }}
-          eda:
-            disabled: true
-          hub:
-            disabled: true
-      EOF            
-    changed_when: true   
+      apiVersion: aap.ansible.com/v1alpha1
+      kind: AnsibleAutomationPlatform
+      metadata:
+        name: {{ aap_name }}
+        namespace: {{ aap_project }}
+      spec:
+        no_log: false
+        controller:
+          name: {{ ac_name }}
+        eda:
+          disabled: true
+        hub:
+          disabled: true
+        route_tls_termination_mechanism: Edge
+      EOF
+    changed_when: true
 
+  # Step 3: Wait for AutomationController to be created
+  - name: Wait for AutomationController {{ ac_name }} to exist
+    shell: |
+      {{ oc_cmd }} get automationcontroller {{ ac_name }} -n {{ aap_project }} -o name 2>/dev/null || echo ""
+    register: ac_exists
+    until: ac_exists.stdout != ''
+    retries: 20
+    delay: 60
+    changed_when: false
+
+  # Step 4: Poll for AutomationController status.conditions type=Successful,status=True
+  - name: Wait for AutomationController {{ ac_name }} to become Successful
+    shell: |
+      {{ oc_cmd }} get automationcontroller {{ ac_name }} -n {{ aap_project }} -o jsonpath='{.status.conditions[?(@.type=="Successful")].status}'
+    register: ac_status
+    until: ac_status.stdout == 'True'
+    retries: 20
+    delay: 60
+    changed_when: false
+
+  - name: Print AutomationController status
+    debug:
+      msg: "AutomationController {{ ac_name }} is Successful"
+
+  # Step 5: Poll for AAP status.conditions type=Successful,status=True
+  - name: Wait for AAP CR to become Successful
+    shell: |
+      {{ oc_cmd }} get ansibleautomationplatform {{ aap_name }} -n {{ aap_project }} -o jsonpath='{.status.conditions[?(@.type=="Successful")].status}'
+    register: aap_status
+    until: aap_status.stdout == 'True'
+    retries: 20
+    delay: 30
+    changed_when: false
+
+  - name: Print AAP status
+    debug:
+      msg: "AAP CR {{ aap_name }} is Successful"
+
+
+  # Get routes and credentials
   - name: Get AAP route
     shell: |
-      {{ oc_cmd }}  get route -n {{ aap_project }} {{ aap_name }} | awk '{ if(NR>1) print $2 }'
-    changed_when: true    
+      {{ oc_cmd }} get route -n {{ aap_project }} {{ aap_name }} -o jsonpath='{.spec.host}'
     register: aap_url
     until: aap_url.stdout != ''
     retries: 15
     delay: 30
-
-  - name: Get AC route
-    shell: |
-      {{ oc_cmd }}  get route -n {{ aap_project }} {{ ac_name }} | awk '{ if(NR>1) print $2 }'
-    changed_when: true    
-    register: ac_url
-    until: ac_url.stdout != ''
-    retries: 15
-    delay: 30    
+    changed_when: false
 
   - name: Print AAP route
     debug:
-      msg: "{{ aap_url.stdout }}"    
-    
-  - name: Wait for AC web ready
-    shell: |
-      curl -k https://{{ ac_url.stdout }}/migrations_notran --fail --show-error 
-    changed_when: true    
-    register: resp
-    until: resp.rc == 0
-    retries: 20
-    delay: 30
+      msg: "{{ aap_url.stdout }}"
 
-  - name: Get AAP admin password 
+  - name: Get AAP admin password
     shell: |
-      {{ oc_cmd }} -n {{ aap_project }} get secret/{{ aap_name }}-admin-password -oyaml | grep password: | tail -n1 | awk '{ print $2}' | base64 -d
-    changed_when: true    
-    register: aap_pwd  
+      {{ oc_cmd }} get secret {{ aap_name }}-admin-password -n {{ aap_project }} -o jsonpath='{.data.password}' | base64 -d
+    register: aap_pwd
+    changed_when: false
 
-  - name: Get AC admin password 
-    shell: |
-      {{ oc_cmd }} -n {{ aap_project }} get secret/{{ ac_name }}-admin-password -oyaml | grep password: | tail -n1 | awk '{ print $2}' | base64 -d
-    changed_when: true    
-    register: ac_pwd     
+  # - name: Get AC admin password
+  #   shell: |
+  #     {{ oc_cmd }} get secret {{ ac_name }}-admin-password -n {{ aap_project }} -o jsonpath='{.data.password}' | base64 -d
+  #   register: ac_pwd
+  #   changed_when: false
 
   - name: Download AAP subscription manifest file from RHSM and apply license
     import_tasks: apply-aap-license.yml
 
   - name: Create a new token using username/password
-    awx.awx.token:
-      description: 'admin-token'
-      scope: "write"
-      state: present
-      controller_username: "admin"
-      controller_password: "{{ ac_pwd.stdout }}"
-      controller_host: "https://{{ ac_url.stdout }}"    
-      validate_certs: false  
-    register: ac_token   
+    uri:
+      url: "https://{{ aap_url.stdout }}/api/gateway/v1/tokens/"
+      method: POST
+      user: "admin"
+      password: "{{ aap_pwd.stdout }}"
+      force_basic_auth: true
+      validate_certs: false
+      body_format: json
+      body:
+        description: "Admin PAT for Automation"
+        scope: "write"
+      status_code: [200, 201]
+    register: token_response
+    until: token_response is not failed
+    retries: 3
+    delay: 15
 
-  - name: Push admin token to secret/{{ ac_name }}-admin-token
+  - name: Extract token from response
+    set_fact:
+      pat_token: "{{ token_response.json.token }}"
+
+  - name: Push admin token to secret/{{ aap_name }}-admin-token
     shell: |
       {{ oc_cmd }} apply -f - <<EOF
-        kind: Secret
-        apiVersion: v1
-        metadata:
-          name: {{ ac_name }}-admin-token
-          namespace: aap
-        data:
-          token: {{ ac_token.ansible_facts.tower_token.token|b64encode }}
-        type: Opaque
-      EOF            
-    changed_when: true        
+      kind: Secret
+      apiVersion: v1
+      metadata:
+        name: {{ ac_name }}-admin-token
+        namespace: {{ aap_project }}
+      data:
+        token: {{ pat_token | b64encode }}
+      type: Opaque
+      EOF
+    changed_when: true
 
-  - name: Update demo job template for prompt on launch 
-    awx.awx.job_template:
-      name: 'Demo Job Template'
-      project: 'Demo Project'
-      ask_variables_on_launch: true
-      state: present
-      controller_username: "admin"
-      controller_password: "{{ ac_pwd.stdout }}"
-      controller_host: "https://{{ ac_url.stdout }}"    
-      validate_certs: false  
-    register: update_result
-    until: update_result is not failed
-    retries: 5
-    delay: 15      
+  - name: Update demo job template for prompt on launch
+    block:
+      - name: Get Demo Job Template ID
+        uri:
+          url: "https://{{ aap_url.stdout }}/api/controller/v2/job_templates/?name=Demo%20Job%20Template"
+          method: GET
+          user: "admin"
+          password: "{{ aap_pwd.stdout }}"
+          force_basic_auth: true
+          validate_certs: false
+          return_content: true
+        register: template_response
+        until: template_response.json.results | length > 0
+        retries: 5
+        delay: 15
+        changed_when: false
 
-  # - name: Create ansible project
-  #   import_tasks: add-ansible-project.yml      
+      - name: Enable ask_variables_on_launch on Demo Job Template
+        uri:
+          url: "https://{{ aap_url.stdout }}/api/controller/v2/job_templates/{{ template_response.json.results[0].id }}/"
+          method: PATCH
+          user: "admin"
+          password: "{{ aap_pwd.stdout }}"
+          force_basic_auth: true
+          validate_certs: false
+          body_format: json
+          body:
+            ask_variables_on_launch: true
+          status_code: [200]
+        register: update_result
+        until: update_result is not failed
+        retries: 3
+        delay: 15

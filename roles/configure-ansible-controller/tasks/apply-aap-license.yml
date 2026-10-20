@@ -59,19 +59,27 @@
     retries: 12
     delay: 5        
 
-- debug: 
-    msg: "{{ ac_url.stdout }}"         
+# - debug: 
+#     msg: "{{ aap_url.stdout }}"         
+
+- name: Read manifest file as base64
+  shell: base64 -w0 ./manifest.zip
+  register: manifest_b64
+  changed_when: false
 
 - name: Set AAP license using manifest file
-  awx.awx.license:
-    manifest: "./manifest.zip"
-    controller_username: "admin"
-    # controller_password: "{{ aap_pwd.stdout }}"
-    # controller_host: "https://{{ aap_url.stdout }}"      
-    controller_password: "{{ ac_pwd.stdout }}"
-    controller_host: "https://{{ ac_url.stdout }}"        
+  uri:
+    url: "https://{{ aap_url.stdout }}/api/controller/v2/config/"
+    method: POST
+    user: "admin"
+    password: "{{ aap_pwd.stdout }}"
+    force_basic_auth: true
     validate_certs: false
-    force: true 
+    body_format: json
+    body:
+      manifest: "{{ manifest_b64.stdout }}"
+      eula_accepted: true
+    status_code: [200, 201]
   register: result
   until: result is not failed
   retries: 3
