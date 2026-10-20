@@ -40,7 +40,7 @@ spec:
       servicePrincipalProfile:
         clientId: 85f7c9eb-eea5-4456-89ac-4f9814290d36
         secret:
-         name: aks-sp-secret # References a Kubernetes Secret holding the password
+         name: cluster-identity-secret # References a Kubernetes Secret holding the password
          key: clientSecret
         #clientId: msi
   version: v{{ k8s_version if kubernetes_version == '' else kubernetes_version }}
