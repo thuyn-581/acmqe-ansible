@@ -2,7 +2,8 @@
   # Step 1: Install AAP operator if not already installed
   - name: Check if AAP operator is already installed
     shell: |
-      {{ oc_cmd }} get csv -n aap -o jsonpath='{.items[?(@.metadata.name matches "aap-operator.*")].metadata.name}' 2>/dev/null || echo ""
+      {{ oc_cmd }} get csv -n {{ aap_project}} -o jsonpath='{.items[*].metadata.name}' | tr ' ' '\n' | grep 'aap-operator' 2>/dev/null || echo ""
+    # {{ oc_cmd }} get csv -n aap -o jsonpath='{.items[?(@.metadata.name matches "aap-operator.*")].metadata.name}' 2>/dev/null || echo ""
     register: aap_csv
     changed_when: false
 
