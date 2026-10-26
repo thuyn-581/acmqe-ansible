@@ -54,7 +54,9 @@
 
       - name: Wait for AAP operator CSV to succeed
         shell: |
-          {{ oc_cmd }} get csv -n {{ aap_project }} -o jsonpath='{.items[?(@.metadata.name matches "aap-operator.*")].status.phase}' 2>/dev/null || echo ""
+          {{ oc_cmd }} get csv -n {{ aap_project }} \
+          -o json | jq -r '.items[] | select(.metadata.name | test("aap-operator.*")) | .status.phase' 2>/dev/null || echo ""
+        # -o jsonpath='{.items[?(@.metadata.name matches "aap-operator.*")].status.phase}' 2>/dev/null || echo ""
         register: csv_phase
         until: csv_phase.stdout == 'Succeeded'
         retries: 30
