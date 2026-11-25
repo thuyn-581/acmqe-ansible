@@ -1,7 +1,45 @@
-- name: Login openshift at {{ ocp_api_url }}
+- name: Set auth_type default
+  set_fact:
+    auth_type: "{{ auth_type | default('oauth') }}"
+
+- name: Login openshift via oauth at {{ ocp_api_url }}
   shell: |
-    {{ oc_cmd }} login -u {{ ocp_user }} -p {{ ocp_pwd }} {{ ocp_api_url }}     
+    {{ oc_cmd }} login -u {{ ocp_user }} -p {{ ocp_pwd }} {{ ocp_api_url }}
   register: task_result
   until: task_result.rc == 0
   retries: 5
-  delay: 30 
+  delay: 30
+  when: auth_type == "oauth"
+
+- name: Login openshift via token at {{ ocp_api_url }}
+  shell: |
+    {{ oc_cmd }} login -s {{ ocp_api_url }} --token {{ sa_token }}
+  register: task_result
+  until: task_result.rc == 0
+  retries: 5
+  delay: 30
+  when: auth_type == "token"
+
+# - name: Login openshift via kubeconfig
+#   when: auth_type == "kubeconfig"
+#   block:
+#     - name: Write kubeconfig file
+#       copy:
+#         content: "{{ kubecfg }}"
+#         dest: "{{ kubeconfig_path | default('/tmp/kubeconfig-' + ocp_api_url | regex_replace('[^a-zA-Z0-9]', '-')) }}"
+#         mode: "0600"
+#       register: kubeconfig_file
+
+#     - name: Set KUBECONFIG environment variable
+#       set_fact:
+#         kubeconfig_filepath: "{{ kubeconfig_file.dest }}"
+
+#     - name: Export KUBECONFIG for subsequent tasks
+#       environment:
+#         KUBECONFIG: "{{ kubeconfig_filepath }}"
+#       shell: |
+#         {{ oc_cmd }} cluster-info
+#       register: task_result
+#       until: task_result.rc == 0
+#       retries: 5
+#       delay: 30
