@@ -2,18 +2,18 @@
   set_fact:
     auth_type: "{{ auth_type | default('oauth') }}"
 
-- name: Login openshift via oauth at {{ ocp_api_url }}
+- name: Login openshift via oauth at {{ api_url }}
   shell: |
-    oc --insecure-skip-tls-verify=true login -u {{ ocp_user }} -p {{ ocp_pwd }} {{ ocp_api_url }}     
+    oc --insecure-skip-tls-verify=true login -u {{ ocp_user }} -p {{ ocp_user_creds }} {{ api_url }}     
   register: task_result
   until: task_result.rc == 0
   retries: 5
   delay: 30
   when: auth_type == "oauth"
 
-- name: Login openshift via token at {{ ocp_api_url }}
+- name: Login openshift via token at {{ api_url }}
   shell: |
-    oc --insecure-skip-tls-verify=true login -s {{ ocp_api_url }} --token {{ sa_token }}
+    oc --insecure-skip-tls-verify=true login -s {{ api_url }} --token {{ sa_token }}
   register: task_result
   until: task_result.rc == 0
   retries: 5
@@ -26,7 +26,7 @@
 #     - name: Write kubeconfig file
 #       copy:
 #         content: "{{ kubecfg }}"
-#         dest: "{{ kubeconfig_path | default('/tmp/kubeconfig-' + ocp_api_url | regex_replace('[^a-zA-Z0-9]', '-')) }}"
+#         dest: "{{ kubeconfig_path | default('/tmp/kubeconfig-' + api_url | regex_replace('[^a-zA-Z0-9]', '-')) }}"
 #         mode: "0600"
 #       register: kubeconfig_file
 
